@@ -190,10 +190,15 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
   var r = document.documentElement, on = null, skin = null;
   r.classList.add('has-js');
   try { on = localStorage.getItem('bouliw-fun'); skin = localStorage.getItem('bouliw-fun-style'); } catch (e) {}
-  if (on !== 'off') {
+  if (on === 'off') return;
+  var still = false;
+  try { still = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+  if (still) {
     r.dataset.fun = '';
     r.dataset.skin = /^(overdrive|y2k|phantom|alert|neon|pixel|mix)$/.test(skin) ? skin : 'overdrive';
-    r.classList.add('od-intro');
+  } else {
+    /* The plain page shows first, then switches off like an old TV and fun mode starts. */
+    r.classList.add('fx-pending');
   }
 })();
 </script>
