@@ -119,7 +119,7 @@
       text.split(' ').forEach(word => {
         const w = document.createElement('span');
         w.className = 'fx-w';
-        [...word].forEach(c => { const ch = document.createElement('span'); ch.className = 'fx-ch'; ch.textContent = c; w.append(ch); });
+        [...word].forEach(c => { const ch = document.createElement('span'); ch.className = c === '\u00a0' ? 'fx-gap' : 'fx-ch'; ch.textContent = c; w.append(ch); });
         split.append(w);
       });
       em.replaceChildren(orig, split);
@@ -155,7 +155,7 @@
     const hero = document.querySelector('.hero');
     if (hero) {
       const mq = hidden('div', 'fx-marquee');
-      const t = 'OPEN SOURCE ✦ MADE ON A MAC ✦ BEST VIEWED AT ANY RESOLUTION ✦ Y2K COMPLIANT ✦ NO INSTALL CD NEEDED ✦ ';
+      const t = 'VIDEO ✦ VOICE ✦ BLUE TEAM ✦ MUSIC ✦ OCR ✦ OPEN SOURCE ✦ BEST VIEWED AT ANY RESOLUTION ✦ Y2K COMPLIANT ✦ ';
       const span = document.createElement('span');
       span.textContent = t.repeat(3) + t.repeat(3);
       mq.append(span);
@@ -163,7 +163,7 @@
     }
     const foot = document.querySelector('footer');
     if (foot) {
-      add(hidden('div', 'fx-badges', ['MADE ON<br>A MAC', 'OPEN<br>SOURCE', 'Y2K<br>COMPLIANT', 'FUN MODE<br>ON', 'ANY<br>BROWSER'].map(x => `<b>${x}</b>`).join('')), foot);
+      add(hidden('div', 'fx-badges', ['VIDEO &amp;<br>VOICE', 'OPEN<br>SOURCE', 'BLUE<br>TEAM', 'MUSIC<br>&amp; OCR', 'Y2K<br>COMPLIANT'].map(x => `<b>${x}</b>`).join('')), foot);
     }
 
     // Reveal on scroll.
@@ -251,15 +251,15 @@
 
     if (hero) {
       const st = add(hidden('div', 'od-stickers',
-        '<span class="od-sticker s1">OPEN SOURCE</span><span class="od-sticker s2">ON-DEVICE ✦</span>' +
-        '<span class="od-sticker s3">MADE ON A MAC</span><span class="od-sticker s4">1UP</span>'), hero);
+        '<span class="od-sticker s1">OPEN SOURCE</span><span class="od-sticker s2">VIDEO ✦</span>' +
+        '<span class="od-sticker s3">BLUE TEAM</span><span class="od-sticker s4">VOICE</span><span class="od-sticker s5">MUSIC ♪</span>'), hero);
       st.querySelectorAll('.od-sticker').forEach(s => {
         let sx = 0, sy = 0, ox = 0, oy = 0, drag = false;
         s.addEventListener('pointerdown', e => { drag = true; s.setPointerCapture(e.pointerId); sx = e.clientX - ox; sy = e.clientY - oy; s.style.animation = 'none'; });
         s.addEventListener('pointermove', e => { if (!drag) return; ox = e.clientX - sx; oy = e.clientY - sy; s.style.translate = `${ox}px ${oy}px`; });
         s.addEventListener('pointerup', () => { drag = false; });
       });
-      add(hidden('div', 'od-band', `<span>${'OPEN SOURCE ✦ ON-DEVICE ✦ MADE ON A MAC ✦ FUN MODE ON ✦ 楽しい ✦ '.repeat(6)}</span>`), hero);
+      add(hidden('div', 'od-band', `<span>${'VIDEO ✦ VOICE ✦ BLUE TEAM ✦ MUSIC ✦ OCR ✦ OPEN SOURCE ✦ 楽しい ✦ '.repeat(6)}</span>`), hero);
     }
 
     projects.forEach((p, i) => {

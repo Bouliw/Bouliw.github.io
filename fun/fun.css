@@ -335,6 +335,7 @@ html.fx-anim :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer)
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).hero h1 em .fx-split { display: inline-flex; flex-wrap: wrap; gap: .04em .02em; vertical-align: top; text-shadow: none; margin-top: .08em; }
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).hero h1 em .fx-split .fx-w { display: inline-flex; gap: .02em; margin-right: .22em; }
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).hero h1 em .fx-ch { display: inline-block; padding: .02em .08em .04em; line-height: 1; }
+:is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).hero h1 em .fx-gap { display: inline-block; width: .2em; }
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).hero h1 em .fx-ch:nth-of-type(5n+1) { font-family: "FX Anton"; background: var(--p-box); color: var(--p-on-box); rotate: -4deg; }
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).hero h1 em .fx-ch:nth-of-type(5n+2) { font: italic 900 1.05em/1 "FX Display", serif; text-transform: none; background: var(--p-red); color: #fff; rotate: 3deg; translate: 0 .06em; }
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).hero h1 em .fx-ch:nth-of-type(5n+3) { font: normal 900 .86em/1 "FX Geist", sans-serif; color: var(--ink); box-shadow: inset 0 0 0 .07em var(--ink); rotate: -1.5deg; }
@@ -467,8 +468,8 @@ html.fx-anim :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, foo
 }
 @keyframes e-flicker { 0%, 62%, 66%, 100% { opacity: 1; } 63%, 65% { opacity: .15; } }
 :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).hero h1 {
-  font: 900 clamp(3.2rem, 10.5vw, 9.4rem)/.82 "FX Serif", serif; font-stretch: 62.5%; text-transform: uppercase; letter-spacing: -.005em;
-  max-width: 9ch; color: var(--ink); padding-top: .12em; border-top: 4px solid var(--ink);
+  font: 900 clamp(3rem, 8vw, 7.6rem)/.84 "FX Serif", serif; font-stretch: 62.5%; text-transform: uppercase; letter-spacing: -.005em;
+  max-width: 13ch; color: var(--ink); padding-top: .12em; border-top: 4px solid var(--ink);
 }
 :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).hero h1 em { font-style: normal; color: var(--e-or); }
 :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).hero .lede { color: var(--text); border-left: 4px solid var(--e-or); padding-left: 18px; }
@@ -969,14 +970,14 @@ html[data-skin="overdrive"] .hero .fx-deco::before {
   font: 400 clamp(26px, 3.4vw, 46px)/1 "FX Dot", monospace; letter-spacing: .12em; color: var(--v-text); opacity: .9;
 }
 html[data-skin="overdrive"] .hero .fx-deco::after {
-  content: "ON-DEVICE  OPEN SOURCE  MADE ON A MAC  ON-DEVICE  OPEN SOURCE  MADE ON A MAC  "; position: absolute; left: 0; top: 30%; white-space: pre;
+  content: "VIDEO  VOICE  BLUE TEAM  MUSIC  OCR  OPEN SOURCE  VIDEO  VOICE  BLUE TEAM  MUSIC  OCR  OPEN SOURCE  "; position: absolute; left: 0; top: 30%; white-space: pre;
   font: 900 clamp(7rem, 18vw, 17rem)/1 "FX Serif", serif; font-stretch: 62.5%; color: transparent; -webkit-text-stroke: 1.5px color-mix(in oklab, var(--ink) 9%, transparent);
   animation: od-slide 60s linear infinite;
 }
 @keyframes od-slide { to { translate: -50% 0; } }
 html[data-skin="overdrive"] .hero h1 {
-  position: relative; isolation: isolate; max-width: 10ch; margin-top: 8px;
-  font: 900 clamp(3.3rem, 9.8vw, 9.2rem)/.84 "FX Serif", serif; font-stretch: 62.5%; letter-spacing: -.005em; text-transform: uppercase; color: var(--ink);
+  position: relative; isolation: isolate; max-width: 13ch; margin-top: 8px;
+  font: 900 clamp(3rem, 7.4vw, 7.4rem)/.86 "FX Serif", serif; font-stretch: 62.5%; letter-spacing: -.005em; text-transform: uppercase; color: var(--ink);
 }
 html[data-skin="overdrive"] .hero h1::before, html[data-skin="overdrive"] .hero h1::after, html[data-skin="overdrive"] main h2::before {
   content: attr(data-text); position: absolute; inset: 0; pointer-events: none; white-space: normal;
@@ -1002,10 +1003,11 @@ html[data-skin="overdrive"] .od-stickers { display: block; position: absolute; i
   border: 2px solid #0a0a0b; box-shadow: 4px 4px 0 #0a0a0b; border-radius: 999px; animation: od-bob 3.2s ease-in-out infinite alternate; cursor: grab;
 }
 .od-sticker:active { cursor: grabbing; }
-.od-sticker.s1 { top: 6%; right: 16%; background: #b6ff3b; color: #0a0a0b; rotate: -8deg; }
-.od-sticker.s2 { top: 24%; right: 6%; background: #6b2bff; color: #fff; rotate: 6deg; animation-delay: -1s; }
-.od-sticker.s3 { top: 40%; right: 21%; background: #ff2e88; color: #0a0a0b; rotate: -3deg; animation-delay: -2s; border-radius: 6px; }
-.od-sticker.s4 { top: 12%; right: 33%; background: #fff; color: #0a0a0b; rotate: 12deg; animation-delay: -.5s; font: 400 11px/1 "FX Press", monospace; padding: 9px 12px; border-radius: 0; }
+.od-sticker.s1 { top: 4%; right: 6%; background: #b6ff3b; color: #0a0a0b; rotate: -8deg; }
+.od-sticker.s2 { top: 19%; right: 15%; background: #6b2bff; color: #fff; rotate: 6deg; animation-delay: -1s; }
+.od-sticker.s3 { top: 33%; right: 2%; background: #ff2e88; color: #0a0a0b; rotate: -3deg; animation-delay: -2s; border-radius: 6px; }
+.od-sticker.s5 { top: 60%; right: 6%; background: #22d3ee; color: #0a0a0b; rotate: 7deg; animation-delay: -1.6s; }
+.od-sticker.s4 { top: 46%; right: 17%; background: #fff; color: #0a0a0b; rotate: 12deg; animation-delay: -.5s; font: 400 11px/1 "FX Press", monospace; padding: 9px 12px; border-radius: 0; }
 @keyframes od-bob { to { translate: 0 -8px; } }
 
 /* Index as a tilted game menu */
