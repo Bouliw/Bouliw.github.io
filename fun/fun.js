@@ -33,17 +33,18 @@
   const MENU_POSES = [[0, 8], [5, 4], [3, 11], [2, 9], [5, 1], [5, 5], [2, 11], [1, 10], [4, 10]];
   const LINES = ['Hi there!', 'Pick a style below!', 'Click a window to see the code.', 'Try ↑↑↓↓←→←→BA', 'Insert coin at the bottom!', 'New outfit?', 'Turn the sound on!'];
   const TROPHIES = {
-    start: ['New game', 'Opened the portfolio in fun mode'],
-    costume: ['Costume change', 'Switched to another style'],
-    hopper: ['Style hopper', 'Tried all seven styles'],
-    tour: ['World tour', 'Visited all nine stages'],
-    source: ['Open source', 'Opened a project'],
-    konami: ['Old school', 'Entered the code from old games'],
-    sticker: ['Sticker bomb', 'Moved a sticker'],
-    sound: ['Sound check', 'Turned the sound on'],
-    clicks: ['Button masher', 'Clicked 30 times'],
-    arcade: ['Insert coin', 'Played the hidden game'],
-    ace: ['Space ace', 'Scored 3,000 points'],
+    start: ["It's dangerous to go alone", 'Opened the portfolio in fun mode'],
+    costume: ['Outfit check', 'Switched to another style'],
+    hopper: ["Gotta try 'em all", 'Tried all seven styles'],
+    tour: ['Around the world in nine stages', 'Visited all nine projects'],
+    source: ['Use the source, Luke', 'Opened a project'],
+    konami: ['Thirty extra lives', 'Entered the code from old games'],
+    sticker: ['Sticky fingers', 'Moved a sticker'],
+    sound: ['Is this thing on?', 'Turned the sound on'],
+    music: ['When the music is good', 'Turned the music on'],
+    clicks: ['Carpal tunnel any%', 'Clicked 30 times'],
+    arcade: ['Arcade rat', 'Found the hidden game'],
+    ace: ['All your base are belong to us', 'Scored 3,000 points'],
   };
 
   // What to do for each achievement still locked; a counter where there is one.
@@ -56,6 +57,7 @@
     konami: 'Type the code shown in the footer',
     sticker: 'Drag a sticker around the Overdrive headline',
     sound: 'Turn the sound on in the dock',
+    music: 'Turn the sound on, then the music',
     clicks: 'Click 30 times in one visit',
     arcade: 'Find the coin slot at the bottom of the page',
     ace: 'Score 3,000 in the hidden game',
@@ -120,7 +122,7 @@
   const audio = {
     ctx: null, out: null, noise: null, last: {},
     fx: store.get(SOUND_KEY) === 'on',
-    music: store.get(MUSIC_KEY) !== 'off',
+    music: store.get(MUSIC_KEY) === 'on',
     typing: store.get(TYPING_KEY) !== 'off',
     ready() {
       if (!this.ctx) {
@@ -146,6 +148,21 @@
       return this.ctx;
     },
     live() { return this.fx && isOn() && this.ctx && this.ctx.state === 'running'; },
+    // An inaudible hiss (about -84 dB) keeps the audio output open. Without it, the browser pauses a
+    // silent output and the first sounds after a pause get lost while Bluetooth headphones wake up.
+    awake: null,
+    keepAwake(on) {
+      const c = this.ctx;
+      if (on && c && !this.awake) {
+        const src = c.createBufferSource(), g = c.createGain();
+        src.buffer = this.noise; src.loop = true; g.gain.value = .00006;
+        src.connect(g).connect(c.destination); src.start();
+        this.awake = src;
+      } else if (!on && this.awake) {
+        try { this.awake.stop(); } catch (e) { /* already stopped */ }
+        this.awake = null;
+      }
+    },
     every(key, ms) { const n = performance.now(); if (n - (this.last[key] || 0) < ms) return false; this.last[key] = n; return true; },
     tone(f, t, dur, type = 'square', vol = .03, f2 = 0, lp = 0, dest) {
       const c = this.ctx;
@@ -226,22 +243,83 @@
     },
   };
 
-  // A short loop that changes timbre with the style. Scheduled ahead on the audio clock.
+  /* ================= Music ================= */
+  // A 32-bar song (intro, verse, chorus, break, verse) with soft drums, bass, pads and a lead.
+  // The melody is rewritten every time the song comes round, so it never loops the same way.
+  // Each style has its own band: lo-fi (Overdrive), glassy (Y2K), jazzy keys (Phantom),
+  // ambient (Alert), synthwave (Neon), soft chiptune (8-bit). Mix plays the Overdrive band.
+  const hz = m => 440 * 2 ** ((m - 69) / 12);
+  const CHORDS = {
+    Fmaj7: { pad: [53, 57, 60, 64], bass: 41 }, Em7: { pad: [52, 55, 59, 62], bass: 40 },
+    Dm7: { pad: [53, 57, 60, 62], bass: 38 }, Cmaj7: { pad: [52, 55, 59, 60], bass: 36 },
+    Am7: { pad: [52, 55, 57, 60], bass: 45 }, G6: { pad: [55, 59, 62, 64], bass: 43 },
+    Dm9: { pad: [53, 57, 60, 64], bass: 38 }, Gsus4: { pad: [55, 60, 62, 67], bass: 43 },
+  };
+  const SECTIONS = [
+    { bars: ['Fmaj7', 'Em7', 'Dm7', 'Cmaj7'], drums: 0, bass: 0, lead: '' },
+    { bars: ['Fmaj7', 'Em7', 'Dm7', 'Cmaj7', 'Fmaj7', 'Em7', 'Dm7', 'G6'], drums: 1, bass: 1, lead: 'a' },
+    { bars: ['Am7', 'Fmaj7', 'Cmaj7', 'G6', 'Am7', 'Fmaj7', 'Dm9', 'Gsus4'], drums: 2, bass: 1, lead: 'b' },
+    { bars: ['Dm9', 'Cmaj7', 'Fmaj7', 'Gsus4'], drums: 0, bass: 0, lead: 'c' },
+    { bars: ['Fmaj7', 'Em7', 'Dm7', 'Cmaj7', 'Fmaj7', 'Em7', 'G6', 'Cmaj7'], drums: 2, bass: 1, lead: 'a' },
+  ];
+  const BARS = SECTIONS.flatMap((sec, si) => sec.bars.map((ch, bi) => ({ ch, sec, si, bi })));
+  const SONG_STEPS = BARS.length * 16;
+  const SCALE = [64, 67, 69, 72, 74, 76, 79, 81, 84];
+  // Two-bar rhythms for the lead: [start, length] in sixteenths.
+  const RHYTHMS = [
+    [[0, 3], [4, 2], [6, 2], [8, 6], [16, 2], [18, 2], [20, 4], [26, 6]],
+    [[2, 2], [4, 4], [10, 2], [12, 4], [18, 3], [22, 2], [24, 8]],
+    [[0, 6], [6, 2], [8, 4], [14, 2], [16, 4], [20, 2], [22, 2], [24, 6]],
+    [[0, 8], [12, 4], [16, 12]],
+  ];
+  const BANDS = {
+    overdrive: { bpm: 88, swing: .17, pad: 'saw', lp: 1100, lead: 'soft', kit: 'lofi', verb: .3 },
+    y2k: { bpm: 82, swing: .1, pad: 'glass', lp: 2800, lead: 'bell', kit: 'shaker', verb: .45 },
+    phantom: { bpm: 96, swing: .3, pad: 'keys', lp: 3000, lead: 'vibes', kit: 'jazz', verb: .25 },
+    alert: { bpm: 64, swing: 0, pad: 'drone', lp: 900, lead: 'bell', kit: 'pulse', verb: .6 },
+    neon: { bpm: 100, swing: 0, pad: 'saw', lp: 1500, lead: 'saw', kit: 'synth', verb: .35 },
+    pixel: { bpm: 104, swing: 0, pad: 'square', lp: 1600, lead: 'square', kit: 'chip', verb: .15 },
+  };
+  const rng32 = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+  const clampI = (v, a, b) => Math.max(a, Math.min(b, v));
+
   const music = {
-    timer: 0, step: 0, next: 0, bus: null,
-    chords: [[220, 261.63, 329.63], [174.61, 220, 261.63], [261.63, 329.63, 392], [196, 246.94, 293.66]],
-    bass: [110, 87.31, 130.81, 98],
+    timer: 0, step: 0, next: 0, bus: null, fx: null, lines: null, cycle: 0,
     wanted() { return audio.fx && audio.music && isOn() && !document.hidden; },
-    sync() { if (this.wanted() && audio.ready()) this.start(); else this.stop(); },
+    sync() {
+      if (this.wanted() && audio.ready()) this.start(); else this.stop();
+      audio.keepAwake(audio.fx && isOn() && !document.hidden);
+    },
+    // Reverb, echo and a warm low-pass, built once per audio context.
+    chain() {
+      const c = audio.ctx;
+      if (this.fx && this.fx.c === c) return this.fx;
+      const len = Math.floor(c.sampleRate * 2.4);
+      const ir = c.createBuffer(2, len, c.sampleRate);
+      for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 3.2; }
+      const tone = c.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 5200; tone.Q.value = .3;
+      const dry = c.createGain(); dry.connect(tone);
+      const verb = c.createConvolver(); verb.buffer = ir;
+      const verbIn = c.createGain(); verbIn.gain.value = .3; verbIn.connect(verb).connect(tone);
+      const echo = c.createDelay(1.5), fb = c.createGain(), echoLp = c.createBiquadFilter(), echoIn = c.createGain();
+      fb.gain.value = .3; echoLp.type = 'lowpass'; echoLp.frequency.value = 2200; echoIn.gain.value = .22;
+      echoIn.connect(echo); echo.connect(echoLp).connect(fb).connect(echo); echoLp.connect(tone);
+      this.fx = { c, tone, dry, verbIn, echo, echoIn };
+      return this.fx;
+    },
     start() {
       if (this.timer || !audio.ctx) return;
-      const c = audio.ctx;
+      trophy('music');
+      const c = audio.ctx, fx = this.chain();
       this.bus = c.createGain();
       this.bus.gain.setValueAtTime(.0001, c.currentTime);
-      this.bus.gain.exponentialRampToValueAtTime(.55, c.currentTime + 1.5);
+      this.bus.gain.exponentialRampToValueAtTime(.055, c.currentTime + 2);
+      try { fx.tone.disconnect(); } catch (e) { /* not connected yet */ }
+      fx.tone.connect(this.bus);
       this.bus.connect(audio.out);
+      if (!this.lines) this.write();
       this.next = c.currentTime + .1;
-      this.timer = setInterval(() => this.schedule(), 60);
+      this.timer = setInterval(() => this.schedule(), 50);
     },
     stop() {
       if (!this.timer) return;
@@ -249,42 +327,189 @@
       this.timer = 0;
       const bus = this.bus;
       if (bus && audio.ctx) {
-        bus.gain.setTargetAtTime(.0001, audio.ctx.currentTime, .15);
-        setTimeout(() => bus.disconnect(), 900);
+        bus.gain.setTargetAtTime(.0001, audio.ctx.currentTime, .2);
+        setTimeout(() => bus.disconnect(), 1200);
       }
       this.bus = null;
     },
+    // New melodies for this time round: a motif per part, answered with a different ending.
+    write() {
+      const rnd = rng32((Date.now() & 0xffff) + this.cycle * 7919);
+      const motifs = {};
+      ['a', 'b', 'c'].forEach(id => {
+        const R = id === 'c' ? RHYTHMS[3] : RHYTHMS[Math.floor(rnd() * 3)];
+        let idx = (id === 'b' ? 3 : 1) + Math.floor(rnd() * 3);
+        const notes = R.map(() => { const n = idx; idx = clampI(idx + [-2, -1, -1, 0, 1, 1, 2][Math.floor(rnd() * 7)], 0, SCALE.length - 1); return n; });
+        motifs[id] = { R, notes };
+      });
+      this.lines = SECTIONS.map(sec => {
+        const ev = new Map();
+        if (!sec.lead) return ev;
+        const { R, notes } = motifs[sec.lead];
+        const phrases = sec.bars.length / 2;
+        for (let k = 0; k < phrases; k++) {
+          if (sec.lead === 'c' && k > 1) break;
+          R.forEach(([st, dur], i) => {
+            let p = notes[i];
+            const last = i === R.length - 1;
+            if (k % 2 && i >= R.length - 3) p = clampI(p + (last ? -1 - Math.floor(rnd() * 2) : Math.floor(rnd() * 3) - 1), 0, SCALE.length - 1);
+            if (k === phrases - 1 && last) p = sec.lead === 'b' ? 5 : 3;
+            const abs = k * 32 + st;
+            const chord = CHORDS[sec.bars[abs >> 4]].pad.map(m => m % 12);
+            let m = SCALE[p];
+            // Strong beats land on a note of the chord when one is close.
+            if (st % 8 === 0 || last) {
+              const near = SCALE.filter(n => chord.includes(n % 12)).sort((x, y) => Math.abs(x - m) - Math.abs(y - m))[0];
+              if (near != null && Math.abs(near - m) <= 3) m = near;
+            }
+            ev.set(abs, [m, dur]);
+          });
+        }
+        return ev;
+      });
+    },
     schedule() {
       const c = audio.ctx;
-      if (!c || c.state !== 'running') return;
+      if (!c || c.state !== 'running' || !this.bus) return;
       const skin = skinNow() === 'mix' ? 'overdrive' : skinNow();
-      const bpm = skin === 'alert' ? 78 : skin === 'y2k' ? 92 : 104;
-      while (this.next < c.currentTime + .2) {
-        this.note(skin, this.step, this.next);
-        this.next += 60 / bpm / 4;
-        this.step = (this.step + 1) % 64;
+      const band = BANDS[skin] || BANDS.overdrive;
+      const six = 60 / band.bpm / 4;
+      this.fx.verbIn.gain.setTargetAtTime(band.verb, c.currentTime, .5);
+      this.fx.echo.delayTime.setTargetAtTime(six * 3, c.currentTime, .1);
+      while (this.next < c.currentTime + .25) {
+        this.play(band, this.step, this.next, six);
+        this.next += six;
+        this.step = (this.step + 1) % SONG_STEPS;
+        if (this.step === 0) { this.cycle++; this.write(); }
       }
     },
-    note(skin, step, t) {
-      const bar = step >> 4, s = step & 15, ch = this.chords[bar], b = this.bass[bar], bus = this.bus;
-      const T = (f, d, type, v, lp) => audio.tone(f, t, d, type, v, 0, lp, bus);
-      const swing = skin === 'phantom' && s % 2 ? .035 : 0;
-      if (skin === 'alert') {
-        if (s === 0) { T(b, 1.6, 'sine', .05); ch.forEach(f => T(f, 1.8, 'sine', .01)); }
-        if (s % 4 === 2) T(ch[(s >> 2) % 3] * 2, .5, 'sine', .012);
+    // One voice: oscillators into an envelope, sent to the dry mix, reverb and optionally the echo.
+    voice(t, { f, type = 'sine', vol, a = .01, d = 0, s = 1, hold, r = .3, lp = 0, detune = 0, verb = 1, echo = 0, vib = 0, fm = 0 }) {
+      const c = audio.ctx, fx = this.fx;
+      const g = c.createGain();
+      const end = t + hold + r;
+      g.gain.setValueAtTime(.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + a);
+      if (d) g.gain.exponentialRampToValueAtTime(Math.max(vol * s, .0001), t + a + d);
+      g.gain.setValueAtTime(Math.max(vol * (d ? s : 1), .0001), t + Math.max(hold, a + d));
+      g.gain.exponentialRampToValueAtTime(.0001, end);
+      let out = g;
+      if (lp) { const fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = lp; fl.Q.value = .6; g.connect(fl); out = fl; }
+      out.connect(fx.dry);
+      if (verb) out.connect(fx.verbIn);
+      if (echo) { const e = c.createGain(); e.gain.value = echo; out.connect(e).connect(fx.echoIn); }
+      const oscs = (detune ? [-detune, detune] : [0]).map(dt => {
+        const o = c.createOscillator();
+        o.type = type; o.frequency.value = f; o.detune.value = dt;
+        o.connect(g); o.start(t); o.stop(end + .05);
+        return o;
+      });
+      if (vib) {
+        const l = c.createOscillator(), lg = c.createGain();
+        l.frequency.value = 5.2; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(f * vib, t + .25);
+        l.connect(lg); oscs.forEach(o => lg.connect(o.frequency)); l.start(t); l.stop(end + .05);
+      }
+      if (fm) { // bell: a modulator whose depth fades
+        const m = c.createOscillator(), mg = c.createGain();
+        m.frequency.value = f * 3.5; mg.gain.setValueAtTime(f * fm, t); mg.gain.exponentialRampToValueAtTime(1, t + 1.2);
+        m.connect(mg); oscs.forEach(o => mg.connect(o.frequency)); m.start(t); m.stop(end + .05);
+      }
+    },
+    drum(kind, t, v = 1) {
+      const c = audio.ctx, fx = this.fx;
+      if (kind === 'kick' || kind === 'beat') {
+        const o = c.createOscillator(), g = c.createGain();
+        o.frequency.setValueAtTime(kind === 'beat' ? 70 : 120, t); o.frequency.exponentialRampToValueAtTime(42, t + .12);
+        g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.42 * v, t + .005); g.gain.exponentialRampToValueAtTime(.0001, t + .3);
+        o.connect(g).connect(fx.dry); o.start(t); o.stop(t + .35);
         return;
       }
-      if ([0, 6, 8, 14].includes(s)) T(b, .22, skin === 'y2k' ? 'sine' : 'triangle', .06);
-      const arpType = { overdrive: 'sawtooth', neon: 'sawtooth', y2k: 'sine', phantom: 'square', pixel: 'square' }[skin] || 'square';
-      const oct = skin === 'y2k' ? 4 : 2;
-      if (skin !== 'y2k' || s % 2 === 0) audio.tone(ch[s % 3] * oct, t + swing, skin === 'y2k' ? .35 : .09, arpType, skin === 'y2k' ? .018 : .012, 0, arpType === 'sawtooth' ? (skin === 'neon' ? 2400 : 1600) : 0, bus);
-      if (s === 0 && skin !== 'pixel') ch.forEach(f => T(f, 1.9, skin === 'y2k' ? 'triangle' : 'sine', .008));
-      if (s % 2 && skin !== 'y2k') audio.hiss(t + swing, .03, .008, 8000, 'highpass', bus);
+      const src = c.createBufferSource(); src.buffer = audio.noise;
+      const f = c.createBiquadFilter(), g = c.createGain();
+      const spec = { snare: ['bandpass', 1900, .14, .18], rim: ['bandpass', 2600, .05, .1], hat: ['highpass', 7500, .045, .06], open: ['highpass', 6500, .2, .05], shaker: ['highpass', 5500, .05, .035], brush: ['bandpass', 3200, .22, .05], ride: ['highpass', 5000, .35, .035] }[kind];
+      f.type = spec[0]; f.frequency.value = spec[1];
+      g.gain.setValueAtTime(spec[3] * v, t); g.gain.exponentialRampToValueAtTime(.0001, t + spec[2]);
+      src.connect(f).connect(g).connect(fx.dry);
+      if (kind === 'snare' || kind === 'brush') g.connect(fx.verbIn);
+      src.start(t, Math.random() * .6, spec[2] + .02);
+      if (kind === 'snare') this.voice(t, { f: 185, type: 'triangle', vol: .06 * v, a: .002, hold: .02, r: .08, verb: 0 });
+    },
+    play(band, step, t, six) {
+      const bar = BARS[step >> 4], s = step & 15, sec = bar.sec, ch = CHORDS[bar.ch];
+      const swing = s % 2 ? band.swing * six : 0, tt = t + swing, barDur = six * 16;
+      const lvl = sec.drums, fill = lvl && bar.bi === sec.bars.length - 1;
+      // Chords
+      if (band.pad === 'keys') {
+        if ([0, 6, 10].includes(s) && (sec.drums || s === 0)) ch.pad.forEach(m => {
+          this.voice(tt, { f: hz(m), vol: s ? .02 : .028, a: .004, d: 1.4, s: .05, hold: 1.4, r: .3 });
+          this.voice(tt, { f: hz(m) * 2, vol: .006, a: .002, d: .4, s: .05, hold: .4, r: .2, verb: 0 });
+        });
+      } else if (s === 0) {
+        const p = { saw: { type: 'sawtooth', vol: .016, a: .35, detune: 7, lp: band.lp }, glass: { type: 'triangle', vol: .026, a: .5, detune: 4 }, drone: { type: 'sine', vol: .03, a: 1.4 }, square: { type: 'square', vol: .009, a: .03, d: .3, s: .7, lp: band.lp } }[band.pad];
+        ch.pad.forEach(m => this.voice(t, { ...p, f: hz(m), hold: barDur, r: band.pad === 'drone' ? 1.8 : 1 }));
+        if (band.pad === 'glass') this.voice(t, { f: hz(ch.pad[3] + 12), vol: .01, a: .6, hold: barDur, r: 1.2 });
+        if (band.pad === 'drone') this.voice(t, { f: hz(ch.bass), type: 'triangle', vol: .05, a: 1.5, hold: barDur, r: 2, lp: 500 });
+      }
+      // Synthwave arpeggio, quiet and filtered, only in the chorus
+      if (band.kit === 'synth' && sec.drums === 2 && s % 2 === 0) this.voice(t, { f: hz(ch.pad[(s / 2) % 4] + 12), type: 'sawtooth', vol: .012, a: .005, d: .12, s: .2, hold: six * 1.5, r: .1, lp: 1300, echo: .6 });
+      // Bass
+      if (sec.bass) {
+        const B = (m, len, v = 1) => this.voice(tt, { f: hz(m), type: 'triangle', vol: .17 * v, a: .008, d: .25, s: .55, hold: six * len, r: .12, lp: 700, verb: 0 });
+        const root = ch.bass, next = CHORDS[BARS[((step >> 4) + 1) % BARS.length].ch].bass;
+        if (band.kit === 'jazz') { if (s % 4 === 0) { const third = /sus/.test(bar.ch) ? 5 : /m(?!aj)/.test(bar.ch) ? 3 : 4; const walk = [root, root + third, root + 7, next + (next > root ? -1 : 1)]; B(walk[s / 4], 3, .9); } }
+        else if (band.kit === 'synth') { if (s % 2 === 0) B(s % 4 ? root + 12 : root, 1.6, .75); }
+        else if (band.kit === 'chip') { if (s % 4 === 0) B(s % 8 ? root + 12 : root, 3, .8); }
+        else if (band.kit === 'shaker') { if (s === 0 || s === 8) B(root, 7, .8); }
+        else if (band.kit !== 'pulse') { if (s === 0) B(root, 6); if (s === 10) B(root, 4, .8); if (s === 14 && fill) B(root + 7, 2, .6); }
+      }
+      // Drums
+      if (band.kit === 'pulse') { if (lvl && (s === 0 || s === 3)) this.drum('beat', t, s ? .45 : .7); }
+      else if (lvl) {
+        const k = band.kit;
+        if (k === 'lofi') {
+          if (s === 0 || s === 10 || (lvl === 2 && s === 7 && bar.bi % 2)) this.drum('kick', tt, s ? .8 : 1);
+          if (s === 4 || s === 12) this.drum(lvl === 2 ? 'snare' : 'rim', tt, lvl === 2 ? .9 : .8);
+          if (s % 2 === 0) this.drum('hat', tt, s % 4 ? .55 : .9);
+          if (lvl === 2 && s === 15) this.drum('hat', tt, .3);
+        } else if (k === 'shaker') {
+          if (s === 0 || s === 8) this.drum('kick', tt, .7);
+          if (lvl === 2 && s === 12) this.drum('rim', tt, .8);
+          this.drum('shaker', tt, s % 2 ? .45 : .9);
+        } else if (k === 'jazz') {
+          if (s % 4 === 0 || s === 7 || s === 15) this.drum('ride', tt, s % 4 ? .6 : 1);
+          if (s === 4 || s === 12) this.drum('brush', tt, lvl === 2 ? 1 : .7);
+          if (s === 0 && lvl === 2) this.drum('kick', tt, .5);
+        } else if (k === 'synth') {
+          if (s % 4 === 0) this.drum('kick', tt, .9);
+          if (s === 4 || s === 12) this.drum('snare', tt, .8);
+          if (s % 4 === 2) this.drum(lvl === 2 ? 'open' : 'hat', tt, .8);
+        } else if (k === 'chip') {
+          if (s === 0 || s === 8 || (lvl === 2 && s === 6)) this.drum('kick', tt, .7);
+          if (s === 4 || s === 12) this.drum('rim', tt, 1);
+          if (s % 4 === 2) this.drum('hat', tt, .7);
+        }
+        if (fill && s >= 13) this.drum(k === 'jazz' ? 'brush' : 'rim', tt, .4 + (s - 13) * .2);
+      }
+      // Lead
+      const ev = this.lines && this.lines[bar.si].get(bar.bi * 16 + s);
+      if (ev) {
+        const [m, len] = ev;
+        const f = hz(m);
+        const hold = six * len * .9;
+        const L = {
+          soft: { type: 'triangle', vol: .07, a: .02, d: .3, s: .6, r: .35, vib: .004, echo: .5 },
+          bell: { type: 'sine', vol: .05, a: .005, d: 1.2, s: .08, r: .6, fm: 2.2, echo: .7 },
+          vibes: { type: 'sine', vol: .07, a: .005, d: .9, s: .25, r: .5, vib: .003, echo: .3 },
+          saw: { type: 'sawtooth', vol: .03, a: .03, d: .3, s: .7, r: .3, lp: 2000, vib: .005, echo: .6 },
+          square: { type: 'square', vol: .022, a: .005, d: .2, s: .6, r: .12, lp: 3000, vib: .004, echo: .3 },
+        }[band.lead];
+        this.voice(tt, { ...L, f, hold });
+      }
     },
   };
   document.addEventListener('visibilitychange', () => {
     if (!audio.ctx) return;
-    if (document.hidden) { music.stop(); audio.ctx.suspend().catch(() => {}); }
+    if (document.hidden) { music.stop(); audio.keepAwake(false); audio.ctx.suspend().catch(() => {}); }
     else if (audio.fx && isOn()) { audio.ctx.resume().then(() => music.sync()).catch(() => {}); }
   });
 
@@ -1177,7 +1402,7 @@
     later(() => buddy.destroy());
     later(() => { if (game) game.close(); });
     music.sync();
-    later(() => music.stop());
+    later(() => { music.stop(); audio.keepAwake(false); });
     probe();
   }
 
@@ -1561,7 +1786,7 @@
       if (e.target.closest('.fx-sound')) {
         audio.fx = !audio.fx;
         store.set(SOUND_KEY, audio.fx ? 'on' : 'off');
-        if (audio.fx) { audio.ready(); setTimeout(() => { audio.play('switch'); music.sync(); }, 40); trophy('sound'); } else music.stop();
+        if (audio.fx) { audio.ready(); setTimeout(() => { audio.play('switch'); music.sync(); }, 40); trophy('sound'); } else music.sync();
         syncAudioButtons();
       }
       if (e.target.closest('.fx-music')) {
@@ -1595,6 +1820,7 @@
       setSkin(root.dataset.skin, false);
     } else {
       music.stop();
+      audio.keepAwake(false);
       closePanel(false);
       odOff();
       coreOff();
