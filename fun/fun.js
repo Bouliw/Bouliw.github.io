@@ -1114,7 +1114,8 @@
       const h = st.closest('.project').querySelector('.head h2');
       if (!h || !st.offsetWidth) return 0;
       const t = layoutPos(h), w = layoutPos(st);
-      const right = t.x + Math.max(h.scrollWidth, h.offsetWidth), bottom = t.y + h.offsetHeight;
+      const right = Math.max(...[...h.parentElement.children].map(c => layoutPos(c).x + Math.max(c.scrollWidth, c.offsetWidth)));
+      const bottom = t.y + h.offsetHeight;
       const overlaps = right > w.x - 6 && t.x < w.x + st.offsetWidth && bottom + 36 > w.y && t.y < w.y + st.offsetHeight;
       return overlaps ? Math.ceil(bottom + 36 - w.y) : 0;
     };
@@ -1250,6 +1251,10 @@
       '<i class="radar"></i><i class="blip" style="--x:180px;--y:220px;--dl:.6s"></i><i class="blip" style="--x:90px;--y:140px;--dl:2.2s"></i><i class="blip" style="--x:260px;--y:90px;--dl:3.1s"></i>' +
       '<div class="floor"><i></i></div><i class="hills far"></i><i class="hills"></i>'), document.body);
 
+    // Entrance animations play once per page load: after this they are switched off for good,
+    // so scrolling back or changing style never replays them.
+    const land = sec => { const id = setTimeout(() => sec.classList.add('fx-landed'), 2600); later(() => clearTimeout(id)); };
+    later(() => document.querySelectorAll('.fx-landed').forEach(n => n.classList.remove('fx-landed')));
     // Animations of sections far off screen are paused. Measured from the layout on every scroll,
     // so a page restored half-way down or opened in a hidden window can never stay frozen.
     const pausable = [...document.querySelectorAll('.hero, .project, .upstream, footer')];
@@ -1259,13 +1264,55 @@
         const r = sec.getBoundingClientRect();
         sec.classList.toggle('fx-paused', r.bottom < top || r.top > bottom);
         // Safety net: a project on screen is always shown, even if its reveal was missed.
-        if (r.top < innerHeight * .85 && r.bottom > 0 && !sec.classList.contains('fx-in') && !sec.matches('.hero, footer')) sec.classList.add('fx-in');
+        if (r.top < innerHeight * .85 && r.bottom > 0 && !sec.classList.contains('fx-in') && !sec.matches('.hero, footer')) { sec.classList.add('fx-in'); land(sec); }
       });
     };
     checkPause();
     [250, 1200].forEach(ms => { const id = setTimeout(checkPause, ms); later(() => clearTimeout(id)); });
     on(window, 'resize', checkPause);
     on(document, 'visibilitychange', () => { if (!document.hidden) checkPause(); });
+
+    // Boulito, in katakana too.
+    const bh = document.querySelector('#boulito .head');
+    if (bh) add(hidden('span', 'fx-kana', 'ブリト'), bh);
+
+    // Tags drop one after another; the main buttons get a shine; clicks squash them; tags tick on hover.
+    document.querySelectorAll('.stack').forEach(ul => [...ul.children].forEach((li, i) => li.style.setProperty('--i', i)));
+    later(() => document.querySelectorAll('.stack li').forEach(li => li.style.removeProperty('--i')));
+    document.querySelectorAll('.btn').forEach((b, i) => { const sh = add(hidden('span', 'fx-shine'), b); sh.style.setProperty('--sd', `${(i * 0.9) % 5}s`); });
+    on(document, 'pointerdown', e => {
+      const b = e.target.closest && e.target.closest('.btn, .fx-coin, .od-continue');
+      if (!b || !motion()) return;
+      b.classList.remove('fx-squash'); void b.offsetWidth; b.classList.add('fx-squash');
+      b.addEventListener('animationend', () => b.classList.remove('fx-squash'), { once: true });
+    });
+    on(document, 'pointerover', e => {
+      const li = e.target.closest && e.target.closest('.stack li');
+      if (li && !(e.relatedTarget instanceof Node && li.contains(e.relatedTarget))) audio.play('tick', clickKind(li));
+    });
+
+    // Lean on scroll: the projects tilt a little when you scroll fast, and straighten up at rest.
+    const main = document.querySelector('main');
+    if (main && motion() && finePointer()) {
+      let lean = 0, target = 0, lastY = scrollY, lastT = performance.now(), raf = 0;
+      const step = () => {
+        raf = 0;
+        lean += (target - lean) * .2;
+        target *= .86;
+        if (Math.abs(lean) < .01 && Math.abs(target) < .01) { main.style.transform = ''; main.style.willChange = ''; return; }
+        main.style.transform = `skewY(${lean.toFixed(3)}deg)`;
+        raf = requestAnimationFrame(step);
+      };
+      on(window, 'scroll', () => {
+        const now = performance.now(), v = (scrollY - lastY) / Math.max(8, now - lastT);
+        lastY = scrollY; lastT = now;
+        if (lite || game) return;
+        target = Math.max(-2.4, Math.min(2.4, v * .45));
+        main.style.willChange = 'transform';
+        if (!raf) raf = requestAnimationFrame(step);
+      }, { passive: true });
+      later(() => { cancelAnimationFrame(raf); main.style.transform = ''; main.style.willChange = ''; });
+    }
 
     // Scroll: scenery parallax, depth XP, pausing. One rAF per frame at most.
     let ticking = false;
@@ -1296,6 +1343,7 @@
       }
       if (e.target.classList.contains('fx-in')) return;
       e.target.classList.add('fx-in');
+      land(e.target);
       const h = e.target.querySelector('h2');
       if (h && od && motion()) setTimeout(() => scramble(h, h.dataset.text || h.textContent), 220);
       const pk = peeks.find(([p]) => p === e.target);
