@@ -1440,8 +1440,6 @@ html[data-fun] { overflow-x: clip; }
   html[data-fun] .index a::after { inset: -10px -12px -10px -12px; }
 }
 
-/* ---------- Startup: the plain page switches off, the fun one takes over ---------- */
-html.fx-starting body { pointer-events: none; }
 
 /* ---------- Project titles behave like trading cards on hover ---------- */
 html[data-fun] .head {

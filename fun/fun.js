@@ -213,7 +213,11 @@
         for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
         this.noise = buf;
       }
-      if (this.ctx.state === 'suspended' && !document.hidden) this.ctx.resume().catch(() => {});
+      if (this.ctx.state !== 'running' && this.ctx.state !== 'closed' && !document.hidden) {
+        this.ctx.resume().catch(() => {});
+        // Safari only opens the output for sound started inside the click itself: a silent blip does it.
+        try { const b = this.ctx.createBufferSource(); b.buffer = this.ctx.createBuffer(1, 1, 22050); b.connect(this.ctx.destination); b.start(0); } catch (e) { /* not needed elsewhere */ }
+      }
       return this.ctx;
     },
     live() { return this.fx && isOn() && this.ctx && this.ctx.state === 'running'; },
@@ -1471,8 +1475,11 @@
       if (e.target.closest && e.target.closest('a[href*="github.com/"], .fx-open, a[href*="bouliw.github.io/vigie"]')) { trophy('source'); xp.add(25); }
     }, true);
     // Browsers start audio only after a click or a key: wake it up on the first one.
+    // Safari counts click, touchend and keydown as gestures (not always pointerdown), so all of them can wake it.
     const wake = () => { if (audio.fx && isOn() && (!audio.ctx || audio.ctx.state !== 'running')) { audio.ready(); setTimeout(() => music.sync(), 60); } };
-    on(window, 'keydown', wake);
+    on(window, 'keydown', wake, true);
+    on(window, 'click', wake, true);
+    on(window, 'touchend', wake, true);
     on(window, 'pointerdown', e => {
       wake();
       if (!isOn() || game) return;
@@ -2065,7 +2072,7 @@
   toggle.setAttribute('aria-label', u('fun'));
 
   toggle.addEventListener('click', () => {
-    if (busy || root.classList.contains('fx-starting')) return;
+    if (busy) return;
     const turnOn = toggle.getAttribute('aria-pressed') !== 'true';
     if (!turnOn) { powerOff(() => setOn(false, { save: true })); return; }
     setOn(true, { save: true });
@@ -2073,30 +2080,10 @@
     setTimeout(() => trophy('start'), 3200);
   });
 
-  const FONTS = {
-    overdrive: ['Mono', 'Serif', 'Dot', 'Press', 'Geist'], y2k: ['Michroma', 'Silk', 'Geist'], phantom: ['Anton', 'Geist', 'Display'],
-    alert: ['Mono', 'Serif', 'Mincho'], neon: ['Mono', 'Orbitron'], pixel: ['Press', 'Silk', 'Pixelify'], mix: ['Anton', 'Geist', 'Mono', 'Orbitron', 'Michroma', 'Press', 'Serif'],
-  };
-  const preload = k => {
-    if (!document.fonts || !document.fonts.load) return Promise.resolve();
-    return Promise.all((FONTS[k] || FONTS.overdrive).map(f => document.fonts.load(`16px "FX ${f}"`).catch(() => {})));
-  };
-
-  if (root.classList.contains('fx-pending')) {
-    // Startup: the plain page shows for a moment, switches off like an old TV, and fun mode takes over.
-    root.classList.add('fx-starting');
-    const saved = store.get(STYLE_KEY);
-    Promise.race([Promise.all([preload(isSkin(saved) ? saved : DEFAULT_SKIN), wait(420)]), wait(900)]).then(() => powerOff(() => {
-      root.classList.remove('fx-pending', 'fx-starting');
-      setOn(true);
-      if (skinNow() === 'overdrive') intro();
-      setTimeout(() => trophy('start'), 2200);
-    }));
-  } else {
-    setOn(isOn());
-    if (isOn()) {
-      if (skinNow() === 'overdrive') intro(false);
-      setTimeout(() => trophy('start'), 2600);
-    }
+  // Opens straight into fun mode (the pre-paint script in index.html already set it).
+  setOn(isOn());
+  if (isOn()) {
+    if (skinNow() === 'overdrive') intro(false);
+    setTimeout(() => trophy('start'), 2600);
   }
 })();

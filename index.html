@@ -198,15 +198,9 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
     setTimeout(function () { r.classList.remove('i18n-pending'); }, 1500);
   }
   if (on === 'off') return;
-  var still = false;
-  try { still = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
-  if (still) {
-    r.dataset.fun = '';
-    r.dataset.skin = /^(overdrive|y2k|phantom|alert|neon|pixel|mix)$/.test(skin) ? skin : 'overdrive';
-  } else {
-    /* The plain page shows first, then switches off like an old TV and fun mode starts. */
-    r.classList.add('fx-pending');
-  }
+  r.dataset.fun = '';
+  r.dataset.skin = /^(overdrive|y2k|phantom|alert|neon|pixel|mix)$/.test(skin) ? skin : 'overdrive';
+  r.classList.add('od-intro');
 })();
 </script>
 </head>
