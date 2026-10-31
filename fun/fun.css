@@ -1837,3 +1837,6 @@ html[data-skin="overdrive"] [data-guest="synth"] .stage { --steps: linear-gradie
   .lang-toggle i, html:not([lang="fr"]) .lang-toggle b[data-l="en"], html[lang="fr"] .lang-toggle b[data-l="fr"] { display: none; }
   .lang-toggle b { opacity: 1 !important; }
 }
+/* Homebrew: its diff box sits higher, so the number goes in the free space below it */
+html[data-skin="overdrive"] .upstream .od-num { top: auto; bottom: 6px; font-size: clamp(8rem, 19vw, 17rem); }
+@media (max-width: 760px) { html[data-skin="overdrive"] .upstream .od-num { top: 90px; bottom: auto; font-size: 9rem; } }
