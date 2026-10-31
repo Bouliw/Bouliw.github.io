@@ -624,6 +624,15 @@
       setTimeout(() => p.remove(), 1150);
     },
   };
+  function cheatBanner() {
+    audio.play('level');
+    if (!motion()) return;
+    const o = hidden('div', 'fx-levelup fx-cheat', '<b></b><span></span>');
+    o.querySelector('b').textContent = isFr() ? '30 VIES !' : '30 LIVES!';
+    o.querySelector('span').textContent = isFr() ? 'CODE DE TRICHE · +100 XP' : 'CHEAT CODE · +100 XP';
+    document.body.append(o);
+    setTimeout(() => o.remove(), 1900);
+  }
   function levelUp(L) {
     audio.play('level');
     buddy.react(9, u('level')(L));
@@ -988,26 +997,40 @@
   }
 
   /* ================= Click bursts ================= */
+  const EASE_OUT = 'cubic-bezier(.2, .8, .3, 1)';
   function burstAt(x, y, kind) {
     const make = (cls, css, text) => {
       const p = hidden('i', `fx-p ${cls}`);
       p.style.cssText = `left:${x}px;top:${y}px;${css}`;
       if (text) p.textContent = text;
       document.body.append(p);
-      setTimeout(() => p.remove(), 900);
+      setTimeout(() => p.remove(), 1100);
+      return p;
     };
-    const fly = n => Array.from({ length: n }, (_, i) => {
-      const ang = (i / n) * Math.PI * 2 + rand(-.3, .3);
-      const d = rand(40, 90);
-      return `--dx:${Math.cos(ang) * d}px;--dy:${Math.sin(ang) * d}px;--r:${rand(-200, 200)}deg;`;
-    });
+    // Flying bits: keyframes built with real numbers.
+    const flyer = (cls, color, text, ms) => (ang, d) => {
+      const p = make(`${cls} fx-js`, `--c:${color};`, text);
+      const dx = Math.cos(ang) * d, dy = Math.sin(ang) * d, r = rand(-200, 200);
+      p.animate([{ transform: 'translate(0, 0) rotate(0deg) scale(1)', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) rotate(${r}deg) scale(.25)`, opacity: 0 }], { duration: ms, easing: EASE_OUT, fill: 'forwards' });
+    };
+    const spread = (n, mk) => { for (let i = 0; i < n; i++) mk((i / n) * Math.PI * 2 + rand(-.3, .3), rand(40, 90)); };
     const n = lite ? .5 : 1;
-    if (kind === 'stars') fly(Math.round(8 * n)).forEach((v, i) => make('star', `${v}--c:${['#e60012', '#ffffff', '#0a0a0b'][i % 3]};`));
+    if (kind === 'stars') spread(Math.round(8 * n), (a, d) => flyer('star', pick(['#e60012', '#ffffff', '#0a0a0b']), '', 700)(a, d));
     else if (kind === 'hex') { make('hex', ''); make('hex', 'animation-delay:.12s;opacity:0;animation-fill-mode:both;'); }
-    else if (kind === 'coins') for (let i = 0; i < 4 * n; i++) make('coin', `--dx:${rand(-70, 70)}px;animation-delay:${i * 40}ms;`);
-    else if (kind === 'neon') { make('ring', ''); for (let i = 0; i < 10 * n; i++) make('ray', `--a:${i * 36 / n}deg;`); }
-    else if (kind === 'sparks') fly(Math.round(9 * n)).forEach((v, i) => make('spark', `${v}--c:${SPARKS[i % SPARKS.length]};`, '✦'));
-    else { make('lock', ''); fly(Math.round(10 * n)).forEach((v, i) => make('px', `${v}--c:${COLORS[i % 4]};`)); }
+    else if (kind === 'coins') for (let i = 0; i < 4 * n; i++) {
+      const p = make('coin fx-js', 'animation: fx-p-spin .24s steps(2) infinite;');
+      const dx = rand(-70, 70);
+      p.animate([{ transform: 'translate(0, 0)', opacity: 1 }, { transform: `translate(${dx * .5}px, -72px)`, opacity: 1, offset: .45 }, { transform: `translate(${dx}px, 26px)`, opacity: 0 }], { duration: 800, delay: i * 40, easing: 'cubic-bezier(.3, .7, .6, 1)', fill: 'both' });
+    }
+    else if (kind === 'neon') {
+      make('ring', '');
+      for (let i = 0; i < 10 * n; i++) {
+        const a = i * 36 / n;
+        make('ray fx-js', '').animate([{ transform: `rotate(${a}deg) translateY(-8px)`, opacity: 1 }, { transform: `rotate(${a}deg) translateY(-46px)`, opacity: 0 }], { duration: 500, easing: 'ease-out', fill: 'forwards' });
+      }
+    }
+    else if (kind === 'sparks') spread(Math.round(9 * n), (a, d) => flyer('spark', pick(SPARKS), '✦', 750)(a, d));
+    else { make('lock', ''); spread(Math.round(10 * n), (a, d) => flyer('px', pick(COLORS.slice(0, 4)), '', 650)(a, d)); }
   }
 
   /* ================= The hidden game ================= */
@@ -1545,11 +1568,12 @@
       if (now - last < 45 || !(e.target instanceof Element)) return;
       last = now;
       if (getComputedStyle(e.target).getPropertyValue('--fx-trail').trim() !== '1') return;
-      const s = hidden('span', 'fx-spark');
+      const s = hidden('span', 'fx-spark fx-js');
       s.textContent = '✦';
-      s.style.cssText = `left:${e.clientX}px;top:${e.clientY}px;--c:${pick(SPARKS)};` +
-        `--dx:${(Math.random() - .5) * 70}px;--dy:${18 + Math.random() * 46}px;font-size:${10 + Math.random() * 14}px`;
+      s.style.cssText = `left:${e.clientX}px;top:${e.clientY}px;--c:${pick(SPARKS)};font-size:${10 + Math.random() * 14}px`;
       document.body.append(s);
+      const dx = (Math.random() - .5) * 70, dy = 18 + Math.random() * 46;
+      s.animate([{ transform: 'translate(-50%, -50%) scale(1) rotate(0deg)', opacity: 1 }, { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(.2) rotate(140deg)`, opacity: 0 }], { duration: 900, easing: EASE_OUT, fill: 'forwards' });
       setTimeout(() => s.remove(), 950);
     }, { passive: true });
 
@@ -1572,8 +1596,9 @@
       }
       if (keys.join(' ') === code) {
         keys = [];
+        cheatBanner();
         trophy('konami');
-        xp.add(100);
+        setTimeout(() => xp.add(100), 1700);
         root.classList.add('od-hyper');
         if (motion()) confetti();
         buddy.react(10, u('cheat'), 2200);
@@ -1629,11 +1654,12 @@
   function confetti(n = 46) {
     if (lite) n = 24;
     for (let i = 0; i < n; i++) {
-      const c = hidden('i', 'od-confetti');
-      c.style.cssText = `left:${Math.random() * 100}vw;background:${COLORS[i % COLORS.length]};--dx:${(Math.random() - .5) * 240}px;` +
-        `--t:${1.6 + Math.random() * 1.8}s;--r:${(Math.random() - .5) * 1440}deg;animation-delay:${Math.random() * .5}s;` +
-        (i % 3 ? '' : 'width:14px;height:6px;');
+      const c = hidden('i', 'od-confetti fx-js');
       document.body.append(c);
+      const t = 1.6 + Math.random() * 1.8;
+      c.animate([{ transform: 'translate(0, 0) rotate(0deg)' }, { transform: `translate(${(Math.random() - .5) * 240}px, 110vh) rotate(${(Math.random() - .5) * 1440}deg)` }], { duration: t * 1000, delay: Math.random() * 500, easing: 'cubic-bezier(.3, .2, .6, 1)', fill: 'both' });
+      c.style.cssText = `left:${Math.random() * 100}vw;background:${COLORS[i % COLORS.length]};` +
+        (i % 3 ? '' : 'width:14px;height:6px;');
       setTimeout(() => c.remove(), 4200);
     }
   }
