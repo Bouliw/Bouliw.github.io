@@ -1501,11 +1501,15 @@ html[data-skin="overdrive"] .head::before { border-radius: 4px; background: var(
 .fx-spr {
   display: block; width: calc(32px * var(--s)); height: calc(52px * var(--s));
   background: url("sprites/buddy.png") no-repeat; background-size: calc(384px * var(--s)) calc(312px * var(--s));
-  background-position: calc(var(--c, 8) * -32px * var(--s)) calc(var(--r, 0) * -52px * var(--s));
+  /* Percentages: column c of 12 is at c/11, row r of 6 at r/5, whatever the scale. */
+  background-position: calc(var(--c, 8) * 100% / 11) calc(var(--r, 0) * 20%);
   image-rendering: pixelated;
 }
-.fx-spr.walk { animation: fx-walk .64s steps(4) infinite; }
-@keyframes fx-walk { from { background-position-x: calc(var(--c0, 0) * -32px * var(--s)); } to { background-position-x: calc((var(--c0, 0) + 4) * -32px * var(--s)); } }
+/* Walk cycles: columns 0-3 walk right, 4-7 walk left. No variables inside the keyframes, so Safari plays them too. */
+.fx-spr.walk { animation: fx-walk-r .64s steps(4) infinite; }
+.fx-spr.walk.l { animation-name: fx-walk-l; }
+@keyframes fx-walk-r { from { background-position-x: 0%; } to { background-position-x: 36.3636%; } }
+@keyframes fx-walk-l { from { background-position-x: 36.3636%; } to { background-position-x: 72.7273%; } }
 .fx-buddy { position: fixed; z-index: 990; left: 0; bottom: 70px; translate: var(--x, -90px) 0; transition: translate var(--t, 0s) linear; cursor: pointer; }
 .fx-buddy[hidden] { display: none; }
 .fx-buddy .hop { position: relative; }

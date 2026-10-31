@@ -190,8 +190,8 @@
   // Every sound is made in the browser: no files. Off by default.
   const audio = {
     ctx: null, out: null, noise: null, last: {},
-    fx: store.get(SOUND_KEY) === 'on',
-    music: store.get(MUSIC_KEY) === 'on',
+    fx: store.get(SOUND_KEY) !== 'off',
+    music: store.get(MUSIC_KEY) !== 'off',
     typing: store.get(TYPING_KEY) !== 'off',
     ready() {
       if (!this.ctx) {
@@ -358,10 +358,10 @@
 
   const music = {
     timer: 0, step: 0, next: 0, bus: null, fx: null, lines: null, cycle: 0,
-    wanted() { return audio.fx && audio.music && isOn() && !document.hidden; },
+    wanted() { return audio.fx && audio.music && isOn(); },
     sync() {
       if (this.wanted() && audio.ready()) this.start(); else this.stop();
-      audio.keepAwake(audio.fx && isOn() && !document.hidden);
+      audio.keepAwake(audio.fx && isOn());
     },
     // Reverb, echo and a warm low-pass, built once per audio context.
     chain() {
@@ -449,7 +449,9 @@
       const six = 60 / band.bpm / 4;
       this.fx.verbIn.gain.setTargetAtTime(band.verb, c.currentTime, .5);
       this.fx.echo.delayTime.setTargetAtTime(six * 3, c.currentTime, .1);
-      while (this.next < c.currentTime + .25) {
+      // Background tabs run timers about once a second, so notes are queued further ahead there.
+      const ahead = document.hidden ? 3 : .25;
+      while (this.next < c.currentTime + ahead) {
         this.play(band, this.step, this.next, six);
         this.next += six;
         this.step = (this.step + 1) % SONG_STEPS;
@@ -580,10 +582,11 @@
       }
     },
   };
+  // The music goes on when the tab is in the background; coming back just makes sure it is running.
   document.addEventListener('visibilitychange', () => {
-    if (!audio.ctx) return;
-    if (document.hidden) { music.stop(); audio.keepAwake(false); audio.ctx.suspend().catch(() => {}); }
-    else if (audio.fx && isOn()) { audio.ctx.resume().then(() => music.sync()).catch(() => {}); }
+    if (!audio.ctx || document.hidden || !audio.fx || !isOn()) return;
+    if (audio.ctx.state !== 'running') audio.ctx.resume().catch(() => {});
+    music.sync();
   });
 
   /* ================= XP and levels ================= */
@@ -811,7 +814,7 @@
       if (!this.s) return;
       this.s.style.setProperty('--c', c);
       this.s.style.setProperty('--r', this.row());
-      this.s.style.setProperty('--c0', c0);
+      this.s.classList.toggle('l', c0 === 4);
       this.s.classList.toggle('walk', walk && motion());
     },
     create() {
