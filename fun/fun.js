@@ -31,7 +31,7 @@
   // Columns: 0-3 walk right, 4-7 walk left, 8 idle, 9 wave, 10 thumbs up, 11 arms crossed.
   const OUTFIT = { overdrive: 0, y2k: 1, phantom: 2, alert: 3, neon: 4, pixel: 0, mix: 0 };
   const MENU_POSES = [[0, 8], [5, 4], [3, 11], [2, 9], [5, 1], [5, 5], [2, 11], [1, 10], [4, 10]];
-  const LINES = ['Hi there!', 'Pick a style below!', 'Click a window to see the code.', 'Try ↑↑↓↓←→←→BA', 'Insert coin at the bottom!', 'New outfit?', 'Turn the sound on!'];
+  const LINES = ['Hi there!', 'Pick a style below!', 'Click a window to see the code.', 'Try the Konami code!', 'Insert coin at the bottom!', 'New outfit?', 'Turn the sound on!'];
   const TROPHIES = {
     start: ["It's dangerous to go alone", 'Opened the portfolio in fun mode'],
     costume: ['Outfit check', 'Switched to another style'],
@@ -117,7 +117,7 @@
       ['Cliquer partout (40 par visite) ou embêter le perso', '+1 / +2'],
       ['Jouer au jeu caché', 'score ÷ 50'],
     ],
-    lines: ['Salut !', 'Choisis un style en bas !', 'Clique sur une fenêtre pour voir le code.', 'Essaie ↑↑↓↓←→←→BA', 'Une pièce en bas de page !', 'Nouvelle tenue ?', 'Active le son !'],
+    lines: ['Salut !', 'Choisis un style en bas !', 'Clique sur une fenêtre pour voir le code.', 'Essaie le code Konami !', 'Une pièce en bas de page !', 'Nouvelle tenue ?', 'Active le son !'],
   };
   const UI = {
     en: {
@@ -1553,15 +1553,25 @@
       setTimeout(() => s.remove(), 950);
     }, { passive: true });
 
-    // ↑ ↑ ↓ ↓ ← → ← → B A
-    const code = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
-    let k = 0;
-    on(document, 'keydown', e => {
-      if (game) return;
-      const key = e.key.length === 1 ? e.key.toLowerCase() : e.key;
-      k = key === code[k] ? k + 1 : (key === code[0] ? 1 : 0);
-      if (k === code.length) {
-        k = 0;
+    // ↑ ↑ ↓ ↓ ← → ← → B A, checked on the last ten keys, so a stray or extra key never spoils it.
+    const code = 'up up down down left right left right b a';
+    let keys = [];
+    on(window, 'keydown', e => {
+      if (game || e.repeat || e.metaKey || e.ctrlKey || e.altKey) return;
+      let key = '';
+      if (e.key.startsWith('Arrow')) key = e.key.slice(5).toLowerCase();
+      else if (/^[a-z]$/i.test(e.key)) key = e.key.toLowerCase();
+      else if (/^Key[A-Z]$/.test(e.code)) key = e.code.slice(3).toLowerCase(); // other alphabets
+      if (!key) return;
+      keys.push(key);
+      if (keys.length > 10) keys.shift();
+      // A little blip for every key that is on the right track.
+      const seq = code.split(' ');
+      for (let n = Math.min(keys.length, seq.length - 1); n >= 2; n--) {
+        if (keys.slice(-n).join(' ') === seq.slice(0, n).join(' ')) { audio.play('seg'); break; }
+      }
+      if (keys.join(' ') === code) {
+        keys = [];
         trophy('konami');
         xp.add(100);
         root.classList.add('od-hyper');
