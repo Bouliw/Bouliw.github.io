@@ -184,6 +184,19 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
   .term dd { margin-bottom: 10px; }
 }
 </style>
+<link rel="stylesheet" href="fun/fun.css">
+<script>
+(function () {
+  var r = document.documentElement, on = null, skin = null;
+  r.classList.add('has-js');
+  try { on = localStorage.getItem('bouliw-fun'); skin = localStorage.getItem('bouliw-fun-style'); } catch (e) {}
+  if (on !== 'off') {
+    r.dataset.fun = '';
+    r.dataset.skin = /^(overdrive|y2k|phantom|alert|neon|pixel|mix)$/.test(skin) ? skin : 'overdrive';
+    r.classList.add('od-intro');
+  }
+})();
+</script>
 </head>
 <body>
 <a class="skip" href="#projects">Skip to projects</a>
@@ -195,6 +208,7 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
     <a href="https://github.com/Bouliw">GitHub</a>
     <a href="https://www.linkedin.com/in/martin-laffont-1a218b250/">LinkedIn</a>
   </nav>
+  <button type="button" class="fun-toggle" aria-pressed="false" aria-label="Fun mode"><span class="fun-switch" aria-hidden="true"><i></i></span><span class="fun-label">Fun</span></button>
 </header>
 
 <section class="hero">
@@ -412,5 +426,6 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
   videos.forEach(v => io.observe(v));
 }
 </script>
+<script src="fun/fun.js" defer></script>
 </body>
 </html>
