@@ -1219,10 +1219,28 @@
       '<i class="radar"></i><i class="blip" style="--x:180px;--y:220px;--dl:.6s"></i><i class="blip" style="--x:90px;--y:140px;--dl:2.2s"></i><i class="blip" style="--x:260px;--y:90px;--dl:3.1s"></i>' +
       '<div class="floor"><i></i></div><i class="hills far"></i><i class="hills"></i>'), document.body);
 
-    // Scroll: scenery parallax, depth XP. One rAF per frame at most.
+    // Animations of sections far off screen are paused. Measured from the layout on every scroll,
+    // so a page restored half-way down or opened in a hidden window can never stay frozen.
+    const pausable = [...document.querySelectorAll('.hero, .project, .upstream, footer')];
+    const checkPause = () => {
+      const top = -400, bottom = innerHeight + 400;
+      pausable.forEach(sec => {
+        const r = sec.getBoundingClientRect();
+        sec.classList.toggle('fx-paused', r.bottom < top || r.top > bottom);
+        // Safety net: a project on screen is always shown, even if its reveal was missed.
+        if (r.top < innerHeight * .85 && r.bottom > 0 && !sec.classList.contains('fx-in') && !sec.matches('.hero, footer')) sec.classList.add('fx-in');
+      });
+    };
+    checkPause();
+    [250, 1200].forEach(ms => { const id = setTimeout(checkPause, ms); later(() => clearTimeout(id)); });
+    on(window, 'resize', checkPause);
+    on(document, 'visibilitychange', () => { if (!document.hidden) checkPause(); });
+
+    // Scroll: scenery parallax, depth XP, pausing. One rAF per frame at most.
     let ticking = false;
     const onScroll = () => {
       ticking = false;
+      checkPause();
       const y = scrollY;
       const k = skinNow();
       if (k === 'neon') scen.style.setProperty('--g', `${((y * .6) % 64).toFixed(1)}px`);
@@ -1255,9 +1273,7 @@
     if (motion()) root.classList.add('fx-anim');
     stages.forEach(s => io.observe(s));
     later(() => { io.disconnect(); document.querySelectorAll('.fx-in').forEach(n => n.classList.remove('fx-in')); root.classList.remove('fx-anim'); });
-    const pauser = new IntersectionObserver(entries => entries.forEach(e => e.target.classList.toggle('fx-paused', !e.isIntersecting)), { rootMargin: '200px 0px' });
-    document.querySelectorAll('.hero, .project, .upstream, footer').forEach(s => pauser.observe(s));
-    later(() => { pauser.disconnect(); document.querySelectorAll('.fx-paused').forEach(n => n.classList.remove('fx-paused')); });
+    later(() => document.querySelectorAll('.fx-paused').forEach(n => n.classList.remove('fx-paused')));
     let cleared = false;
     if (foot) {
       const endIO = new IntersectionObserver(es => {
@@ -1403,7 +1419,9 @@
     later(() => { if (game) game.close(); });
     music.sync();
     later(() => { music.stop(); audio.keepAwake(false); });
-    probe();
+    // Check the frame rate once the start-up animations are over.
+    const probeId = setTimeout(probe, 3500);
+    later(() => clearTimeout(probeId));
   }
 
   function coreOff() {
