@@ -1613,13 +1613,13 @@
   }
 
   /* ================= Overdrive: HUD, cursor, particles, stickers, title cards ================= */
-  function confetti(n = 90) {
-    if (lite) n = 40;
+  function confetti(n = 46) {
+    if (lite) n = 24;
     for (let i = 0; i < n; i++) {
       const c = hidden('i', 'od-confetti');
       c.style.cssText = `left:${Math.random() * 100}vw;background:${COLORS[i % COLORS.length]};--dx:${(Math.random() - .5) * 240}px;` +
         `--t:${1.6 + Math.random() * 1.8}s;--r:${(Math.random() - .5) * 1440}deg;animation-delay:${Math.random() * .5}s;` +
-        (i % 3 ? '' : 'clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);width:16px;height:16px;');
+        (i % 3 ? '' : 'width:14px;height:6px;');
       document.body.append(c);
       setTimeout(() => c.remove(), 4200);
     }
