@@ -981,6 +981,7 @@ html[data-skin="overdrive"] .hero .fx-deco::before {
 html[data-skin="overdrive"] .hero .fx-deco::after {
   content: "VIDEO  VOICE  BLUE TEAM  MUSIC  OCR  OPEN SOURCE  VIDEO  VOICE  BLUE TEAM  MUSIC  OCR  OPEN SOURCE  "; position: absolute; left: 0; top: 30%; white-space: pre;
   font: 900 clamp(7rem, 18vw, 17rem)/1 "FX Serif", serif; font-stretch: 62.5%; color: transparent; -webkit-text-stroke: 1.5px color-mix(in oklab, var(--ink) 9%, transparent);
+  animation: od-slide 80s linear infinite; /* the giant outline words drift across the hero */
 }
 @keyframes od-slide { to { translate: -50% 0; } }
 html[data-skin="overdrive"] .hero h1 {
@@ -1429,7 +1430,7 @@ html.fx-poweroff :is(.fx-dock, .od-hud, .od-progress, .od-dot, .od-ring, .od-aur
 
 /* ---------- Pause what is off screen; lighter mode when frames drop ---------- */
 html[data-fun] .fx-paused, html[data-fun] .fx-paused *, html[data-fun] .fx-paused *::before, html[data-fun] .fx-paused *::after { animation-play-state: paused !important; }
-html.fx-lite .od-aurora i, html.fx-lite .fx-scenery *, html.fx-lite .od-sticker, html.fx-lite .od-band span, html.fx-lite .od-endroll span, html.fx-lite .fx-marquee span { animation: none !important; }
+html.fx-lite[data-skin="overdrive"] .hero .fx-deco::after, html.fx-lite .od-aurora i, html.fx-lite .fx-scenery *, html.fx-lite .od-sticker, html.fx-lite .od-band span, html.fx-lite .od-endroll span, html.fx-lite .fx-marquee span { animation: none !important; }
 html.fx-lite[data-fun] body::after { display: none; }
 
 /* ---------- Phones: nothing may push the page sideways ---------- */

@@ -225,19 +225,19 @@
           break;
         case 'seg': if (this.every('seg', 60)) T(3000, t, .01, 'square', .006); break;
         case 'type': if (this.typing && this.every('type', 32)) this.hiss(t, .012, .018, rand(2200, 4500)); break;
-        case 'clear': [523, 659, 784, 1047, 1319].forEach((f, i) => T(f, t + i * .09, .14, k === 'sparks' ? 'sine' : 'square', .03)); break;
-        case 'switch': [523, 659, 784, 1047].forEach((f, i) => T(f, t + i * .05, .08, 'square', .025)); break;
-        case 'trophy': [784, 988, 1175, 1568].forEach((f, i) => T(f, t + i * .08, .16, 'triangle', .05)); break;
-        case 'level': [523, 659, 784, 1047, 784, 1047, 1319, 1568].forEach((f, i) => T(f, t + i * .07, .12, 'square', .03)); break;
+        case 'clear': [523, 659, 784, 1047].forEach((f, i) => T(f, t + i * .1, .22, 'triangle', .011)); break;
+        case 'switch': [523, 659, 784, 1047].forEach((f, i) => T(f, t + i * .05, .08, 'square', .008, 0, 1800)); break;
+        case 'trophy': [784, 988, 1175, 1568].forEach((f, i) => T(f, t + i * .08, .16, 'triangle', .014)); break;
+        case 'level': [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => T(f, t + i * .07, .12, 'triangle', .013)); break;
         case 'whoosh': T(180, t, .28, 'sawtooth', .02, 1600, 3000); this.hiss(t, .25, .02, 1200); break;
-        case 'off': T(880, t, .34, 'square', .025, 55); break;
-        case 'boot': [262, 330, 392, 523, 659, 784].forEach((f, i) => T(f, t + i * .07, .1, 'square', .025)); break;
-        case 'jump': T(330, t, .14, 'square', .025, 880); break;
+        case 'off': T(880, t, .34, 'square', .012, 55, 2000); break;
+        case 'boot': [262, 330, 392, 523, 659, 784].forEach((f, i) => T(f, t + i * .07, .1, 'square', .009, 0, 1800)); break;
+        case 'jump': T(330, t, .14, 'square', .012, 880, 2000); break;
         case 'shoot': T(880, t, .08, 'square', .02, 300); break;
         case 'boom': this.hiss(t, .22, .06, 600, 'lowpass'); T(140, t, .2, 'square', .02, 40); break;
         case 'hurt': T(200, t, .3, 'sawtooth', .03, 60, 1200); break;
-        case 'wave': [659, 784, 988, 1319].forEach((f, i) => T(f, t + i * .06, .1, 'square', .025)); break;
-        case 'coin': T(988, t, .07, 'square', .03); T(1319, t + .07, .3, 'square', .03); break;
+        case 'wave': [659, 784, 988, 1319].forEach((f, i) => T(f, t + i * .06, .1, 'triangle', .012)); break;
+        case 'coin': T(988, t, .07, 'square', .01, 0, 2400); T(1319, t + .07, .3, 'square', .01, 0, 2400); break;
         default:
       }
     },
@@ -1100,6 +1100,37 @@
     game = { close };
   }
 
+  /* ================= Long titles never run into their window ================= */
+  // Some styles set project titles huge; a long one (doc-indexer-macos) would run under the window
+  // next to it. Measured from the layout (transforms ignored), the window then starts below the title.
+  const layoutPos = el => { let x = 0, y = 0; for (let n = el; n; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; } return { x, y }; };
+  let clearTimer = 0;
+  function clearTitles() {
+    const stages = [...document.querySelectorAll('.project .stage')];
+    stages.forEach(st => { st.style.marginTop = ''; });
+    if (!isOn()) return;
+    // How far the window must still move down (0 when the title is clear of it).
+    const need = st => {
+      const h = st.closest('.project').querySelector('.head h2');
+      if (!h || !st.offsetWidth) return 0;
+      const t = layoutPos(h), w = layoutPos(st);
+      const right = t.x + Math.max(h.scrollWidth, h.offsetWidth), bottom = t.y + h.offsetHeight;
+      const overlaps = right > w.x - 6 && t.x < w.x + st.offsetWidth && bottom + 36 > w.y && t.y < w.y + st.offsetHeight;
+      return overlaps ? Math.ceil(bottom + 36 - w.y) : 0;
+    };
+    // Columns are centred, so pushing the window also moves the title a little: repeat until clear.
+    stages.forEach(st => {
+      let m = 0;
+      for (let pass = 0; pass < 8; pass++) {
+        const n = need(st);
+        if (n <= 1) break;
+        m += n;
+        st.style.marginTop = `${m}px`;
+      }
+    });
+  }
+  const clearTitlesSoon = (ms = 120) => { clearTimeout(clearTimer); clearTimer = setTimeout(clearTitles, ms); };
+
   /* ================= Shared decorations, used by every style ================= */
   function coreOn() {
     if (core) return;
@@ -1413,6 +1444,11 @@
       }
     });
     later(() => root.classList.remove('od-hyper'));
+
+    clearTitlesSoon(60);
+    on(window, 'resize', () => clearTitlesSoon(200));
+    if (document.fonts) document.fonts.ready.then(() => clearTitlesSoon(0));
+    later(() => { clearTimeout(clearTimer); document.querySelectorAll('.project .stage').forEach(st => { st.style.marginTop = ''; }); });
 
     buddy.create();
     later(() => buddy.destroy());
@@ -1758,6 +1794,7 @@
     if (tried.size >= SKINS.length) trophy('hopper');
     if (save && changed) xp.add(fresh ? 20 : 10);
     requestAnimationFrame(() => moveSel(false));
+    if (changed) { clearTitlesSoon(30); setTimeout(clearTitles, 700); }
     if (changed && buddy.el) buddy.outfit();
   }
 
