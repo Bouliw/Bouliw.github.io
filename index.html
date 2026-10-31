@@ -187,9 +187,16 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
 <link rel="stylesheet" href="fun/fun.css">
 <script>
 (function () {
-  var r = document.documentElement, on = null, skin = null;
+  var r = document.documentElement, on = null, skin = null, lang = null;
   r.classList.add('has-js');
-  try { on = localStorage.getItem('bouliw-fun'); skin = localStorage.getItem('bouliw-fun-style'); } catch (e) {}
+  try { on = localStorage.getItem('bouliw-fun'); skin = localStorage.getItem('bouliw-fun-style'); lang = localStorage.getItem('bouliw-lang'); } catch (e) {}
+  if (lang !== 'fr' && lang !== 'en') lang = /^fr/i.test((navigator.languages && navigator.languages[0]) || navigator.language || '') ? 'fr' : 'en';
+  if (lang === 'fr') {
+    /* Hidden for a moment while lang.js swaps in the French copy (shown anyway after 1.5 s). */
+    r.lang = 'fr';
+    r.classList.add('i18n-pending');
+    setTimeout(function () { r.classList.remove('i18n-pending'); }, 1500);
+  }
   if (on === 'off') return;
   var still = false;
   try { still = matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
@@ -204,33 +211,34 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
 </script>
 </head>
 <body>
-<a class="skip" href="#projects">Skip to projects</a>
+<a class="skip" href="#projects" data-i18n="t0">Skip to projects</a>
 <div class="wrap">
 
 <header class="top">
   <a class="mark" href="/"><span class="glyph" aria-hidden="true">B</span>Bouliw</a>
-  <nav aria-label="Elsewhere">
+  <nav aria-label="Elsewhere" data-i18n-aria="a0">
     <a href="https://github.com/Bouliw">GitHub</a>
     <a href="https://www.linkedin.com/in/martin-laffont-1a218b250/">LinkedIn</a>
+    <button type="button" class="lang-toggle" aria-label="Français" lang="fr"><b data-l="en" lang="en">EN</b><i aria-hidden="true">/</i><b data-l="fr" lang="fr">FR</b></button>
   </nav>
   <button type="button" class="fun-toggle" aria-pressed="false" aria-label="Fun mode"><span class="fun-switch" aria-hidden="true"><i></i></span><span class="fun-label">Fun</span></button>
 </header>
 
 <section class="hero">
-  <h1>Software that does its work <em>where your files&nbsp;are.</em></h1>
-  <p class="lede">I build apps and command-line tools to fix problems I actually have, then publish them as open source. Most of them run entirely on-device, so footage, audio, logs and documents stay on the machine.</p>
+  <h1 data-i18n="t1">Software that does its work <em>where your files&nbsp;are.</em></h1>
+  <p class="lede" data-i18n="t2">I build apps and command-line tools to fix problems I actually have, then publish them as open source. Most of them run entirely on-device, so footage, audio, logs and documents stay on the machine.</p>
 
-  <nav class="index" aria-label="Projects">
+  <nav class="index" aria-label="Projects" data-i18n-aria="a1">
     <ol>
-      <li style="--accent:#e8553f"><a href="#roughcut"><span class="n">01</span><span class="t">Roughcut</span><span class="d">Rough cuts for Final Cut Pro</span></a></li>
-      <li style="--accent:#7c5cff"><a href="#earshot"><span class="n">02</span><span class="t">Earshot</span><span class="d">Live transcription</span></a></li>
-      <li style="--accent:#3d6df2"><a href="#vigie"><span class="n">03</span><span class="t">Vigie</span><span class="d">Sigma log analysis</span></a></li>
-      <li style="--accent:#9a4dff"><a href="#boulito"><span class="n">04</span><span class="t">Boulito</span><span class="d">On-device voice assistant</span></a></li>
-      <li style="--accent:#e0b000"><a href="#takeline"><span class="n">05</span><span class="t">Takeline</span><span class="d">Voice-following teleprompter</span></a></li>
-      <li style="--accent:#e07a2e"><a href="#trackmend"><span class="n">06</span><span class="t">trackmend</span><span class="d">Music library repair</span></a></li>
-      <li style="--accent:#2ea36b"><a href="#doc-indexer"><span class="n">07</span><span class="t">doc-indexer-macos</span><span class="d">Private OCR</span></a></li>
-      <li style="--accent:#1499a6"><a href="#mac-toolkit"><span class="n">08</span><span class="t">mac-toolkit</span><span class="d">Everyday Mac tools</span></a></li>
-      <li style="--accent:#a8a49a"><a href="#upstream"><span class="n">+</span><span class="t">Homebrew</span><span class="d">Upstream fix, merged</span></a></li>
+      <li style="--accent:#e8553f"><a href="#roughcut"><span class="n">01</span><span class="t">Roughcut</span><span class="d" data-i18n="t3">Rough cuts for Final Cut Pro</span></a></li>
+      <li style="--accent:#7c5cff"><a href="#earshot"><span class="n">02</span><span class="t">Earshot</span><span class="d" data-i18n="t4">Live transcription</span></a></li>
+      <li style="--accent:#3d6df2"><a href="#vigie"><span class="n">03</span><span class="t">Vigie</span><span class="d" data-i18n="t5">Sigma log analysis</span></a></li>
+      <li style="--accent:#9a4dff"><a href="#boulito"><span class="n">04</span><span class="t">Boulito</span><span class="d" data-i18n="t6">On-device voice assistant</span></a></li>
+      <li style="--accent:#e0b000"><a href="#takeline"><span class="n">05</span><span class="t">Takeline</span><span class="d" data-i18n="t7">Voice-following teleprompter</span></a></li>
+      <li style="--accent:#e07a2e"><a href="#trackmend"><span class="n">06</span><span class="t">trackmend</span><span class="d" data-i18n="t8">Music library repair</span></a></li>
+      <li style="--accent:#2ea36b"><a href="#doc-indexer"><span class="n">07</span><span class="t">doc-indexer-macos</span><span class="d" data-i18n="t9">Private OCR</span></a></li>
+      <li style="--accent:#1499a6"><a href="#mac-toolkit"><span class="n">08</span><span class="t">mac-toolkit</span><span class="d" data-i18n="t10">Everyday Mac tools</span></a></li>
+      <li style="--accent:#a8a49a"><a href="#upstream"><span class="n">+</span><span class="t">Homebrew</span><span class="d" data-i18n="t11">Upstream fix, merged</span></a></li>
     </ol>
   </nav>
 </section>
@@ -239,33 +247,33 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
 
 <article class="project" id="roughcut" style="--accent:#e8553f">
   <div class="copy">
-    <p class="label">01 · Video editing</p>
+    <p class="label" data-i18n="t14">01 · Video editing</p>
     <div class="head"><img src="assets/roughcut-icon.webp" width="192" height="192" alt=""><h2>Roughcut</h2></div>
-    <p class="tagline">Turns a folder of footage into a rough cut in Final Cut Pro.</p>
-    <p>Drop a folder on the window and press Edit. Whisper transcribes every word with its timestamp on the Mac, then a language model of your choice picks the takes. The scripts turn its cuts into a frame-accurate FCPXML timeline that comes with subtitles and up to three vertical Shorts. Each timeline is checked against the DTD that ships inside Final Cut Pro before it's imported.</p>
-    <p class="fact">Real test: 47 min of 4K vlog footage became a 22-min rough cut and three Shorts in 31 min.</p>
+    <p class="tagline" data-i18n="t15">Turns a folder of footage into a rough cut in Final Cut Pro.</p>
+    <p data-i18n="t16">Drop a folder on the window and press Edit. Whisper transcribes every word with its timestamp on the Mac, then a language model of your choice picks the takes. The scripts turn its cuts into a frame-accurate FCPXML timeline that comes with subtitles and up to three vertical Shorts. Each timeline is checked against the DTD that ships inside Final Cut Pro before it's imported.</p>
+    <p class="fact" data-i18n="t17">Real test: 47 min of 4K vlog footage became a 22-min rough cut and three Shorts in 31 min.</p>
     <ul class="stack"><li>Swift</li><li>Python</li><li>whisper.cpp</li><li>ffmpeg</li><li>FCPXML</li></ul>
-    <p class="links"><a class="btn" href="https://github.com/Bouliw/fcpxml-roughcut/releases/latest">Download for Mac</a><a class="more" href="https://github.com/Bouliw/fcpxml-roughcut">Source on GitHub</a></p>
+    <p class="links"><a class="btn" href="https://github.com/Bouliw/fcpxml-roughcut/releases/latest" data-i18n="t12">Download for Mac</a><a class="more" href="https://github.com/Bouliw/fcpxml-roughcut" data-i18n="t13">Source on GitHub</a></p>
   </div>
   <figure class="stage roughcut-stage">
-    <img class="shot" src="assets/roughcut-before-after.webp" width="1280" height="560" alt="Waveforms of a 30.7 s raw take with the kept parts highlighted, then the 16.3 s rough cut made from it">
-    <img class="shot inset" src="assets/roughcut-app.webp" width="640" height="521" alt="Roughcut window: the demo footage is ready, a 20-minute edit and three Shorts, with an Open in Final Cut Pro button">
+    <img class="shot" src="assets/roughcut-before-after.webp" width="1280" height="560" alt="Waveforms of a 30.7 s raw take with the kept parts highlighted, then the 16.3 s rough cut made from it" data-i18n-alt="a2">
+    <img class="shot inset" src="assets/roughcut-app.webp" width="640" height="521" alt="Roughcut window: the demo footage is ready, a 20-minute edit and three Shorts, with an Open in Final Cut Pro button" data-i18n-alt="a3">
   </figure>
 </article>
 
 <article class="project" id="earshot" style="--accent:#7c5cff">
   <div class="copy">
-    <p class="label">02 · Live transcription</p>
+    <p class="label" data-i18n="t18">02 · Live transcription</p>
     <div class="head"><img src="assets/earshot-icon.webp" width="192" height="192" alt="" loading="lazy"><h2>Earshot</h2></div>
-    <p class="tagline">Live transcription of any app on the Mac, with speaker names.</p>
-    <p>Pick Teams, Zoom or Chrome from the menu bar and Earshot transcribes only that app's audio, as it's said. It taps the app's own output through Core Audio. System sounds and your own microphone stay out of the transcript, and no bot joins the call.</p>
-    <p>In Teams, speaker names come from its live captions. Each session is filed under its calendar event, and live subtitles can float over any window.</p>
-    <p class="fact">Nothing is uploaded: capture and transcription both run on the Mac.</p>
+    <p class="tagline" data-i18n="t19">Live transcription of any app on the Mac, with speaker names.</p>
+    <p data-i18n="t20">Pick Teams, Zoom or Chrome from the menu bar and Earshot transcribes only that app's audio, as it's said. It taps the app's own output through Core Audio. System sounds and your own microphone stay out of the transcript, and no bot joins the call.</p>
+    <p data-i18n="t21">In Teams, speaker names come from its live captions. Each session is filed under its calendar event, and live subtitles can float over any window.</p>
+    <p class="fact" data-i18n="t22">Nothing is uploaded: capture and transcription both run on the Mac.</p>
     <ul class="stack"><li>Swift</li><li>Core Audio taps</li><li>whisper.cpp + Metal</li><li>EventKit</li><li>Accessibility API</li></ul>
-    <p class="links"><a class="btn" href="https://github.com/Bouliw/earshot/releases/latest">Download for Mac</a><a class="more" href="https://github.com/Bouliw/earshot">Source on GitHub</a></p>
+    <p class="links"><a class="btn" href="https://github.com/Bouliw/earshot/releases/latest" data-i18n="t12">Download for Mac</a><a class="more" href="https://github.com/Bouliw/earshot" data-i18n="t13">Source on GitHub</a></p>
   </div>
   <figure class="stage earshot-stage">
-    <video class="shot" data-autoplay muted loop playsinline preload="none" width="760" height="980" poster="assets/earshot-poster.webp" aria-label="Earshot's menu bar panel lists the apps playing sound, then a live transcript of a Teams class fills in with speaker names (demo data)">
+    <video class="shot" data-autoplay muted loop playsinline preload="none" width="760" height="980" poster="assets/earshot-poster.webp" aria-label="Earshot's menu bar panel lists the apps playing sound, then a live transcript of a Teams class fills in with speaker names (demo data)" data-i18n-aria="a4">
       <source src="assets/earshot-demo.mp4" type="video/mp4">
     </video>
   </figure>
@@ -273,37 +281,37 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
 
 <article class="project" id="vigie" style="--accent:#3d6df2">
   <div class="copy">
-    <p class="label">03 · Threat detection</p>
+    <p class="label" data-i18n="t23">03 · Threat detection</p>
     <div class="head"><h2>Vigie</h2></div>
-    <p class="tagline">A blue team tool that turns raw logs into a report an analyst can read.</p>
-    <p>Vigie reads Windows event logs (Sysmon and PowerShell included), Linux auth.log files and the macOS unified log. It runs Sigma rules on them with its own engine, maps every alert to MITRE ATT&amp;CK offline, and works either on collected logs or live, as they're written.</p>
-    <p>Correlation rules catch brute force, password spraying and a successful login right after a brute force.</p>
-    <p class="fact">36 Sigma rules, each one tested with positive and negative cases.</p>
+    <p class="tagline" data-i18n="t24">A blue team tool that turns raw logs into a report an analyst can read.</p>
+    <p data-i18n="t25">Vigie reads Windows event logs (Sysmon and PowerShell included), Linux auth.log files and the macOS unified log. It runs Sigma rules on them with its own engine, maps every alert to MITRE ATT&amp;CK offline, and works either on collected logs or live, as they're written.</p>
+    <p data-i18n="t26">Correlation rules catch brute force, password spraying and a successful login right after a brute force.</p>
+    <p class="fact" data-i18n="t27">36 Sigma rules, each one tested with positive and negative cases.</p>
     <ul class="stack"><li>Python</li><li>Sigma</li><li>MITRE ATT&amp;CK</li><li>EVTX</li><li>Jinja2</li></ul>
-    <p class="links"><a class="btn" href="https://bouliw.github.io/vigie/example-report.html">Example report</a><a class="more" href="https://github.com/Bouliw/vigie">Source on GitHub</a></p>
+    <p class="links"><a class="btn" href="https://bouliw.github.io/vigie/example-report.html" data-i18n="t28">Example report</a><a class="more" href="https://github.com/Bouliw/vigie" data-i18n="t13">Source on GitHub</a></p>
   </div>
   <figure class="stage">
     <a class="window" href="https://bouliw.github.io/vigie/example-report.html">
       <span class="bar" aria-hidden="true"><i></i><i></i><i></i><span>example-report.html</span></span>
-      <img src="assets/vigie-report.webp" width="1200" height="700" loading="lazy" decoding="async" alt="Top of a Vigie HTML report: alert counts by severity and the MITRE ATT&amp;CK tactics and techniques they map to">
+      <img src="assets/vigie-report.webp" width="1200" height="700" loading="lazy" decoding="async" alt="Top of a Vigie HTML report: alert counts by severity and the MITRE ATT&amp;CK tactics and techniques they map to" data-i18n-alt="a5">
     </a>
   </figure>
 </article>
 
 <article class="project" id="boulito" style="--accent:#9a4dff">
   <div class="copy">
-    <p class="label">04 · Voice assistant</p>
+    <p class="label" data-i18n="t29">04 · Voice assistant</p>
     <div class="head"><h2>Boulito</h2></div>
-    <p class="tagline">A voice assistant for macOS that runs 100% on the Mac.</p>
-    <p>Hold a key or say its name, then talk in English or French: open apps, drive YouTube in Safari, set timers, send a message or dictate. Simple commands go through rules in about 0.2 s, and a local model only steps in for free-form requests.</p>
-    <p>No server runs, not even on localhost. Messages and reminders are read back first, and Boulito waits for a clear yes.</p>
-    <p class="fact">Parakeet and Qwen 3.5 run through MLX, with no open port.</p>
+    <p class="tagline" data-i18n="t30">A voice assistant for macOS that runs 100% on the Mac.</p>
+    <p data-i18n="t31">Hold a key or say its name, then talk in English or French: open apps, drive YouTube in Safari, set timers, send a message or dictate. Simple commands go through rules in about 0.2 s, and a local model only steps in for free-form requests.</p>
+    <p data-i18n="t32">No server runs, not even on localhost. Messages and reminders are read back first, and Boulito waits for a clear yes.</p>
+    <p class="fact" data-i18n="t33">Parakeet and Qwen 3.5 run through MLX, with no open port.</p>
     <ul class="stack"><li>Python</li><li>MLX</li><li>Parakeet</li><li>Qwen 3.5</li><li>PyObjC</li></ul>
-    <p class="links"><a class="btn" href="https://github.com/Bouliw/boulito/releases/latest">Download for Mac</a><a class="more" href="https://github.com/Bouliw/boulito">Source on GitHub</a></p>
+    <p class="links"><a class="btn" href="https://github.com/Bouliw/boulito/releases/latest" data-i18n="t12">Download for Mac</a><a class="more" href="https://github.com/Bouliw/boulito" data-i18n="t13">Source on GitHub</a></p>
   </div>
-  <figure class="stage boulito-stage" role="img" aria-label="Boulito's icon next to examples of spoken commands: Open Notes, Play the second one, Skip the ad, Timer 10 minutes, Mets pause">
+  <figure class="stage boulito-stage" role="img" aria-label="Boulito's icon next to examples of spoken commands: Open Notes, Play the second one, Skip the ad, Timer 10 minutes, Mets pause" data-i18n-aria="a6">
     <img src="assets/boulito-icon.webp" width="384" height="384" alt="" loading="lazy">
-    <ul class="said">
+    <ul class="said" data-i18n="t34">
       <li>“Open Notes”</li>
       <li>“Play the second one”</li>
       <li>“Skip the ad”</li>
@@ -315,83 +323,83 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
 
 <article class="project" id="takeline" style="--accent:#e0b000">
   <div class="copy">
-    <p class="label">05 · Teleprompter</p>
+    <p class="label" data-i18n="t35">05 · Teleprompter</p>
     <div class="head"><img src="assets/takeline-icon.webp" width="192" height="192" alt="" loading="lazy"><h2>Takeline</h2></div>
-    <p class="tagline">A teleprompter that follows your voice in French and English, entirely on the Mac.</p>
-    <p>The script sits under the MacBook notch or in a floating window, and each word lights up as you say it. Say “take two” or “on la refait”, or just read the sentence again: the text goes back and the retake is noted with its time, in a session file an editing tool can use.</p>
-    <p>It's a fork of <a class="more" href="https://github.com/f/textream">Textream</a>.</p>
-    <p class="fact">On-device speech recognition with SpeechAnalyzer. No account, no analytics.</p>
+    <p class="tagline" data-i18n="t36">A teleprompter that follows your voice in French and English, entirely on the Mac.</p>
+    <p data-i18n="t37">The script sits under the MacBook notch or in a floating window, and each word lights up as you say it. Say “take two” or “on la refait”, or just read the sentence again: the text goes back and the retake is noted with its time, in a session file an editing tool can use.</p>
+    <p data-i18n="t38">It's a fork of <a class="more" href="https://github.com/f/textream">Textream</a>.</p>
+    <p class="fact" data-i18n="t39">On-device speech recognition with SpeechAnalyzer. No account, no analytics.</p>
     <ul class="stack"><li>Swift</li><li>SwiftUI</li><li>SpeechAnalyzer</li><li>Foundation Models</li></ul>
-    <p class="links"><a class="btn" href="https://github.com/Bouliw/takeline/releases/latest">Download for Mac</a><a class="more" href="https://github.com/Bouliw/takeline">Source on GitHub</a></p>
+    <p class="links"><a class="btn" href="https://github.com/Bouliw/takeline/releases/latest" data-i18n="t12">Download for Mac</a><a class="more" href="https://github.com/Bouliw/takeline" data-i18n="t13">Source on GitHub</a></p>
   </div>
-  <figure class="stage" role="img" aria-label="Illustration: a script under the MacBook notch, with the word being read highlighted and a retake noted">
+  <figure class="stage" role="img" aria-label="Illustration: a script under the MacBook notch, with the word being read highlighted and a retake noted" data-i18n-aria="a7">
     <div class="screen">
       <div class="notch">
-        <p>Takeline follows your voice, <mark>word</mark> <span class="next">by word, and goes back when you read a sentence again.</span></p>
+        <p data-i18n="t40">Takeline follows your voice, <mark>word</mark> <span class="next">by word, and goes back when you read a sentence again.</span></p>
         <div class="meter"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
       </div>
-      <div class="retake">↺ Retake noted · 00:42</div>
+      <div class="retake" data-i18n="t41">↺ Retake noted · 00:42</div>
     </div>
   </figure>
 </article>
 
 <article class="project" id="trackmend" style="--accent:#e07a2e">
   <div class="copy">
-    <p class="label">06 · Music library</p>
+    <p class="label" data-i18n="t42">06 · Music library</p>
     <div class="head"><h2>trackmend</h2></div>
-    <p class="tagline">Repairs a macOS Music library full of local files.</p>
-    <p>It's made for YouTube rips and albums saved as one long file. trackmend cleans the titles and finds the real artwork, album, year and track number on Deezer. It also adds lyrics from LRCLIB and removes duplicate copies. Full albums get cut into one track per song.</p>
-    <p>Changes go through the Music app itself: each track is found by its persistent ID, so Music takes every one of them.</p>
-    <p class="fact">Dry run by default. Every change is backed up first, and <code>trackmend undo</code> puts it all back.</p>
+    <p class="tagline" data-i18n="t43">Repairs a macOS Music library full of local files.</p>
+    <p data-i18n="t44">It's made for YouTube rips and albums saved as one long file. trackmend cleans the titles and finds the real artwork, album, year and track number on Deezer. It also adds lyrics from LRCLIB and removes duplicate copies. Full albums get cut into one track per song.</p>
+    <p data-i18n="t45">Changes go through the Music app itself: each track is found by its persistent ID, so Music takes every one of them.</p>
+    <p class="fact" data-i18n="t46">Dry run by default. Every change is backed up first, and <code>trackmend undo</code> puts it all back.</p>
     <ul class="stack"><li>Python</li><li>JavaScript for Automation</li><li>AppleScript</li><li>mutagen</li><li>ffmpeg</li></ul>
-    <p class="links"><a class="more" href="https://github.com/Bouliw/trackmend">Source on GitHub</a></p>
+    <p class="links"><a class="more" href="https://github.com/Bouliw/trackmend" data-i18n="t13">Source on GitHub</a></p>
   </div>
   <figure class="stage">
-    <img class="shot" src="assets/trackmend-scan.webp" width="1600" height="581" loading="lazy" decoding="async" alt="trackmend scan report on a sample library of twelve files, before and after the tags, lyrics and dedup commands">
+    <img class="shot" src="assets/trackmend-scan.webp" width="1600" height="581" loading="lazy" decoding="async" alt="trackmend scan report on a sample library of twelve files, before and after the tags, lyrics and dedup commands" data-i18n-alt="a8">
   </figure>
 </article>
 
 <article class="project" id="doc-indexer" style="--accent:#2ea36b">
   <div class="copy">
-    <p class="label">07 · Private OCR</p>
+    <p class="label" data-i18n="t47">07 · Private OCR</p>
     <div class="head"><h2>doc-indexer-macos</h2></div>
-    <p class="tagline">On-device OCR and text extraction for a folder of paperwork.</p>
-    <p>Point it at scanned PDFs and phone photos of receipts, and you get one plain-text file per document plus a manifest that grep or any other tool can read. OCR runs on the Mac with Apple Vision, and the originals are never modified.</p>
-    <p>Runs are incremental: only the documents that changed are processed again.</p>
-    <p class="fact">Zero dependencies: Python's standard library and frameworks that ship with macOS.</p>
+    <p class="tagline" data-i18n="t48">On-device OCR and text extraction for a folder of paperwork.</p>
+    <p data-i18n="t49">Point it at scanned PDFs and phone photos of receipts, and you get one plain-text file per document plus a manifest that grep or any other tool can read. OCR runs on the Mac with Apple Vision, and the originals are never modified.</p>
+    <p data-i18n="t50">Runs are incremental: only the documents that changed are processed again.</p>
+    <p class="fact" data-i18n="t51">Zero dependencies: Python's standard library and frameworks that ship with macOS.</p>
     <ul class="stack"><li>Python</li><li>Swift</li><li>Apple Vision</li><li>PDFKit</li><li>textutil</li></ul>
-    <p class="links"><a class="more" href="https://github.com/Bouliw/doc-indexer-macos">Source on GitHub</a></p>
+    <p class="links"><a class="more" href="https://github.com/Bouliw/doc-indexer-macos" data-i18n="t13">Source on GitHub</a></p>
   </div>
   <figure class="stage">
-    <img class="shot" src="assets/doc-indexer-demo.webp" width="1180" height="852" loading="lazy" decoding="async" alt="Terminal: fictitious documents extracted to text, then the OCR text of a scanned rent receipt">
+    <img class="shot" src="assets/doc-indexer-demo.webp" width="1180" height="852" loading="lazy" decoding="async" alt="Terminal: fictitious documents extracted to text, then the OCR text of a scanned rent receipt" data-i18n-alt="a9">
   </figure>
 </article>
 
 <article class="project" id="mac-toolkit" style="--accent:#1499a6">
   <div class="copy">
-    <p class="label">08 · Everyday tools</p>
+    <p class="label" data-i18n="t52">08 · Everyday tools</p>
     <div class="head"><h2>mac-toolkit</h2></div>
-    <p class="tagline">Small tools I use every day, in one install script.</p>
-    <p>HeadsetGuard keeps a Bluetooth headset from clipping short sounds, CleanLinks strips tracking parameters from copied links, and Finder quick actions transcribe a video or compress it for Discord. Two Safari share actions download a video or send it to an LG TV at the current timestamp.</p>
-    <p>Most of them run in the background as launch agents.</p>
-    <p class="fact">Running <code>./install.sh</code> again updates everything in place.</p>
+    <p class="tagline" data-i18n="t53">Small tools I use every day, in one install script.</p>
+    <p data-i18n="t54">HeadsetGuard keeps a Bluetooth headset from clipping short sounds, CleanLinks strips tracking parameters from copied links, and Finder quick actions transcribe a video or compress it for Discord. Two Safari share actions download a video or send it to an LG TV at the current timestamp.</p>
+    <p data-i18n="t55">Most of them run in the background as launch agents.</p>
+    <p class="fact" data-i18n="t56">Running <code>./install.sh</code> again updates everything in place.</p>
     <ul class="stack"><li>Shell</li><li>Swift</li><li>Python</li><li>launchd</li><li>Shortcuts</li></ul>
-    <p class="links"><a class="more" href="https://github.com/Bouliw/mac-toolkit">Source on GitHub</a></p>
+    <p class="links"><a class="more" href="https://github.com/Bouliw/mac-toolkit" data-i18n="t13">Source on GitHub</a></p>
   </div>
   <figure class="stage">
     <div class="term">
       <span class="bar" aria-hidden="true"><i></i><i></i><i></i><span>mac-toolkit</span></span>
       <p class="cmd"><b>$</b> ./install.sh --list</p>
       <dl>
-        <dt>headset-guard</dt><dd>Bluetooth headset: no more clipped sounds, its mic is never picked automatically</dd>
-        <dt>clean-links</dt><dd>strips tracking parameters (utm, fbclid, ?si=…) from copied links</dd>
-        <dt>fps-counter</dt><dd>Metal FPS counter in games</dd>
-        <dt>quick-actions</dt><dd>Finder: Transcribe, Compress for Discord, Shrink PDF, Strip Metadata</dd>
-        <dt>download-video</dt><dd>Share menu: Download Video (yt-dlp, updated daily)</dd>
-        <dt>send-to-tv</dt><dd>Share menu: send a YouTube video or a Twitch channel to an LG TV</dd>
-        <dt>auto-pip</dt><dd>Safari: automatic picture-in-picture when you switch tabs</dd>
-        <dt>wallper-sync</dt><dd>system wallpaper kept in sync with Wallper</dd>
-        <dt>finetune-patch</dt><dd>FineTune rebuilt: per-app volume, audio devices left to macOS</dd>
+        <dt>headset-guard</dt><dd data-i18n="t57">Bluetooth headset: no more clipped sounds, its mic is never picked automatically</dd>
+        <dt>clean-links</dt><dd data-i18n="t58">strips tracking parameters (utm, fbclid, ?si=…) from copied links</dd>
+        <dt>fps-counter</dt><dd data-i18n="t59">Metal FPS counter in games</dd>
+        <dt>quick-actions</dt><dd data-i18n="t60">Finder: Transcribe, Compress for Discord, Shrink PDF, Strip Metadata</dd>
+        <dt>download-video</dt><dd data-i18n="t61">Share menu: Download Video (yt-dlp, updated daily)</dd>
+        <dt>send-to-tv</dt><dd data-i18n="t62">Share menu: send a YouTube video or a Twitch channel to an LG TV</dd>
+        <dt>auto-pip</dt><dd data-i18n="t63">Safari: automatic picture-in-picture when you switch tabs</dd>
+        <dt>wallper-sync</dt><dd data-i18n="t64">system wallpaper kept in sync with Wallper</dd>
+        <dt>finetune-patch</dt><dd data-i18n="t65">FineTune rebuilt: per-app volume, audio devices left to macOS</dd>
       </dl>
     </div>
   </figure>
@@ -401,18 +409,18 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
   <div class="copy">
     <p class="label">Upstream</p>
     <div class="head"><h2>Homebrew</h2></div>
-    <p class="tagline">One-line fix to the whisper.cpp formula, merged into homebrew-core.</p>
-    <p>After installing whisper.cpp, Homebrew's caveats sent users to a model host that now returns a 404. I replaced the link with the models folder of the upstream repository, which lists the available models and how to download them.</p>
-    <p class="links"><a class="more" href="https://github.com/Homebrew/homebrew-core/pull/318001">Pull request #318001</a><span class="label" style="color:var(--muted)">Merged 13 Oct 2026</span></p>
+    <p class="tagline" data-i18n="t66">One-line fix to the whisper.cpp formula, merged into homebrew-core.</p>
+    <p data-i18n="t67">After installing whisper.cpp, Homebrew's caveats sent users to a model host that now returns a 404. I replaced the link with the models folder of the upstream repository, which lists the available models and how to download them.</p>
+    <p class="links"><a class="more" href="https://github.com/Homebrew/homebrew-core/pull/318001">Pull request #318001</a><span class="label" style="color:var(--muted)" data-i18n="t68">Merged 13 Oct 2026</span></p>
   </div>
-  <pre class="diff" tabindex="0" aria-label="The one-line change in Formula/w/whisper.cpp.rb"><span class="file">Formula/w/whisper.cpp.rb</span><span>    To obtain model files (.bin), visit one of these locations:</span><span> </span><span>      https://huggingface.co/ggerganov/whisper.cpp/tree/main</span><del>-     https://ggml.ggerganov.com/</del><ins>+     https://github.com/ggml-org/whisper.cpp/tree/master/models</ins></pre>
+  <pre class="diff" tabindex="0" aria-label="The one-line change in Formula/w/whisper.cpp.rb" data-i18n-aria="a10"><span class="file">Formula/w/whisper.cpp.rb</span><span>    To obtain model files (.bin), visit one of these locations:</span><span> </span><span>      https://huggingface.co/ggerganov/whisper.cpp/tree/main</span><del>-     https://ggml.ggerganov.com/</del><ins>+     https://github.com/ggml-org/whisper.cpp/tree/master/models</ins></pre>
 </section>
 
 </main>
 
 <footer>
   <span>Bouliw</span>
-  <nav aria-label="Elsewhere">
+  <nav aria-label="Elsewhere" data-i18n-aria="a0">
     <a href="https://github.com/Bouliw">GitHub</a>
     <a href="https://www.linkedin.com/in/martin-laffont-1a218b250/">LinkedIn</a>
   </nav>
@@ -431,6 +439,7 @@ if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
   videos.forEach(v => io.observe(v));
 }
 </script>
+<script src="lang.js" defer></script>
 <script src="fun/fun.js" defer></script>
 </body>
 </html>

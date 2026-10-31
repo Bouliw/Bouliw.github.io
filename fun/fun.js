@@ -64,16 +64,85 @@
   };
   const EARN = [
     ['Unlock an achievement', '+50'],
+    ['Type the cheat code', '+100'],
     ['Open a project on GitHub', '+25'],
     ['Try a style for the first time', '+20'],
     ['Reach a project you have not seen this visit', '+15'],
     ['Switch back to a style', '+10'],
     ['Press CONTINUE? in the footer', '+10'],
-    ['Type the cheat code', '+30'],
     ['Scroll further down the page', '+3'],
     ['Click around (40 per visit) or poke the buddy', '+1 / +2'],
     ['Play the hidden game', 'score ÷ 50'],
   ];
+
+  // French, when the page language is French (lang.js sets <html lang>).
+  const FR = {
+    trophies: {
+      start: ["Dangereux d'y aller seul", 'Portfolio ouvert en mode fun'],
+      costume: ['Relooking extrême', 'Un autre style essayé'],
+      hopper: ['Attrapez-les tous', 'Les sept styles essayés'],
+      tour: ['Le tour du monde en neuf étapes', 'Les neuf projets visités'],
+      source: ['Utilise la source, Luke', 'Un projet ouvert'],
+      konami: ['Trente vies en rab', 'Le code des vieux jeux tapé'],
+      sticker: ['Ça colle !', 'Un autocollant déplacé'],
+      sound: ['Un, deux, un, deux', 'Son activé'],
+      music: ['Quand la musique est bonne', 'Musique activée'],
+      clicks: ['Tendinite any%', '30 clics'],
+      arcade: ["Rat d'arcade", 'Jeu caché trouvé'],
+      ace: ['All your base are belong to us', '3 000 points marqués'],
+    },
+    hints: {
+      start: 'Ouvrir le portfolio en mode fun',
+      costume: 'Choisir un autre style dans le dock',
+      hopper: 'Essayer les sept styles',
+      tour: 'Faire défiler les neuf projets en une visite',
+      source: "Cliquer sur la fenêtre d'un projet ou sur un de ses liens",
+      konami: 'Taper le code affiché en bas de page',
+      sticker: 'Déplacer un autocollant du titre Overdrive',
+      sound: 'Activer le son dans le dock',
+      music: 'Activer le son, puis la musique',
+      clicks: 'Cliquer 30 fois en une visite',
+      arcade: 'Trouver la fente à pièces en bas de page',
+      ace: 'Faire 3 000 points au jeu caché',
+    },
+    earn: [
+      ['Débloquer un succès', '+50'],
+      ['Taper le code de triche', '+100'],
+      ['Ouvrir un projet sur GitHub', '+25'],
+      ['Essayer un style pour la première fois', '+20'],
+      ['Arriver sur un projet pas encore vu pendant la visite', '+15'],
+      ['Revenir à un style', '+10'],
+      ['Appuyer sur CONTINUE? en bas de page', '+10'],
+      ['Descendre plus loin dans la page', '+3'],
+      ['Cliquer partout (40 par visite) ou embêter le perso', '+1 / +2'],
+      ['Jouer au jeu caché', 'score ÷ 50'],
+    ],
+    lines: ['Salut !', 'Choisis un style en bas !', 'Clique sur une fenêtre pour voir le code.', 'Essaie ↑↑↓↓←→←→BA', 'Une pièce en bas de page !', 'Nouvelle tenue ?', 'Active le son !'],
+  };
+  const UI = {
+    en: {
+      unlockedToast: 'Achievement unlocked', progress: 'Progress', close: 'Close', todo: 'Still to unlock', earn: 'How to earn XP', done: 'Unlocked',
+      next: (n, L, t) => `${n} XP to level ${L} · ${t} XP in total`, all: 'Every achievement unlocked. Well played.', hi: n => `Hidden game high score: ${n}`,
+      ok: 'Done', best: n => `best ${n}`, chip: (L, a, b) => `Level ${L}, ${a} of ${b} XP. Show achievements and how to level up`,
+      sound: 'Sound', music: 'Music', typing: 'Typing', typingAria: 'Typing sounds', dock: 'Fun mode style', fun: 'Fun mode',
+      game: 'Hidden game', screen: 'Game screen. Move with the arrow keys or the pointer, fire with space or a tap.', cont: 'Continue: back to the top',
+      hello: 'Hi there!', thanks: 'Thanks for playing!', round: 'Round 2!', outfit: 'New outfit!', cheat: 'Cheat code!', level: L => `LEVEL ${L}!`,
+    },
+    fr: {
+      unlockedToast: 'Succès débloqué', progress: 'Progression', close: 'Fermer', todo: 'Encore à débloquer', earn: "Comment gagner de l'XP", done: 'Débloqués',
+      next: (n, L, t) => `${n} XP avant le niveau ${L} · ${t} XP au total`, all: 'Tous les succès sont débloqués. Bien joué.', hi: n => `Meilleur score au jeu caché : ${n}`,
+      ok: 'Fait', best: n => `record ${n}`, chip: (L, a, b) => `Niveau ${L}, ${a} XP sur ${b}. Voir les succès et comment monter de niveau`,
+      sound: 'Son', music: 'Musique', typing: 'Frappe', typingAria: 'Sons de frappe', dock: 'Style du mode fun', fun: 'Mode fun',
+      game: 'Jeu caché', screen: 'Écran du jeu. Déplacement avec les flèches ou la souris, tir avec espace ou un toucher.', cont: 'Continuer : retour en haut',
+      hello: 'Salut !', thanks: "Merci d'avoir joué !", round: 'Round 2 !', outfit: 'Nouvelle tenue !', cheat: 'Code de triche !', level: L => `NIVEAU ${L} !`,
+    },
+  };
+  const isFr = () => root.lang === 'fr';
+  const u = k => UI[isFr() ? 'fr' : 'en'][k];
+  const trophyText = id => (isFr() ? FR.trophies : TROPHIES)[id];
+  const hintText = id => (isFr() ? FR.hints : HINTS)[id];
+  const earnList = () => (isFr() ? FR.earn : EARN);
+  const lineList = () => (isFr() ? FR.lines : LINES);
 
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -537,7 +606,7 @@
       const L = this.level(), lo = 50 * (L - 1) * L, hi = 50 * L * (L + 1);
       chip.querySelector('b').textContent = `LV ${L}`;
       chip.querySelector('i').style.setProperty('--p', ((this.total - lo) / (hi - lo)).toFixed(3));
-      chip.setAttribute('aria-label', `Level ${L}, ${this.total - lo} of ${hi - lo} XP. Show achievements and how to level up`);
+      chip.setAttribute('aria-label', u('chip')(L, this.total - lo, hi - lo));
       if (panel) renderPanel();
     },
     popup(n) {
@@ -550,7 +619,7 @@
   };
   function levelUp(L) {
     audio.play('level');
-    buddy.react(9, `LEVEL ${L}!`);
+    buddy.react(9, u('level')(L));
     if (!motion()) return;
     const o = hidden('div', 'fx-levelup', '<b>LEVEL UP!</b><span></span>');
     o.querySelector('span').textContent = `LV ${L}`;
@@ -568,7 +637,7 @@
     if (id === 'hopper') return `${Math.min(store.list(TRIED_KEY).length, SKINS.length)}/${SKINS.length}`;
     if (id === 'tour') return `${visit.seen.size}/${visit.stages}`;
     if (id === 'clicks') return `${Math.min(visit.clicks, 30)}/30`;
-    if (id === 'ace') { const hi = parseInt(store.get(HI_KEY) || '0', 10) || 0; return hi ? `best ${hi}` : ''; }
+    if (id === 'ace') { const hi = parseInt(store.get(HI_KEY) || '0', 10) || 0; return hi ? u('best')(hi) : ''; }
     return '';
   }
   function renderPanel() {
@@ -577,19 +646,19 @@
     const todo = ids.filter(id => !unlocked.has(id)), done = ids.filter(id => unlocked.has(id));
     const best = parseInt(store.get(HI_KEY) || '0', 10) || 0;
     const item = (id, ok) => {
-      const [name, desc] = TROPHIES[id];
+      const [name, desc] = trophyText(id);
       const c = ok ? '' : counter(id);
-      return `<li class="${ok ? 'ok' : 'todo'}"><span class="ico">${ok ? ICON_CUP : ICON_LOCK}</span><span class="txt"><b>${esc(name)}</b><span>${esc(ok ? desc : HINTS[id])}</span></span>` +
-        `<em>${c ? `<i>${esc(c)}</i>` : ''}${ok ? 'Done' : '+50 XP'}</em></li>`;
+      return `<li class="${ok ? 'ok' : 'todo'}"><span class="ico">${ok ? ICON_CUP : ICON_LOCK}</span><span class="txt"><b>${esc(name)}</b><span>${esc(ok ? desc : hintText(id))}</span></span>` +
+        `<em>${c ? `<i>${esc(c)}</i>` : ''}${ok ? u('ok') : '+50 XP'}</em></li>`;
     };
     panel.querySelector('.fx-panel-body').innerHTML =
       `<div class="lv"><b>LV ${L}</b><span>${xp.total - lo} / ${hi - lo} XP</span></div>` +
       `<div class="bar"><i style="--p:${((xp.total - lo) / (hi - lo)).toFixed(3)}"></i></div>` +
-      `<p class="next">${hi - xp.total} XP to level ${L + 1} · ${xp.total} XP in total</p>` +
-      (todo.length ? `<div class="fx-sec">Still to unlock · ${todo.length}</div><ul class="ach">${todo.map(id => item(id, false)).join('')}</ul>` : '<p class="all">Every achievement unlocked. Well played.</p>') +
-      `<div class="fx-sec">How to earn XP</div><ul class="earn">${EARN.map(([what, n]) => `<li><span>${esc(what)}</span><b>${esc(n)}</b></li>`).join('')}</ul>` +
-      (done.length ? `<div class="fx-sec">Unlocked · ${done.length}/${ids.length}</div><ul class="ach">${done.map(id => item(id, true)).join('')}</ul>` : '') +
-      (best ? `<p class="next">Hidden game high score: ${best}</p>` : '');
+      `<p class="next">${u('next')(hi - xp.total, L + 1, xp.total)}</p>` +
+      (todo.length ? `<div class="fx-sec">${u('todo')} · ${todo.length}</div><ul class="ach">${todo.map(id => item(id, false)).join('')}</ul>` : `<p class="all">${u('all')}</p>`) +
+      `<div class="fx-sec">${u('earn')}</div><ul class="earn">${earnList().map(([what, n]) => `<li><span>${esc(what)}</span><b>${esc(n)}</b></li>`).join('')}</ul>` +
+      (done.length ? `<div class="fx-sec">${u('done')} · ${done.length}/${ids.length}</div><ul class="ach">${done.map(id => item(id, true)).join('')}</ul>` : '') +
+      (best ? `<p class="next">${u('hi')(best)}</p>` : '');
   }
   function openPanel() {
     if (panel) { closePanel(); return; }
@@ -599,7 +668,7 @@
     panel.setAttribute('role', 'dialog');
     panel.setAttribute('aria-modal', 'true');
     panel.setAttribute('aria-labelledby', 'fx-panel-title');
-    panel.innerHTML = '<div class="fx-panel-top"><div class="fx-panel-title" id="fx-panel-title">Progress</div><button type="button" class="close" aria-label="Close">×</button></div><div class="fx-panel-body" tabindex="0"></div>';
+    panel.innerHTML = `<div class="fx-panel-top"><div class="fx-panel-title" id="fx-panel-title">${u('progress')}</div><button type="button" class="close" aria-label="${u('close')}">×</button></div><div class="fx-panel-body" tabindex="0"></div>`;
     renderPanel();
     document.body.append(panel);
     if (chip) chip.setAttribute('aria-expanded', 'true');
@@ -649,11 +718,11 @@
     if (showing || !queue.length || !toasts) return;
     showing = true;
     const id = queue.shift();
-    const [name, desc] = TROPHIES[id];
+    const [name, desc] = trophyText(id);
     const t = document.createElement('div');
     t.className = 'fx-toast';
     t.innerHTML = '<span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3zm0 4H6v1a2 2 0 0 0 1.2 1.8A5 5 0 0 1 7 8zm10 0v1q0 .9-.2 1.8A2 2 0 0 0 18 8V7z"/></svg></span>' +
-      `<span><small>Achievement unlocked · ${unlocked.size}/${Object.keys(TROPHIES).length} · +50 XP</small><b></b><span></span></span>`;
+      `<span><small>${u('unlockedToast')} · ${unlocked.size}/${Object.keys(TROPHIES).length} · +50 XP</small><b></b><span></span></span>`;
     t.querySelector('b').textContent = name;
     t.querySelector('b + span').textContent = desc;
     toasts.append(t);
@@ -750,7 +819,7 @@
         e.stopPropagation();
         this.wake();
         this.jump();
-        this.talk(pick(LINES), 2200);
+        this.talk(pick(lineList()), 2200);
         if (xp.session.clicks < 40) xp.add(2);
       });
       document.body.append(this.el);
@@ -761,7 +830,7 @@
       const arrive = () => {
         if (!this.el) return;
         if (document.querySelector('.od-boot')) { setTimeout(arrive, 300); return; }
-        this.walkTo(rand(40, Math.min(innerWidth * .4, 420)), () => this.talk('Hi there!', 1800));
+        this.walkTo(rand(40, Math.min(innerWidth * .4, 420)), () => this.talk(u('hello'), 1800));
       };
       if (motion()) setTimeout(arrive, 900);
       else { this.x = 16; this.el.style.setProperty('--x', '16px'); }
@@ -782,7 +851,7 @@
         const r = Math.random();
         if (r < .6) this.walkTo(rand(16, innerWidth - 90));
         else if (r < .8) this.react(pick([9, 10, 11]), '', 1600);
-        else this.react(8, pick(LINES), 2400);
+        else this.react(8, pick(lineList()), 2400);
         this.schedule();
       }, rand(6000, 12000));
     },
@@ -830,7 +899,7 @@
       if (!this.el) return;
       this.frame(8);
       if (motion()) { this.el.classList.remove('poof'); void this.el.offsetWidth; this.el.classList.add('poof'); }
-      this.talk('New outfit!', 1400);
+      this.talk(u('outfit'), 1400);
     },
     poke() {
       this.wake();
@@ -944,9 +1013,9 @@
     g.className = 'fx-game';
     g.setAttribute('role', 'dialog');
     g.setAttribute('aria-modal', 'true');
-    g.setAttribute('aria-label', 'Hidden game');
+    g.setAttribute('aria-label', u('game'));
     g.innerHTML = '<div class="cab"><div class="hud"><span>SCORE <b class="sc">0</b></span><span>HI <b class="hi">0</b></span><span>LIVES <b class="lv">3</b></span></div>' +
-      '<canvas width="240" height="320" tabindex="0" aria-label="Game screen. Move with the arrow keys or the pointer, fire with space or a tap."></canvas>' +
+      `<canvas width="240" height="320" tabindex="0" aria-label="${u('screen')}"></canvas>` +
       '<div class="help"><span>← → OR Q D / A D MOVE · SPACE FIRE · ESC QUIT</span><button type="button" class="quit">QUIT</button></div></div>';
     document.body.append(g);
     const cv = g.querySelector('canvas');
@@ -1356,7 +1425,7 @@
     let cleared = false;
     if (foot) {
       const endIO = new IntersectionObserver(es => {
-        if (es[0].isIntersecting && !cleared) { cleared = true; audio.play('clear', clickKind(foot)); buddy.react(9, 'Thanks for playing!', 2600); }
+        if (es[0].isIntersecting && !cleared) { cleared = true; audio.play('clear', clickKind(foot)); buddy.react(9, u('thanks'), 2600); }
       }, { threshold: .5 });
       endIO.observe(foot);
       later(() => endIO.disconnect());
@@ -1484,10 +1553,10 @@
       if (k === code.length) {
         k = 0;
         trophy('konami');
-        xp.add(30);
+        xp.add(100);
         root.classList.add('od-hyper');
         if (motion()) confetti();
-        buddy.react(10, 'Cheat code!', 2200);
+        buddy.react(10, u('cheat'), 2200);
         setTimeout(() => root.classList.remove('od-hyper'), 6000);
       }
     });
@@ -1550,7 +1619,7 @@
   }
 
   // CONTINUE? and the logo: back to the start of the page, with the style's own transition and the intro again.
-  function backToTop({ title = 'CONTINUE', small = 'NEW GAME +', xp: gain = 10, say = 'Round 2!' } = {}) {
+  function backToTop({ title = 'CONTINUE', small = 'NEW GAME +', xp: gain = 10, say = u('round') } = {}) {
     if (busy) return;
     if (gain) xp.add(gain);
     audio.play(gain ? 'coin' : 'whoosh');
@@ -1622,14 +1691,33 @@
       add(hidden('div', 'od-band', `<span>${'VIDEO ✦ VOICE ✦ BLUE TEAM ✦ MUSIC ✦ OCR ✦ OPEN SOURCE ✦ 楽しい ✦ '.repeat(6)}</span>`), hero);
     }
 
+    // Mashup: each project gets a guest reference for its title card and a few details.
+    const GUESTS = ['synth', 'persona', 'eva', 'arcade', 'y2k'];
     projects.forEach((p, i) => {
       const n = String(i + 1).padStart(2, '0');
+      const name = p.id.replace(/-/g, ' ');
+      const guest = GUESTS[i % GUESTS.length];
+      p.dataset.guest = guest;
       const segsHtml = Array.from({ length: 9 }, (_, k) => `<i class="${k <= i ? 'on' : ''}"></i>`).join('');
-      add(hidden('div', 'od-card', `<div class="inner"><b>${EPISODES[i] || ''}</b><span class="ep">EPISODE ${n}</span><span class="rule"></span>` +
-        `<span>${p.id.replace(/-/g, ' ')}</span><span class="seg">${segsHtml}</span></div><span class="hz"></span>`), p, p.firstChild);
+      const ransom = [...name.toUpperCase()].map((c, k) => c === ' ' ? '<i class="gap"></i>' : `<i style="--k:${k}">${c}</i>`).join('');
+      const card = {
+        eva: `<div class="inner"><b>${EPISODES[i] || ''}</b><span class="ep">EPISODE ${n}</span><span class="rule"></span><span>${name}</span><span class="seg">${segsHtml}</span></div><span class="hz"></span>`,
+        persona: `<div class="inner"><span class="star">★</span><span class="cc">CALLING CARD</span><span class="ransom">${ransom}</span><span class="no">No.${n}</span></div><span class="slash"></span>`,
+        arcade: `<div class="inner"><span class="up">1UP <b>${n}0000</b></span><span class="stage-t">STAGE ${n}</span><span class="nm">${name}</span><span class="ready">READY!</span><span class="coins"><i></i><i></i><i></i></span></div>`,
+        y2k: `<div class="inner"><span class="win"><i class="ico"></i><span class="tt">Episode_${n}.exe — ${name}</span><span class="btns"><i>_</i><i>□</i><i>×</i></span></span><span class="prog"><i></i></span><span class="spark">✦</span></div>`,
+        synth: `<div class="inner"><span class="sun"></span><span class="ep">EPISODE</span><b class="big">${n}</b><span class="nm">${name}</span></div><span class="grid"></span>`,
+      }[guest];
+      add(hidden('div', `od-card g-${guest}`, card), p, p.firstChild);
+      add(hidden('span', 'od-num', n), p, p.firstChild);
       const st = p.querySelector('.stage');
       if (st) add(hidden('span', 'od-sheen'), st);
+      const h = p.querySelector('h2');
+      if (h) h.style.setProperty('--gd', `${(-i * 1.37).toFixed(2)}s`);
     });
+    later(() => projects.forEach(p => { delete p.dataset.guest; const h = p.querySelector('h2'); if (h) h.style.removeProperty('--gd'); }));
+    // An RGB glitch layer over the headline (decorative copy of its text).
+    const h1 = hero && hero.querySelector('h1');
+    if (h1) { const gl = add(hidden('span', 'od-glitch'), h1); gl.textContent = h1.dataset.text || h1.textContent; }
 
     const foot = document.querySelector('footer');
     if (foot) {
@@ -1640,7 +1728,7 @@
       cont.type = 'button';
       cont.className = 'od-continue';
       cont.innerHTML = '<b aria-hidden="true">▶</b> CONTINUE?';
-      cont.setAttribute('aria-label', 'Continue: back to the top');
+      cont.setAttribute('aria-label', u('cont'));
       cont.addEventListener('click', () => newGame());
       thanks.prepend(cont);
     }
@@ -1714,7 +1802,8 @@
     // HUD: progress, gauge, current stage, pointer coordinates.
     const named = [hero, ...projects].filter(Boolean);
     hud.querySelector('.of').textContent = String(named.length - 1).padStart(2, '0');
-    let lit = -1, ticking = false;
+    let lit = -1, ticking = false, tinted = -1;
+    later(() => { root.style.removeProperty('--od-c1'); root.style.removeProperty('--od-c3'); });
     const onScroll = () => {
       ticking = false;
       if (!od) return;
@@ -1731,6 +1820,12 @@
       named.forEach((s, k) => { if (s.getBoundingClientRect().top < innerHeight * .45) cur = k; });
       hud.querySelector('b').textContent = String(cur).padStart(2, '0');
       hud.querySelector('.nm').textContent = cur === 0 ? 'START' : named[cur].id.replace(/-/g, ' ');
+      if (cur !== tinted) {
+        tinted = cur;
+        const acc = cur === 0 ? '' : getComputedStyle(named[cur]).getPropertyValue('--accent').trim();
+        if (acc) { root.style.setProperty('--od-c1', acc); root.style.setProperty('--od-c3', `color-mix(in oklab, ${acc} 60%, #ff2e88)`); }
+        else { root.style.removeProperty('--od-c1'); root.style.removeProperty('--od-c3'); }
+      }
       kick();
     };
     on(window, 'scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
@@ -1875,13 +1970,13 @@
     dock = document.createElement('div');
     dock.className = 'fx-dock';
     dock.setAttribute('role', 'group');
-    dock.setAttribute('aria-label', 'Fun mode style');
+    dock.setAttribute('aria-label', u('dock'));
     dock.innerHTML = '<button type="button" class="fx-xp" aria-haspopup="dialog" aria-expanded="false"><b>LV 1</b><i aria-hidden="true"></i></button><span class="fx-dock-label" aria-hidden="true">STYLE</span>' +
       SKINS.map(([k, name]) => `<button type="button" data-skin-btn="${k}" aria-pressed="false"><span class="sw" aria-hidden="true"></span>${name}</button>`).join('') +
       '<span class="fx-dock-sep" aria-hidden="true"></span>' +
-      `<button type="button" class="fx-sound" aria-pressed="false" aria-label="Sound">${ICONS.soundOff}${ICONS.soundOn}<span class="lbl" aria-hidden="true">Sound</span></button>` +
-      `<button type="button" class="fx-music" aria-pressed="false" aria-label="Music" hidden>${ICONS.music}<span class="lbl" aria-hidden="true">Music</span></button>` +
-      `<button type="button" class="fx-typing" aria-pressed="false" aria-label="Typing sounds" hidden>${ICONS.typing}<span class="lbl" aria-hidden="true">Typing</span></button>`;
+      `<button type="button" class="fx-sound" aria-pressed="false" aria-label="${u('sound')}">${ICONS.soundOff}${ICONS.soundOn}<span class="lbl" aria-hidden="true">${u('sound')}</span></button>` +
+      `<button type="button" class="fx-music" aria-pressed="false" aria-label="${u('music')}" hidden>${ICONS.music}<span class="lbl" aria-hidden="true">${u('music')}</span></button>` +
+      `<button type="button" class="fx-typing" aria-pressed="false" aria-label="${u('typingAria')}" hidden>${ICONS.typing}<span class="lbl" aria-hidden="true">${u('typing')}</span></button>`;
     dock.addEventListener('click', e => {
       if (e.target.closest('.fx-xp')) { openPanel(); return; }
       const b = e.target.closest('[data-skin-btn]');
@@ -1925,6 +2020,8 @@
       music.stop();
       audio.keepAwake(false);
       closePanel(false);
+      lite = false;
+      root.classList.remove('fx-lite');
       odOff();
       coreOff();
       if (dock) { dock.remove(); dock = null; }
@@ -1947,6 +2044,25 @@
       done();
     }, 450);
   }
+
+  let relang = false;
+  document.addEventListener('bouliw:beforelang', () => {
+    if (!isOn()) return;
+    relang = true;
+    closePanel(false);
+    odOff();
+    coreOff();
+  });
+  document.addEventListener('bouliw:afterlang', () => {
+    toggle.setAttribute('aria-label', u('fun'));
+    if (!relang) return;
+    relang = false;
+    if (dock) { dock.remove(); dock = null; }
+    buildDock();
+    coreOn();
+    setSkin(root.dataset.skin, false);
+  });
+  toggle.setAttribute('aria-label', u('fun'));
 
   toggle.addEventListener('click', () => {
     if (busy || root.classList.contains('fx-starting')) return;

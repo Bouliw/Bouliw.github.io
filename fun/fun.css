@@ -140,14 +140,14 @@ html.fx-anim[data-fun] :is(.project, .upstream).fx-in :is(.stage, .diff) { anima
   text-shadow: 0 1px 1px rgb(0 0 0 / .5);
 }
 :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top nav { gap: 8px; }
-:is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top nav a, :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle {
+:is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top nav :is(a, .lang-toggle), :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle {
   margin: 0; padding: 7px 14px; border: 1.5px solid var(--y-edge); border-radius: 999px; color: #0a0a0b;
   font: 11px/1 "FX Silk", var(--mono); letter-spacing: .04em;
   background: linear-gradient(180deg, #ffffff 0 46%, #e3e0ef 52%, #f6f5fb 100%);
   box-shadow: inset 0 -2px 0 rgb(0 0 0 / .08);
 }
 :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle { margin-left: 8px; }
-:is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top nav a:hover, :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle:hover { background: linear-gradient(180deg, #e2f6ff 0 46%, #7cc8f7 52%, #bfe9ff 100%); }
+:is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top nav :is(a, .lang-toggle):hover, :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle:hover { background: linear-gradient(180deg, #e2f6ff 0 46%, #7cc8f7 52%, #bfe9ff 100%); }
 :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle[aria-pressed="true"] { background: linear-gradient(180deg, #f3ffe0 0 46%, #a6ef2f 52%, #d8ff98 100%); }
 
 :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).hero h1 {
@@ -307,11 +307,11 @@ html.fx-anim :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer)
 
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .mark { font: 400 22px/1 "FX Anton", sans-serif; text-transform: uppercase; font-style: italic; letter-spacing: .02em; }
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .glyph { background: var(--p-red); color: #fff; border-radius: 0; clip-path: polygon(0 8%, 100% 0, 92% 100%, 6% 92%); font: 400 20px/1 "FX Anton", sans-serif; rotate: -6deg; }
-:is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top nav a, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .fun-toggle, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])):is(footer) nav a {
+:is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top nav :is(a, .lang-toggle), :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .fun-toggle, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])):is(footer) nav :is(a, .lang-toggle) {
   padding: 5px 12px; background: var(--p-box); color: var(--p-on-box); font: italic 800 12px/1 "FX Geist", sans-serif; text-transform: uppercase; letter-spacing: .06em;
   clip-path: polygon(0 0, 100% 12%, 96% 100%, 3% 88%); transition: background .15s, color .15s, rotate .15s;
 }
-:is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top nav a:hover, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .fun-toggle:hover, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])):is(footer) nav a:hover { background: var(--p-red); color: #fff; rotate: -3deg; }
+:is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top nav :is(a, .lang-toggle):hover, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .fun-toggle:hover, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])):is(footer) nav :is(a, .lang-toggle):hover { background: var(--p-red); color: #fff; rotate: -3deg; }
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .fun-toggle[aria-pressed="true"] { background: var(--p-red); color: #fff; }
 :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .fun-toggle .fun-switch { border-color: currentColor; }
 
@@ -453,16 +453,16 @@ html.fx-anim :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, foo
 }
 :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .mark { font: 900 18px/1 "FX Serif", serif; font-stretch: 62.5%; text-transform: uppercase; letter-spacing: .02em; }
 :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .glyph { border-radius: 0; background: var(--ink); color: var(--bg); font: 900 20px/1 "FX Serif", serif; font-stretch: 62.5%; }
-:is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav a, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])):is(footer) nav a { color: var(--e-or-text); font: 600 12px/1 "FX Mono", monospace; text-transform: uppercase; letter-spacing: .12em; }
-:is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav a::before, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle .fun-label::before, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])):is(footer) nav a::before { content: "["; margin-right: 3px; }
-:is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav a::after, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle .fun-label::after, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])):is(footer) nav a::after { content: "]"; margin-left: 3px; }
-:is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav a:hover, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle:hover { color: var(--ink); }
+:is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav :is(a, .lang-toggle), :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])):is(footer) nav :is(a, .lang-toggle) { color: var(--e-or-text); font: 600 12px/1 "FX Mono", monospace; text-transform: uppercase; letter-spacing: .12em; }
+:is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav :is(a, .lang-toggle)::before, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle .fun-label::before, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])):is(footer) nav :is(a, .lang-toggle)::before { content: "["; margin-right: 3px; }
+:is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav :is(a, .lang-toggle)::after, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle .fun-label::after, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])):is(footer) nav :is(a, .lang-toggle)::after { content: "]"; margin-left: 3px; }
+:is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav :is(a, .lang-toggle):hover, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle:hover { color: var(--ink); }
 :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-switch { border-radius: 0; } :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-switch i { border-radius: 0; }
 @media (max-width: 560px) {
   :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .mark { font-size: 0; gap: 0; }
-  :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav a, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle { letter-spacing: .04em; }
-  :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav a::before, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle .fun-label::before { margin-right: 1px; }
-  :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav a::after, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle .fun-label::after { margin-left: 1px; }
+  :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav :is(a, .lang-toggle), :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle { letter-spacing: .04em; }
+  :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav :is(a, .lang-toggle)::before, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle .fun-label::before { margin-right: 1px; }
+  :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top nav :is(a, .lang-toggle)::after, :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).top .fun-toggle .fun-label::after { margin-left: 1px; }
 }
 
 :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])).hero .fx-deco::before {
@@ -590,8 +590,8 @@ html.fx-anim :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, foote
 }
 :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top .mark { font: 800 15px/1 "FX Orbitron", sans-serif; letter-spacing: .12em; text-transform: uppercase; }
 :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top .glyph { border-radius: 0; background: transparent; color: var(--n-ct); box-shadow: inset 0 0 0 1.5px var(--n-c), 0 0 14px var(--n-glow); font: 900 16px/1 "FX Orbitron", sans-serif; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); }
-:is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top nav a, :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top .fun-toggle, :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])):is(footer) nav a { color: var(--n-ct); font: 600 12px/1 "FX Mono", monospace; text-transform: uppercase; letter-spacing: .14em; }
-:is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top nav a:hover, :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top .fun-toggle:hover { color: var(--n-mt); text-shadow: 0 0 10px var(--n-glow); }
+:is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top nav :is(a, .lang-toggle), :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top .fun-toggle, :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])):is(footer) nav :is(a, .lang-toggle) { color: var(--n-ct); font: 600 12px/1 "FX Mono", monospace; text-transform: uppercase; letter-spacing: .14em; }
+:is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top nav :is(a, .lang-toggle):hover, :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).top .fun-toggle:hover { color: var(--n-mt); text-shadow: 0 0 10px var(--n-glow); }
 
 :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).hero .fx-deco::before {
   top: clamp(40px, 8vw, 100px); right: max(24px, calc(50vw - 560px)); width: min(30vw, 380px); aspect-ratio: 1; border-radius: 50%;
@@ -705,12 +705,12 @@ html.fx-anim :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, foote
 }
 :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .mark { font: 12px/1 "FX Press", monospace; text-transform: uppercase; }
 :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .glyph { border-radius: 0; background: var(--x-a); color: var(--x-on-a); font: 13px/1 "FX Press", monospace; box-shadow: 0 0 0 3px var(--ink), 4px 4px 0 3px var(--ink); }
-:is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top nav a, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-toggle, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)):is(footer) nav a {
+:is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top nav :is(a, .lang-toggle), :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-toggle, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)):is(footer) nav :is(a, .lang-toggle) {
   padding: 8px 10px; background: var(--surface); color: var(--ink); font: 11px/1 "FX Silk", monospace; text-transform: uppercase;
   box-shadow: 0 0 0 3px var(--ink), inset -3px -3px 0 rgb(0 0 0 / .18), inset 3px 3px 0 rgb(255 255 255 / .35);
 }
 :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top nav { gap: 14px; } :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-toggle { margin-left: 14px; }
-:is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top nav a:hover, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-toggle:hover, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)):is(footer) nav a:hover { background: var(--x-a); color: var(--x-on-a); }
+:is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top nav :is(a, .lang-toggle):hover, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-toggle:hover, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)):is(footer) nav :is(a, .lang-toggle):hover { background: var(--x-a); color: var(--x-on-a); }
 :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-switch { border-radius: 0; } :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-switch i { border-radius: 0; }
 :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).hero .fx-deco::before {
   top: 40px; left: 0; width: 8px; height: 8px; background: transparent;
@@ -813,8 +813,8 @@ html.fx-anim :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, foote
   :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).hero .fx-deco::before { width: 40vw; top: 18px; opacity: .55; }
   :is([data-skin="neon"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])).hero .fx-deco::after { display: none; }
   :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top { border-radius: 22px; }
-  :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top nav a, :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle { padding: 6px 9px; }
-  :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top nav a, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-toggle { padding: 6px 7px; font-size: 10px; }
+  :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top nav :is(a, .lang-toggle), :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle { padding: 6px 9px; }
+  :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top nav :is(a, .lang-toggle), :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-toggle { padding: 6px 7px; font-size: 10px; }
   :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).hero .index a { grid-template-columns: 1.4em 2.2em 1fr; }
   :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).hero .index .d { grid-column: 3; }
   :is([data-skin="alert"], [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])) .fx-ep b { font-size: 1.8rem; }
@@ -827,7 +827,7 @@ html.fx-anim :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, foote
   .fx-dock button { padding: 9px 8px; font-size: 12.5px; }
 }
 @media (max-width: 520px) {
-  :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top nav a, :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top nav a, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .fun-toggle, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top nav a, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-toggle { font-size: 10px; }
+  :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top nav :is(a, .lang-toggle), :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .fun-toggle, :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top nav :is(a, .lang-toggle), :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .fun-toggle, :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top nav :is(a, .lang-toggle), :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .fun-toggle { font-size: 10px; }
   :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .mark, :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .mark { font-size: 0; gap: 0; }
   :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is(.top, .hero, [id="takeline"])).top .mark .glyph, :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="earshot"], [id="trackmend"])).top .mark .glyph { font-size: 18px; }
   :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .mark { font-size: 0; gap: 0; } :is([data-skin="pixel"] :is(.top, .hero, .project, .upstream, footer), [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)).top .mark .glyph { font-size: 13px; }
@@ -878,9 +878,9 @@ html[data-skin="overdrive"] a:focus-visible, html[data-skin="overdrive"] button:
 /* ---------- Ambient layers ---------- */
 .od-aurora { position: fixed; inset: 0; z-index: -3; pointer-events: none; overflow: hidden; }
 .od-aurora i { position: absolute; width: 70vmax; height: 70vmax; border-radius: 50%; opacity: .42; }
-.od-aurora i:nth-child(1) { background: radial-gradient(closest-side, #6b2bff, transparent); left: -22vmax; top: -26vmax; animation: od-drift-a 48s ease-in-out infinite alternate; }
+.od-aurora i:nth-child(1) { background: radial-gradient(closest-side, var(--od-c1), transparent); left: -22vmax; top: -26vmax; animation: od-drift-a 48s ease-in-out infinite alternate; }
 .od-aurora i:nth-child(2) { background: radial-gradient(closest-side, #b6ff3b, transparent); right: -30vmax; top: 18vh; opacity: .16; animation: od-drift-b 56s ease-in-out infinite alternate; }
-.od-aurora i:nth-child(3) { background: radial-gradient(closest-side, #ff2e88, transparent); left: 18vw; bottom: -40vmax; opacity: .24; animation: od-drift-c 52s ease-in-out infinite alternate; }
+.od-aurora i:nth-child(3) { background: radial-gradient(closest-side, var(--od-c3), transparent); left: 18vw; bottom: -40vmax; opacity: .24; animation: od-drift-c 52s ease-in-out infinite alternate; }
 @media (prefers-color-scheme: light) { .od-aurora i { opacity: .26; } .od-aurora i:nth-child(2) { opacity: .18; } }
 @keyframes od-drift-a { to { transform: translate(24vw, 18vh) scale(1.15); } }
 @keyframes od-drift-b { to { transform: translate(-30vw, 30vh) scale(.9); } }
@@ -964,11 +964,11 @@ html[data-skin="overdrive"] .mark { font: 700 13px/1 "FX Mono", monospace; lette
 html[data-skin="overdrive"] .glyph { position: relative; border-radius: 0; background: var(--v); color: #fff; font: 900 21px/1 "FX Serif", serif; font-stretch: 62.5%; box-shadow: 3px 3px 0 var(--a); }
 html[data-skin="overdrive"] .glyph::after { content: ""; position: absolute; right: -2px; top: -2px; width: 6px; height: 6px; background: var(--a); box-shadow: 0 0 0 1.5px var(--bg); animation: od-blink 1.2s steps(1) infinite; }
 html[data-skin="overdrive"] .top nav { gap: 6px; }
-html[data-skin="overdrive"] .top nav a, html[data-skin="overdrive"] .fun-toggle {
+html[data-skin="overdrive"] .top nav :is(a, .lang-toggle), html[data-skin="overdrive"] .fun-toggle {
   position: relative; padding: 7px 10px; color: var(--ink); font: 600 11.5px/1 "FX Mono", monospace; text-transform: uppercase; letter-spacing: .14em;
   border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent); transition: background .12s, color .12s;
 }
-html[data-skin="overdrive"] .top nav a:hover { background: var(--ink); color: var(--bg); }
+html[data-skin="overdrive"] .top nav :is(a, .lang-toggle):hover { background: var(--ink); color: var(--bg); }
 html[data-skin="overdrive"] .fun-toggle { margin-left: 6px; background: var(--a); color: #0a0a0b; border-color: var(--a); box-shadow: 3px 3px 0 var(--v); }
 html[data-skin="overdrive"] .fun-toggle:hover { color: #0a0a0b; background: #c9ff6b; }
 
@@ -1208,7 +1208,7 @@ html.od-hyper .hero h1 { animation: od-rainbow 1s linear infinite; }
   html[data-skin="overdrive"] .od-card { gap: 12px; padding: 0 14px; } html[data-skin="overdrive"] .od-card .seg, html[data-skin="overdrive"] .od-card .rule { display: none; }
 }
 @media (max-width: 520px) {
-  html[data-skin="overdrive"] .top nav a, html[data-skin="overdrive"] .fun-toggle { padding: 6px 7px; font-size: 10px; letter-spacing: .08em; }
+  html[data-skin="overdrive"] .top nav :is(a, .lang-toggle), html[data-skin="overdrive"] .fun-toggle { padding: 6px 7px; font-size: 10px; letter-spacing: .08em; }
   html[data-skin="overdrive"] .mark { font-size: 0; gap: 0; } html[data-skin="overdrive"] .mark .glyph { font-size: 21px; }
   html[data-skin="overdrive"] .fun-switch { display: none; }
 }
@@ -1714,3 +1714,126 @@ html[data-fun] .head .fx-kana {
 :is([data-skin="neon"], [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])) .head .fx-kana { background: none; color: var(--n-ct); border: 1.5px solid var(--n-c); box-shadow: 0 0 18px -2px var(--n-c), inset 0 0 12px -4px var(--n-c); text-shadow: 0 0 10px var(--n-c); rotate: 0deg; }
 :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .head .fx-kana { background: var(--bg); color: var(--ink); border: 0; box-shadow: 0 0 0 3px var(--ink), 3px 3px 0 3px var(--ink); rotate: 0deg; }
 :is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .head .fx-kana { background: linear-gradient(180deg, #ff6bd5, #b49cff 55%, #22d3ee); color: #fff; border: 2px solid #fff; border-radius: 10px; box-shadow: 0 6px 18px -6px rgb(107 43 255 / .6); text-shadow: 0 1px 0 rgb(0 0 0 / .25); rotate: -3deg; }
+
+/* =====================================================================
+   LANGUAGE · the EN / FR button (also in the default site)
+   ===================================================================== */
+html.i18n-pending body { visibility: hidden; }
+.lang-toggle { display: none; }
+.has-js .lang-toggle { display: inline-flex; align-items: center; padding: 0; border: 0; background: none; font: inherit; color: var(--muted); cursor: pointer; }
+.has-js .lang-toggle:hover { color: var(--ink); }
+.lang-toggle:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; border-radius: 4px; }
+.lang-toggle b { font-weight: inherit; opacity: .5; }
+.lang-toggle i { font-style: normal; opacity: .4; margin: 0 .3em; }
+html:not([lang="fr"]) .lang-toggle b[data-l="en"], html[lang="fr"] .lang-toggle b[data-l="fr"] { opacity: 1; }
+
+/* =====================================================================
+   OVERDRIVE MASHUP · each project has a guest reference
+   (synthwave, Persona, Evangelion, arcade, Y2K) inside the violet and acid palette
+   ===================================================================== */
+/* Background glows take the colour of the project on screen */
+@property --od-c1 { syntax: "<color>"; inherits: true; initial-value: #6b2bff; }
+@property --od-c3 { syntax: "<color>"; inherits: true; initial-value: #ff2e88; }
+.od-aurora i { transition: --od-c1 1.6s ease, --od-c3 1.6s ease; }
+
+/* A giant outline number behind each project, drifting slowly */
+.od-num { display: none; }
+html[data-skin="overdrive"] :is(.project, .upstream) { position: relative; isolation: isolate; }
+html[data-skin="overdrive"] .od-num {
+  display: block; position: absolute; z-index: -1; right: 0; top: 70px; pointer-events: none; user-select: none;
+  font: 900 clamp(11rem, 28vw, 26rem)/.8 "FX Serif", serif; font-stretch: 62.5%; letter-spacing: -.02em; color: transparent;
+  -webkit-text-stroke: 2px color-mix(in oklab, var(--accent, #6b2bff) 34%, transparent);
+  animation: od-num-drift 24s ease-in-out infinite alternate;
+}
+@keyframes od-num-drift { from { translate: 0 0; } to { translate: -7vw 36px; } }
+@media (max-width: 760px) { html[data-skin="overdrive"] .od-num { top: 90px; font-size: 9rem; -webkit-text-stroke-width: 1.5px; } }
+
+/* RGB glitch on the titles, a split second every few seconds */
+@keyframes od-rgb {
+  0%, 86%, 100% { opacity: 0; translate: 0 0; clip-path: inset(0); }
+  87% { opacity: .95; clip-path: inset(8% 0 64% 0); translate: -.07em 0; }
+  89% { opacity: .95; clip-path: inset(52% 0 24% 0); translate: .06em 0; }
+  91% { opacity: .95; clip-path: inset(28% 0 50% 0); translate: -.03em 0; }
+  92% { opacity: 0; }
+}
+html[data-skin="overdrive"] main h2::after {
+  content: attr(data-text); position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0;
+  color: #22d3ee; text-shadow: .05em 0 #ff2e88; animation: od-rgb 5.2s steps(1) var(--gd, 0s) infinite;
+}
+.od-glitch { display: none; }
+html[data-skin="overdrive"] .hero h1 .od-glitch {
+  display: block; position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0;
+  color: #22d3ee; text-shadow: .04em 0 #ff2e88; animation: od-rgb 4.4s steps(1) 1.4s infinite;
+}
+html.fx-lite[data-skin="overdrive"] :is(main h2::after, .hero h1 .od-glitch, .od-num) { animation: none; }
+
+/* --- Title cards --- */
+html[data-skin="overdrive"] .od-card .inner { position: relative; z-index: 1; }
+/* Persona: a red calling card with a cut-out name */
+html[data-skin="overdrive"] .od-card.g-persona { background: #e60012; color: #fff; border-color: #0a0a0b; }
+.od-card.g-persona .slash { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(104deg, transparent 0 62%, #0a0a0b 62% 76%, transparent 76% 79%, #0a0a0b 79%); }
+.od-card.g-persona .star { font-size: 28px; line-height: 1; color: #0a0a0b; text-shadow: 2px 2px 0 #fff; rotate: -14deg; }
+.od-card.g-persona .cc { padding: 6px 10px; background: #0a0a0b; color: #fff; font: 400 13px/1 "FX Anton", sans-serif; letter-spacing: .16em; rotate: -3deg; }
+.od-card.g-persona .ransom { display: inline-flex; align-items: center; gap: 2px; }
+.od-card.g-persona .ransom i { display: inline-block; padding: 3px 5px 2px; font: 400 20px/1 "FX Anton", sans-serif; font-style: normal; letter-spacing: 0; background: #fff; color: #0a0a0b; rotate: -3deg; }
+.od-card.g-persona .ransom i:nth-child(3n) { background: #0a0a0b; color: #fff; rotate: 4deg; }
+.od-card.g-persona .ransom i:nth-child(4n+2) { background: #e60012; color: #fff; box-shadow: 0 0 0 2px #fff; rotate: 2deg; font-family: "FX Serif", serif; font-weight: 900; }
+.od-card.g-persona .ransom i:nth-child(5n+4) { translate: 0 3px; rotate: -6deg; }
+.od-card.g-persona .ransom i.gap { width: 10px; padding: 0; background: none; box-shadow: none; }
+.od-card.g-persona .no { margin-left: auto; font: 400 15px/1 "FX Anton", sans-serif; letter-spacing: .12em; color: #fff; }
+/* Arcade: STAGE 03, blinking READY, coins */
+html[data-skin="overdrive"] .od-card.g-arcade { background: #111327; color: #fff1e8; border-color: #29adff; font: 400 10px/1 "FX Press", monospace; letter-spacing: .04em; }
+.od-card.g-arcade .up { color: #ff004d; } .od-card.g-arcade .up b { font: inherit; color: #fff1e8; }
+.od-card.g-arcade .stage-t { font-size: 17px; color: #ffec27; text-shadow: 3px 3px 0 #ff004d; }
+.od-card.g-arcade .nm { color: #29adff; text-transform: uppercase; }
+.od-card.g-arcade .ready { margin-left: auto; color: #00e436; animation: od-ready 1s steps(1) infinite; }
+@keyframes od-ready { 50% { opacity: 0; } }
+.od-card.g-arcade .coins { display: flex; gap: 6px; }
+.od-card.g-arcade .coins i { width: 11px; height: 11px; background: #ffec27; box-shadow: inset -2px -2px 0 #ab5236; clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); animation: od-coin 1.2s steps(2) infinite; }
+.od-card.g-arcade .coins i:nth-child(2) { animation-delay: .2s; } .od-card.g-arcade .coins i:nth-child(3) { animation-delay: .4s; }
+@keyframes od-coin { 50% { scale: .35 1; } }
+/* Y2K: a glossy window title bar and a loading bar */
+html[data-skin="overdrive"] .od-card.g-y2k { background: linear-gradient(180deg, #f1edff, #cfc6ff); color: #1d1450; border-color: #fff; text-transform: none; letter-spacing: .02em; }
+.od-card.g-y2k .win { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; height: 30px; padding: 0 5px 0 9px; color: #fff; font: 700 12px/1 "FX Geist", sans-serif;
+  background: linear-gradient(90deg, #0a246a, #6b2bff 60%, #ff6bd5); border: 2px solid #fff; box-shadow: 0 0 0 1px #1d1450, 3px 3px 0 #1d1450; }
+.od-card.g-y2k .ico { width: 14px; height: 14px; flex: none; background: conic-gradient(#ff004d 25%, #00e436 0 50%, #29adff 0 75%, #ffec27 0); }
+.od-card.g-y2k .tt { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.od-card.g-y2k .btns { display: flex; gap: 3px; }
+.od-card.g-y2k .btns i { display: grid; place-items: center; width: 18px; height: 16px; font: 700 10px/1 "FX Mono", monospace; font-style: normal; color: #0a0a0b; background: #d4d0c8; box-shadow: inset -1px -1px 0 #404040, inset 1px 1px 0 #fff; }
+.od-card.g-y2k .prog { display: flex; flex: none; width: 160px; height: 16px; padding: 2px; background: #fff; box-shadow: inset 1px 1px 0 #808080, 0 0 0 1px #1d1450; }
+.od-card.g-y2k .prog i { flex: 1; background: repeating-linear-gradient(90deg, #6b2bff 0 8px, transparent 8px 10px); transform-origin: left; animation: od-prog 3.4s steps(16) infinite; }
+@keyframes od-prog { from { scale: 0 1; } to { scale: 1 1; } }
+.od-card.g-y2k .spark { flex: none; color: #ff6bd5; font-size: 18px; animation: od-twinkle 1.6s ease-in-out infinite; }
+@keyframes od-twinkle { 50% { scale: .5; opacity: .4; rotate: 45deg; } }
+/* Synthwave: sunset, chrome number, grid */
+html[data-skin="overdrive"] .od-card.g-synth { background: linear-gradient(180deg, #14042a 0%, #3b0a5c 62%, #ff2e88 140%); color: #fff; border-color: #ff2e88; }
+.od-card.g-synth .grid { position: absolute; left: -10%; right: -10%; bottom: 0; height: 55%; pointer-events: none; opacity: .55; transform-origin: bottom; transform: perspective(70px) rotateX(38deg);
+  background: repeating-linear-gradient(90deg, rgb(34 211 238 / .7) 0 1px, transparent 1px 44px), repeating-linear-gradient(0deg, rgb(34 211 238 / .7) 0 1px, transparent 1px 9px); }
+.od-card.g-synth .sun { width: 40px; height: 40px; flex: none; border-radius: 50%; box-shadow: 0 0 22px #ff2e88;
+  background: linear-gradient(180deg, #ffe14d 0 46%, transparent 46% 52%, #ffa03d 52% 64%, transparent 64% 69%, #ff5a7a 69% 80%, transparent 80% 85%, #ff2e88 85%); }
+.od-card.g-synth .ep { color: #22d3ee; text-shadow: 0 0 8px #22d3ee; }
+html[data-skin="overdrive"] .od-card.g-synth b.big { font: 400 30px/1 "FX Michroma", sans-serif; letter-spacing: .02em; color: transparent;
+  background: linear-gradient(180deg, #fff 0 45%, #b49cff 52%, #ff2e88 100%); -webkit-background-clip: text; background-clip: text; filter: drop-shadow(0 0 6px rgb(255 46 136 / .8)); }
+.od-card.g-synth .nm { font: 700 13px/1 "FX Orbitron", sans-serif; letter-spacing: .22em; color: #ffe14d; text-shadow: 0 0 10px #ff2e88; }
+@media (max-width: 760px) {
+  .od-card.g-y2k .prog, .od-card.g-arcade .up, .od-card.g-arcade .coins, .od-card.g-persona .cc, .od-card.g-synth .ep { display: none; }
+  .od-card.g-persona .ransom i { font-size: 15px; padding: 2px 4px; }
+}
+
+/* --- Small details from each guest --- */
+html[data-skin="overdrive"] [data-guest="persona"] .label { background: #e60012; color: #fff; rotate: -2deg; box-shadow: 4px 4px 0 #0a0a0b; clip-path: none; }
+html[data-skin="overdrive"] [data-guest="arcade"] .label { background: #111327; color: #ffec27; font: 400 10px/1.2 "FX Press", monospace; letter-spacing: .04em; clip-path: none; box-shadow: 0 0 0 3px #29adff; }
+html[data-skin="overdrive"] [data-guest="y2k"] .label { background: linear-gradient(180deg, #fff 0 45%, #ddd4ff 50%, #b49cff); color: #1d1450; border-radius: 999px; clip-path: none; box-shadow: inset 0 0 0 1.5px #6b2bff, 0 4px 14px -6px #6b2bff; }
+html[data-skin="overdrive"] [data-guest="synth"] .label { background: transparent; color: #ff5fa8; clip-path: none; box-shadow: inset 0 0 0 1.5px #ff2e88, 0 0 16px -3px #ff2e88; text-shadow: 0 0 8px rgb(255 46 136 / .55); }
+html[data-skin="overdrive"] [data-guest="persona"] .stage { --steps: repeating-linear-gradient(-45deg, #e60012 0 12px, #0a0a0b 12px 24px); }
+html[data-skin="overdrive"] [data-guest="arcade"] .stage { --steps: #111327; }
+html[data-skin="overdrive"] [data-guest="y2k"] .stage { --steps: linear-gradient(90deg, #0a246a, #6b2bff 60%, #ff6bd5); }
+html[data-skin="overdrive"] [data-guest="synth"] .stage { --steps: linear-gradient(90deg, #14042a, #6b2bff 55%, #ff2e88); }
+@media (prefers-color-scheme: light) { html[data-skin="overdrive"] [data-guest="synth"] .label { color: #c8005f; text-shadow: none; } }
+/* Phones: the button only shows the language it switches to, and the header tightens up */
+@media (max-width: 560px) {
+  .top nav { gap: 14px; }
+  .has-js .fun-toggle { margin-left: 14px; }
+  .lang-toggle i, html:not([lang="fr"]) .lang-toggle b[data-l="en"], html[lang="fr"] .lang-toggle b[data-l="fr"] { display: none; }
+  .lang-toggle b { opacity: 1 !important; }
+}
