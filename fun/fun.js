@@ -46,6 +46,33 @@
     ace: ['Space ace', 'Scored 3,000 points'],
   };
 
+  // What to do for each achievement still locked; a counter where there is one.
+  const HINTS = {
+    start: 'Open the portfolio in fun mode',
+    costume: 'Pick another style in the dock',
+    hopper: 'Try all seven styles',
+    tour: 'Scroll through all nine projects in one visit',
+    source: 'Click a project window or one of its links',
+    konami: 'Type the code shown in the footer',
+    sticker: 'Drag a sticker around the Overdrive headline',
+    sound: 'Turn the sound on in the dock',
+    clicks: 'Click 30 times in one visit',
+    arcade: 'Find the coin slot at the bottom of the page',
+    ace: 'Score 3,000 in the hidden game',
+  };
+  const EARN = [
+    ['Unlock an achievement', '+50'],
+    ['Open a project on GitHub', '+25'],
+    ['Try a style for the first time', '+20'],
+    ['Reach a project you have not seen this visit', '+15'],
+    ['Switch back to a style', '+10'],
+    ['Press CONTINUE? in the footer', '+10'],
+    ['Type the cheat code', '+30'],
+    ['Scroll further down the page', '+3'],
+    ['Click around (40 per visit) or poke the buddy', '+1 / +2'],
+    ['Play the hidden game', 'score ÷ 50'],
+  ];
+
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set(k, v) { try { localStorage.setItem(k, v); } catch (e) { /* storage blocked: the choice just isn't kept */ } },
@@ -86,6 +113,7 @@
   let busy = false;
   let lite = false;
   let game = null;
+  const visit = { seen: new Set(), clicks: 0, stages: 9 };
 
   /* ================= Sound ================= */
   // Every sound is made in the browser: no files. Off by default.
@@ -97,11 +125,18 @@
     ready() {
       if (!this.ctx) {
         const AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return null;
+        if (!AC || (navigator.userActivation && !navigator.userActivation.hasBeenActive)) return null;
         const c = this.ctx = new AC();
+        // Sounds are written quiet; the master gain brings them up and the compressor keeps peaks in check.
         this.out = c.createGain();
-        this.out.gain.value = .9;
-        this.out.connect(c.destination);
+        this.out.gain.value = 7;
+        const comp = c.createDynamicsCompressor();
+        comp.threshold.value = -12;
+        comp.knee.value = 6;
+        comp.ratio.value = 8;
+        comp.attack.value = .002;
+        comp.release.value = .12;
+        this.out.connect(comp).connect(c.destination);
         const buf = c.createBuffer(1, c.sampleRate, c.sampleRate);
         const d = buf.getChannelData(0);
         for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
@@ -172,7 +207,7 @@
           T(k === 'hex' ? 440 : k === 'sparks' ? 1046 : k === 'neon' ? 880 : k === 'coins' ? 523 : 1200, t, .03, k === 'sparks' || k === 'hex' ? 'sine' : 'square', .02, 0, k === 'neon' ? 2000 : 0);
           break;
         case 'seg': if (this.every('seg', 60)) T(3000, t, .01, 'square', .006); break;
-        case 'type': if (this.typing && this.every('type', 32)) this.hiss(t, .012, .05, rand(2200, 4500)); break;
+        case 'type': if (this.typing && this.every('type', 32)) this.hiss(t, .012, .018, rand(2200, 4500)); break;
         case 'clear': [523, 659, 784, 1047, 1319].forEach((f, i) => T(f, t + i * .09, .14, k === 'sparks' ? 'sine' : 'square', .03)); break;
         case 'switch': [523, 659, 784, 1047].forEach((f, i) => T(f, t + i * .05, .08, 'square', .025)); break;
         case 'trophy': [784, 988, 1175, 1568].forEach((f, i) => T(f, t + i * .08, .16, 'triangle', .05)); break;
@@ -277,7 +312,8 @@
       const L = this.level(), lo = 50 * (L - 1) * L, hi = 50 * L * (L + 1);
       chip.querySelector('b').textContent = `LV ${L}`;
       chip.querySelector('i').style.setProperty('--p', ((this.total - lo) / (hi - lo)).toFixed(3));
-      chip.setAttribute('aria-label', `Level ${L}, ${this.total - lo} of ${hi - lo} XP to the next level`);
+      chip.setAttribute('aria-label', `Level ${L}, ${this.total - lo} of ${hi - lo} XP. Show achievements and how to level up`);
+      if (panel) renderPanel();
     },
     popup(n) {
       if (!motion() || !dock) return;
@@ -297,6 +333,78 @@
     setTimeout(() => o.remove(), 1900);
   }
 
+  /* ================= Progress panel: level, achievements left, ways to earn XP ================= */
+  let panel = null;
+  let panelOff = null;
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const ICON_CUP = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3zm0 4H6v1a2 2 0 0 0 1.2 1.8A5 5 0 0 1 7 8zm10 0v1q0 .9-.2 1.8A2 2 0 0 0 18 8V7z"/></svg>';
+  const ICON_LOCK = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a5 5 0 0 1 5 5v3h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5zm0 2a3 3 0 0 0-3 3v3h6V7a3 3 0 0 0-3-3z"/></svg>';
+  function counter(id) {
+    if (id === 'hopper') return `${Math.min(store.list(TRIED_KEY).length, SKINS.length)}/${SKINS.length}`;
+    if (id === 'tour') return `${visit.seen.size}/${visit.stages}`;
+    if (id === 'clicks') return `${Math.min(visit.clicks, 30)}/30`;
+    if (id === 'ace') { const hi = parseInt(store.get(HI_KEY) || '0', 10) || 0; return hi ? `best ${hi}` : ''; }
+    return '';
+  }
+  function renderPanel() {
+    const L = xp.level(), lo = 50 * (L - 1) * L, hi = 50 * L * (L + 1);
+    const ids = Object.keys(TROPHIES);
+    const todo = ids.filter(id => !unlocked.has(id)), done = ids.filter(id => unlocked.has(id));
+    const best = parseInt(store.get(HI_KEY) || '0', 10) || 0;
+    const item = (id, ok) => {
+      const [name, desc] = TROPHIES[id];
+      const c = ok ? '' : counter(id);
+      return `<li class="${ok ? 'ok' : 'todo'}"><span class="ico">${ok ? ICON_CUP : ICON_LOCK}</span><span class="txt"><b>${esc(name)}</b><span>${esc(ok ? desc : HINTS[id])}</span></span>` +
+        `<em>${c ? `<i>${esc(c)}</i>` : ''}${ok ? 'Done' : '+50 XP'}</em></li>`;
+    };
+    panel.querySelector('.fx-panel-body').innerHTML =
+      `<div class="lv"><b>LV ${L}</b><span>${xp.total - lo} / ${hi - lo} XP</span></div>` +
+      `<div class="bar"><i style="--p:${((xp.total - lo) / (hi - lo)).toFixed(3)}"></i></div>` +
+      `<p class="next">${hi - xp.total} XP to level ${L + 1} · ${xp.total} XP in total</p>` +
+      (todo.length ? `<div class="fx-sec">Still to unlock · ${todo.length}</div><ul class="ach">${todo.map(id => item(id, false)).join('')}</ul>` : '<p class="all">Every achievement unlocked. Well played.</p>') +
+      `<div class="fx-sec">How to earn XP</div><ul class="earn">${EARN.map(([what, n]) => `<li><span>${esc(what)}</span><b>${esc(n)}</b></li>`).join('')}</ul>` +
+      (done.length ? `<div class="fx-sec">Unlocked · ${done.length}/${ids.length}</div><ul class="ach">${done.map(id => item(id, true)).join('')}</ul>` : '') +
+      (best ? `<p class="next">Hidden game high score: ${best}</p>` : '');
+  }
+  function openPanel() {
+    if (panel) { closePanel(); return; }
+    const chip = dock && dock.querySelector('.fx-xp');
+    panel = document.createElement('div');
+    panel.className = 'fx-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute('aria-labelledby', 'fx-panel-title');
+    panel.innerHTML = '<div class="fx-panel-top"><div class="fx-panel-title" id="fx-panel-title">Progress</div><button type="button" class="close" aria-label="Close">×</button></div><div class="fx-panel-body" tabindex="0"></div>';
+    renderPanel();
+    document.body.append(panel);
+    if (chip) chip.setAttribute('aria-expanded', 'true');
+    audio.play('switch');
+    const close = panel.querySelector('.close');
+    close.addEventListener('click', () => closePanel());
+    close.focus();
+    const onKey = e => {
+      if (e.key === 'Escape') { e.preventDefault(); closePanel(); return; }
+      if (e.key === 'Tab') {
+        const f = [close, panel.querySelector('.fx-panel-body')];
+        const i = f.indexOf(document.activeElement);
+        e.preventDefault();
+        f[(i + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
+      }
+    };
+    const onDown = e => { if (!panel.contains(e.target) && !(chip && chip.contains(e.target))) closePanel(false); };
+    addEventListener('keydown', onKey, true);
+    addEventListener('pointerdown', onDown, true);
+    panelOff = () => { removeEventListener('keydown', onKey, true); removeEventListener('pointerdown', onDown, true); };
+  }
+  function closePanel(refocus = true) {
+    if (!panel) return;
+    panelOff();
+    panel.remove();
+    panel = null;
+    const chip = dock && dock.querySelector('.fx-xp');
+    if (chip) { chip.setAttribute('aria-expanded', 'false'); if (refocus) chip.focus(); }
+  }
+
   /* ================= Achievements ================= */
   let toasts = null;
   const unlocked = new Set(store.list(TROPHY_KEY));
@@ -306,6 +414,7 @@
     if (!TROPHIES[id] || unlocked.has(id) || !isOn()) return;
     unlocked.add(id);
     store.set(TROPHY_KEY, JSON.stringify([...unlocked]));
+    if (panel) renderPanel();
     queue.push(id);
     nextToast();
     xp.add(50);
@@ -423,7 +532,13 @@
       this.x = -90;
       this.el.style.setProperty('--x', `${this.x}px`);
       this.frame(8);
-      if (motion()) setTimeout(() => this.walkTo(rand(40, Math.min(innerWidth * .4, 420)), () => this.talk('Hi there!', 1800)), 900);
+      // Walk in once the boot screen (if any) is gone.
+      const arrive = () => {
+        if (!this.el) return;
+        if (document.querySelector('.od-boot')) { setTimeout(arrive, 300); return; }
+        this.walkTo(rand(40, Math.min(innerWidth * .4, 420)), () => this.talk('Hi there!', 1800));
+      };
+      if (motion()) setTimeout(arrive, 900);
       else { this.x = 16; this.el.style.setProperty('--x', '16px'); }
       this.schedule();
       this.poke();
@@ -607,7 +722,7 @@
     g.setAttribute('aria-label', 'Hidden game');
     g.innerHTML = '<div class="cab"><div class="hud"><span>SCORE <b class="sc">0</b></span><span>HI <b class="hi">0</b></span><span>LIVES <b class="lv">3</b></span></div>' +
       '<canvas width="240" height="320" tabindex="0" aria-label="Game screen. Move with the arrow keys or the pointer, fire with space or a tap."></canvas>' +
-      '<div class="help"><span>← → MOVE · SPACE FIRE · ESC QUIT</span><button type="button" class="quit">QUIT</button></div></div>';
+      '<div class="help"><span>← → OR Q D / A D MOVE · SPACE FIRE · ESC QUIT</span><button type="button" class="quit">QUIT</button></div></div>';
     document.body.append(g);
     const cv = g.querySelector('canvas');
     const ctx = cv.getContext('2d');
@@ -635,19 +750,35 @@
       if (S.score > hi) { hi = S.score; store.set(HI_KEY, String(hi)); hiEl.textContent = hi; }
       xp.add(Math.round(S.score / 50));
     };
+    // Arrows, Q/D (AZERTY) or A/D (QWERTY) to move; space, Z, W or ↑ to fire.
+    const LEFT = ['arrowleft', 'q', 'a'], RIGHT = ['arrowright', 'd'], FIRE = [' ', 'arrowup', 'z', 'w'];
     const onKey = e => {
       if (e.key === 'Escape') { e.preventDefault(); close(); return; }
-      if (['ArrowLeft', 'ArrowRight', ' ', 'a', 'd', 'A', 'D'].includes(e.key)) e.preventDefault();
-      keys[e.key.toLowerCase()] = e.type === 'keydown';
-      if (e.type === 'keydown' && e.key === ' ') { if (S.state !== 'play') reset(); else fire(); }
-      if (e.type === 'keydown' && e.key === 'Tab') { e.preventDefault(); (document.activeElement === cv ? g.querySelector('.quit') : cv).focus(); }
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const k = e.key.toLowerCase();
+      if (e.key === 'Tab') { if (e.type === 'keydown') { e.preventDefault(); (document.activeElement === cv ? g.querySelector('.quit') : cv).focus(); } return; }
+      if (e.key === 'Enter' && document.activeElement !== cv) return;
+      if (![...LEFT, ...RIGHT, ...FIRE, 'enter'].includes(k)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const down = e.type === 'keydown';
+      if (LEFT.includes(k)) keys.left = down;
+      if (RIGHT.includes(k)) keys.right = down;
+      if (LEFT.includes(k) || RIGHT.includes(k)) S.tx = null; // the keyboard takes over from the pointer
+      if (FIRE.includes(k) || k === 'enter') {
+        keys.fire = down;
+        if (down && !e.repeat) { if (S.state !== 'play') reset(); else fire(); }
+      }
     };
     const toCanvas = e => { const r = cv.getBoundingClientRect(); return (e.clientX - r.left) / r.width * 240; };
     cv.addEventListener('pointermove', e => { S.tx = toCanvas(e); });
     cv.addEventListener('pointerdown', e => { S.tx = toCanvas(e); S.fireHeld = true; if (S.state !== 'play') reset(); else fire(); });
     addEventListener('pointerup', () => { S.fireHeld = false; });
-    addEventListener('keydown', onKey);
-    addEventListener('keyup', onKey);
+    addEventListener('keydown', onKey, true);
+    addEventListener('keyup', onKey, true);
+    const onBlur = () => { keys.left = keys.right = keys.fire = false; };
+    addEventListener('blur', onBlur);
+    root.classList.add('fx-gaming');
     g.querySelector('.quit').addEventListener('click', () => close());
     let raf = 0, last = performance.now();
     const hit = (a, b, w, h) => Math.abs(a.x - b.x) < w && Math.abs(a.y - b.y) < h;
@@ -660,12 +791,12 @@
       // update
       if (S.state === 'play') {
         const sp = .12 * dt;
-        if (keys.arrowleft || keys.a) S.px -= sp * 1.4;
-        if (keys.arrowright || keys.d) S.px += sp * 1.4;
+        if (keys.left) S.px -= sp * 1.6;
+        if (keys.right) S.px += sp * 1.6;
         if (S.tx != null) S.px += Math.max(-sp * 1.6, Math.min(sp * 1.6, S.tx - S.px));
         S.px = Math.max(14, Math.min(226, S.px));
         S.cool -= dt; S.inv -= dt;
-        if (S.fireHeld || keys[' ']) fire();
+        if (S.fireHeld || keys.fire) fire();
         const alive = S.en.filter(e => e.alive);
         const speed = (.012 + S.wave * .004 + (1 - alive.length / 24) * .03) * dt;
         let edge = false;
@@ -717,7 +848,7 @@
       ctx.fillStyle = '#ff004d'; S.bombs.forEach(b => ctx.fillRect(b.x - 2, b.y - 3, 4, 6));
       S.booms.forEach(b => { const k = b.t / 360; ctx.fillStyle = `rgba(255,236,39,${1 - k})`; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; ctx.fillRect(b.x + Math.cos(a) * k * 16 - 1, b.y + Math.sin(a) * k * 16 - 1, 3, 3); } });
       if (atlas.complete && atlas.naturalWidth && (S.inv <= 0 || Math.floor(S.t / 80) % 2)) {
-        const f = S.state === 'play' && (keys.arrowleft || keys.arrowright || keys.a || keys.d || (S.tx != null && Math.abs(S.tx - S.px) > 2)) ? Math.floor(S.t / 160) % 4 : 0;
+        const f = S.state === 'play' && (keys.left || keys.right || (S.tx != null && Math.abs(S.tx - S.px) > 2)) ? Math.floor(S.t / 160) % 4 : 0;
         ctx.drawImage(atlas, (6 + f) * 32, 5 * 52, 32, 52, Math.round(S.px - 16), 262, 32, 52);
       }
       ctx.fillStyle = '#fff1e8';
@@ -731,8 +862,10 @@
     cv.focus();
     function close() {
       cancelAnimationFrame(raf);
-      removeEventListener('keydown', onKey);
-      removeEventListener('keyup', onKey);
+      removeEventListener('keydown', onKey, true);
+      removeEventListener('keyup', onKey, true);
+      removeEventListener('blur', onBlur);
+      root.classList.remove('fx-gaming');
       if (S.state === 'play' && S.score) xp.add(Math.round(S.score / 50));
       g.remove();
       game = null;
@@ -875,8 +1008,10 @@
     on(window, 'scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
 
     // Reveal on scroll, the world tour, sounds; pause what is off screen.
-    const seen = new Set();
+    const seen = visit.seen;
+    seen.clear();
     const stages = [...document.querySelectorAll('.project, .upstream')];
+    visit.stages = stages.length;
     const io = new IntersectionObserver(entries => entries.forEach(e => {
       if (!e.isIntersecting) return;
       if (!seen.has(e.target.id)) {
@@ -933,8 +1068,16 @@
       cover('slash', skinOf(sec), h ? (h.dataset.text || h.textContent) : id, lab ? lab.textContent : '', land);
     });
 
+    // The logo goes back to the top (no reload, so no start-up animation again).
+    on(document, 'click', e => {
+      const a = e.target.closest && e.target.closest('.top .mark');
+      if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      backToTop({ title: 'BOULIW', small: 'HOME', xp: 0 });
+    });
+
     // Projects opened, clicks counted, bursts and sounds, the buddy reacting.
-    let clicks = 0;
+    visit.clicks = 0;
     on(document, 'click', e => {
       if (e.target.closest && e.target.closest('a[href*="github.com/"], .fx-open, a[href*="bouliw.github.io/vigie"]')) { trophy('source'); xp.add(25); }
     }, true);
@@ -944,7 +1087,7 @@
     on(window, 'pointerdown', e => {
       wake();
       if (!isOn() || game) return;
-      if (++clicks === 30) trophy('clicks');
+      if (++visit.clicks === 30) trophy('clicks');
       if (xp.session.clicks++ < 40) xp.add(1);
       const kind = clickKind(e.target);
       if (motion() && e.target instanceof Element && !e.target.closest('.fx-buddy')) burstAt(e.clientX, e.clientY, kind);
@@ -981,7 +1124,7 @@
       const h1 = document.querySelector('.hero h1');
       if (hero && h1) {
         let raf = 0, ev = null;
-        const depthEls = () => [h1, document.querySelector('.od-stickers'), document.querySelector('.fx-pose'), document.querySelector('.od-pose')].filter(Boolean);
+        const depthEls = () => [h1];
         const apply = () => {
           raf = 0;
           if (!ev) return;
@@ -1079,12 +1222,13 @@
     }
   }
 
-  // CONTINUE?: back to the start of the page, with the style's own transition and the intro again.
-  function newGame() {
+  // CONTINUE? and the logo: back to the start of the page, with the style's own transition and the intro again.
+  function backToTop({ title = 'CONTINUE', small = 'NEW GAME +', xp: gain = 10, say = 'Round 2!' } = {}) {
     if (busy) return;
-    xp.add(10);
-    audio.play('coin');
+    if (gain) xp.add(gain);
+    audio.play(gain ? 'coin' : 'whoosh');
     const top = () => {
+      if (location.hash) history.pushState(null, '', location.pathname + location.search);
       scrollTo({ top: 0, behavior: 'instant' });
       const h1 = document.querySelector('.hero h1');
       if (h1) {
@@ -1093,11 +1237,13 @@
         h1.addEventListener('blur', () => h1.removeAttribute('tabindex'), { once: true });
       }
       if (od) intro();
-      buddy.react(9, 'Round 2!', 2000);
+      if (say) buddy.react(9, say, 2000);
     };
+    if (!motion()) { top(); return; }
     const k = skinNow();
-    cover(SKIN_COVER[k] || 'slash', k, 'CONTINUE', 'NEW GAME +', top);
+    cover(SKIN_COVER[k] || 'slash', k, title, small, top);
   }
+  const newGame = () => backToTop();
 
   function intro(restart = true) {
     if (restart || !root.classList.contains('od-intro')) {
@@ -1306,16 +1452,8 @@
         on(st, 'pointermove', e => { ev = e; if (!r2) r2 = requestAnimationFrame(apply); });
         on(st, 'pointerleave', () => { ev = null; st.style.setProperty('--rx', '0deg'); st.style.setProperty('--ry', '0deg'); });
       });
-      document.querySelectorAll('.btn').forEach(b => {
-        on(b, 'pointermove', e => {
-          const r = b.getBoundingClientRect();
-          b.style.translate = `${((e.clientX - r.left - r.width / 2) * .25).toFixed(1)}px ${((e.clientY - r.top - r.height / 2) * .35).toFixed(1)}px`;
-        });
-        on(b, 'pointerleave', () => { b.style.translate = ''; });
-      });
       later(() => {
         document.querySelectorAll('.stage').forEach(st => ['--rx', '--ry', '--mx', '--my'].forEach(p => st.style.removeProperty(p)));
-        document.querySelectorAll('.btn').forEach(b => { b.style.translate = ''; });
       });
     }
     later(() => root.classList.remove('od-intro'));
@@ -1410,13 +1548,14 @@
     dock.className = 'fx-dock';
     dock.setAttribute('role', 'group');
     dock.setAttribute('aria-label', 'Fun mode style');
-    dock.innerHTML = '<span class="fx-xp" role="img"><b>LV 1</b><i></i></span><span class="fx-dock-label" aria-hidden="true">STYLE</span>' +
+    dock.innerHTML = '<button type="button" class="fx-xp" aria-haspopup="dialog" aria-expanded="false"><b>LV 1</b><i aria-hidden="true"></i></button><span class="fx-dock-label" aria-hidden="true">STYLE</span>' +
       SKINS.map(([k, name]) => `<button type="button" data-skin-btn="${k}" aria-pressed="false"><span class="sw" aria-hidden="true"></span>${name}</button>`).join('') +
       '<span class="fx-dock-sep" aria-hidden="true"></span>' +
       `<button type="button" class="fx-sound" aria-pressed="false" aria-label="Sound">${ICONS.soundOff}${ICONS.soundOn}<span class="lbl" aria-hidden="true">Sound</span></button>` +
       `<button type="button" class="fx-music" aria-pressed="false" aria-label="Music" hidden>${ICONS.music}<span class="lbl" aria-hidden="true">Music</span></button>` +
       `<button type="button" class="fx-typing" aria-pressed="false" aria-label="Typing sounds" hidden>${ICONS.typing}<span class="lbl" aria-hidden="true">Typing</span></button>`;
     dock.addEventListener('click', e => {
+      if (e.target.closest('.fx-xp')) { openPanel(); return; }
       const b = e.target.closest('[data-skin-btn]');
       if (b) pickSkin(b.dataset.skinBtn);
       if (e.target.closest('.fx-sound')) {
@@ -1456,6 +1595,7 @@
       setSkin(root.dataset.skin, false);
     } else {
       music.stop();
+      closePanel(false);
       odOff();
       coreOff();
       if (dock) { dock.remove(); dock = null; }
@@ -1483,14 +1623,8 @@
     if (busy || root.classList.contains('fx-starting')) return;
     const turnOn = toggle.getAttribute('aria-pressed') !== 'true';
     if (!turnOn) { powerOff(() => setOn(false, { save: true })); return; }
-    const skin = store.get(STYLE_KEY);
-    const k = isSkin(skin) ? skin : DEFAULT_SKIN;
-    if (k === 'overdrive') {
-      setOn(true, { save: true });
-      boot();
-    } else {
-      cover(SKIN_COVER[k], k, label(k), 'FUN MODE', () => setOn(true, { save: true }));
-    }
+    setOn(true, { save: true });
+    boot();
     setTimeout(() => trophy('start'), 3200);
   });
 
