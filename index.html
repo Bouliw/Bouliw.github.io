@@ -226,7 +226,7 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
     <ol>
       <li style="--accent:#e8553f"><a href="#roughcut"><span class="n">01</span><span class="t">Roughcut</span><span class="d" data-i18n="t3">Rough cuts for Final Cut Pro</span></a></li>
       <li style="--accent:#7c5cff"><a href="#earshot"><span class="n">02</span><span class="t">Earshot</span><span class="d" data-i18n="t4">Live transcription</span></a></li>
-      <li style="--accent:#3d6df2"><a href="#vigie"><span class="n">03</span><span class="t">Vigie</span><span class="d" data-i18n="t5">Sigma log analysis</span></a></li>
+      <li style="--accent:#3d6df2"><a href="#vigie"><span class="n">03</span><span class="t">Vigie</span><span class="d" data-i18n="t5">Log and AI agent detection</span></a></li>
       <li style="--accent:#9a4dff"><a href="#boulito"><span class="n">04</span><span class="t">Boulito</span><span class="d" data-i18n="t6">On-device voice assistant</span></a></li>
       <li style="--accent:#e0b000"><a href="#takeline"><span class="n">05</span><span class="t">Takeline</span><span class="d" data-i18n="t7">Voice-following teleprompter</span></a></li>
       <li style="--accent:#e07a2e"><a href="#trackmend"><span class="n">06</span><span class="t">trackmend</span><span class="d" data-i18n="t8">Music library repair</span></a></li>
@@ -278,16 +278,16 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
     <p class="label" data-i18n="t23">03 · Threat detection</p>
     <div class="head"><h2>Vigie</h2></div>
     <p class="tagline" data-i18n="t24">A blue team tool that turns raw logs into a report an analyst can read.</p>
-    <p data-i18n="t25">Vigie reads Windows event logs (Sysmon and PowerShell included), Linux auth.log files and the macOS unified log. It runs Sigma rules on them with its own engine, maps every alert to MITRE ATT&amp;CK offline, and works either on collected logs or live, as they're written.</p>
-    <p data-i18n="t26">Correlation rules catch brute force, password spraying and a successful login right after a brute force.</p>
-    <p class="fact" data-i18n="t27">36 Sigma rules, each one tested with positive and negative cases.</p>
-    <ul class="stack"><li>Python</li><li>Sigma</li><li>MITRE ATT&amp;CK</li><li>EVTX</li><li>Jinja2</li></ul>
-    <p class="links"><a class="btn" href="https://bouliw.github.io/vigie/example-report.html" data-i18n="t28">Example report</a><a class="more" href="https://github.com/Bouliw/vigie" data-i18n="t13">Source on GitHub</a></p>
+    <p data-i18n="t25">Vigie reads Windows event logs (Sysmon and PowerShell included), Linux auth.log files, the macOS unified log and the activity logs of AI agents and LLM applications. It runs Sigma rules on them with its own engine and maps every alert to MITRE ATT&amp;CK offline, or to the OWASP Top 10 lists when the target is an AI system. It works on collected logs or live, from a desktop app or the terminal.</p>
+    <p data-i18n="t26">Correlation rules catch brute force, password spraying and a successful login right after a brute force. On the AI side, Vigie flags prompt injections, leaked system prompts and MCP tools whose description hides instructions for the model.</p>
+    <p class="fact" data-i18n="t27">53 Sigma rules, each one tested with positive and negative cases.</p>
+    <ul class="stack"><li>Python</li><li>Sigma</li><li>MITRE ATT&amp;CK</li><li>OWASP</li><li>EVTX</li><li>Jinja2</li></ul>
+    <p class="links"><a class="btn" href="https://github.com/Bouliw/vigie/releases/latest" data-i18n="t28b">Download for Windows and Mac</a><a class="more" href="https://bouliw.github.io/vigie/example-report.html" data-i18n="t28">Example report</a><a class="more" href="https://github.com/Bouliw/vigie" data-i18n="t13">Source on GitHub</a></p>
   </div>
   <figure class="stage">
     <a class="window" href="https://bouliw.github.io/vigie/example-report.html">
       <span class="bar" aria-hidden="true"><i></i><i></i><i></i><span>example-report.html</span></span>
-      <img src="assets/vigie-report.webp" width="1200" height="700" loading="lazy" decoding="async" alt="Top of a Vigie HTML report: alert counts by severity and the MITRE ATT&amp;CK tactics and techniques they map to" data-i18n-alt="a5">
+      <img src="assets/vigie-report.webp" width="1200" height="700" loading="lazy" decoding="async" alt="Top of a Vigie HTML report: the verdict, alert counts by severity and the MITRE ATT&amp;CK tactics they map to" data-i18n-alt="a5">
     </a>
   </figure>
 </article>
