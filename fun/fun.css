@@ -1846,6 +1846,11 @@ html[data-skin="overdrive"] [data-guest="synth"] .stage { --steps: linear-gradie
 }
 /* Homebrew: the diff sits in a stage like the other projects, which animates for it */
 html[data-fun] .stage .diff { animation: none !important; }
+/* Its copy is short, so a centred window would hide the 09: start it where the number thins out, as on the projects */
+/* The whole window is a link in fun mode, so the diff cannot scroll: it shrinks a little, then wraps on small screens */
+@media (min-width: 960px) { html[data-fun] .diff-stage .diff { font-size: clamp(9.5px, .94vw, 12px); } }
+@media (max-width: 959px) { html[data-fun] .diff-stage .diff :is(span, del, ins) { white-space: pre-wrap; overflow-wrap: anywhere; } }
+@media (min-width: 960px) { html[data-skin="overdrive"] .upstream .stage { align-self: start; margin-top: calc(70px + clamp(110px, 17.4vw, 258px) - clamp(56px, 9vw, 112px)); } }
 
 /* Particles animated from JS (Web Animations): their CSS keyframes stay off */
 .fx-p.fx-js:not(.coin), .fx-spark.fx-js, .od-confetti.fx-js { animation: none !important; }
