@@ -1205,12 +1205,12 @@
   const layoutPos = el => { let x = 0, y = 0; for (let n = el; n; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; } return { x, y }; };
   let clearTimer = 0;
   function clearTitles() {
-    const stages = [...document.querySelectorAll('.project .stage')];
+    const stages = [...document.querySelectorAll(':is(.project, .upstream) .stage')];
     stages.forEach(st => { st.style.marginTop = ''; });
     if (!isOn()) return;
     // How far the window must still move down (0 when the title is clear of it).
     const need = st => {
-      const h = st.closest('.project').querySelector('.head h2');
+      const h = st.closest('.project, .upstream').querySelector('.head h2');
       if (!h || !st.offsetWidth) return 0;
       const t = layoutPos(h), w = layoutPos(st);
       const right = Math.max(...[...h.parentElement.children].map(c => layoutPos(c).x + Math.max(c.scrollWidth, c.offsetWidth)));
@@ -1610,7 +1610,7 @@
     clearTitlesSoon(60);
     on(window, 'resize', () => clearTitlesSoon(200));
     if (document.fonts) document.fonts.ready.then(() => clearTitlesSoon(0));
-    later(() => { clearTimeout(clearTimer); document.querySelectorAll('.project .stage').forEach(st => { st.style.marginTop = ''; }); });
+    later(() => { clearTimeout(clearTimer); document.querySelectorAll(':is(.project, .upstream) .stage').forEach(st => { st.style.marginTop = ''; }); });
 
     buddy.create();
     later(() => buddy.destroy());

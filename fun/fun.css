@@ -253,7 +253,7 @@ html.fx-anim[data-fun] :is(.project, .upstream).fx-in :is(.stage, .diff) { anima
     linear-gradient(#fff 0 0) left / 20px 12px no-repeat;
   -webkit-mask: radial-gradient(farthest-side, #000 98%, transparent) right / 20px 12px no-repeat, radial-gradient(farthest-side, #000 98%, transparent) center / 20px 12px no-repeat, radial-gradient(farthest-side, #000 98%, transparent) left / 20px 12px no-repeat;
 }
-:is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .stage .shot, :is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .stage .window, :is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .stage .term, :is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .stage .screen { border: 2px solid var(--y-edge); box-shadow: 5px 5px 0 rgb(10 10 11 / .85); }
+:is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .stage .shot, :is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .stage .window, :is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .stage .term, :is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .stage .screen, :is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .stage .diff { border: 2px solid var(--y-edge); box-shadow: 5px 5px 0 rgb(10 10 11 / .85); }
 :is([data-skin="y2k"], [data-skin="mix"] :is([id="earshot"], [id="trackmend"])) .said li {
   font-weight: 600; color: #0a0a0b; border: 1.5px solid var(--y-edge); border-radius: 18px 18px 18px 4px;
   background: linear-gradient(180deg, #ffffff 0 50%, #eef1ff 100%); box-shadow: 4px 4px 0 var(--accent);
@@ -415,7 +415,7 @@ html.fx-anim :is([data-skin="y2k"] :is(.top, .hero, .project, .upstream, footer)
   clip-path: polygon(5% 2%, 100% 0, 95% 100%, 0 92%, 4% 60%, 0 56%);
   -webkit-mask-image: linear-gradient(135deg, transparent 30%, #000); mask-image: linear-gradient(135deg, transparent 30%, #000);
 }
-:is([data-skin="phantom"], [data-skin="mix"] :is(.top, .hero, [id="takeline"])) .stage :is(.shot, .window, .term, .screen) { border-radius: 0; border: 5px solid #fff; box-shadow: 10px 10px 0 #0a0a0b; rotate: -1.5deg; }
+:is([data-skin="phantom"], [data-skin="mix"] :is(.top, .hero, [id="takeline"])) .stage :is(.shot, .window, .term, .screen, .diff) { border-radius: 0; border: 5px solid #fff; box-shadow: 10px 10px 0 #0a0a0b; rotate: -1.5deg; }
 :is([data-skin="phantom"], [data-skin="mix"] :is(.top, .hero, [id="takeline"])) .stage .inset { rotate: 3deg; }
 :is([data-skin="phantom"], [data-skin="mix"] :is(.top, .hero, [id="takeline"])) .said li { border-radius: 0; border: 0; background: #fff; color: #0a0a0b; font: italic 800 16px/1.2 "FX Geist", sans-serif; text-transform: uppercase; clip-path: polygon(0 8%, 100% 0, 97% 100%, 2% 90%); box-shadow: none; }
 :is([data-skin="phantom"], [data-skin="mix"] :is(.top, .hero, [id="takeline"])) .said li::before { background: #e60012; border-radius: 0; }
@@ -548,7 +548,7 @@ html.fx-anim :is([data-skin="phantom"] :is(.top, .hero, .project, .upstream, foo
   font: 600 10.5px/1 "FX Mono", monospace; letter-spacing: .16em; color: var(--e-or-text); white-space: pre; text-transform: uppercase;
 }
 :is([data-skin="alert"], [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])) .stage::after { content: ""; position: absolute; z-index: 3; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, rgb(255 106 0 / .05) 0 1px, transparent 1px 4px); }
-:is([data-skin="alert"], [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])) .stage :is(.shot, .window, .term, .screen) { border-radius: 0; box-shadow: 0 0 0 1px var(--e-or), 0 0 40px -8px rgb(255 106 0 / .45); }
+:is([data-skin="alert"], [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])) .stage :is(.shot, .window, .term, .screen, .diff) { border-radius: 0; box-shadow: 0 0 0 1px var(--e-or), 0 0 40px -8px rgb(255 106 0 / .45); }
 :is([data-skin="alert"], [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])) .said li { border-radius: 0; border: 1px solid var(--e-or); background: var(--bg); color: var(--ink); font-family: "FX Mono", monospace; font-size: 14px; box-shadow: none; }
 :is([data-skin="alert"], [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])) .said li::before { border-radius: 0; background: var(--e-ok); }
 :is([data-skin="alert"], [data-skin="mix"] :is([id="vigie"], [id="doc-indexer"])) .diff { border-radius: 0; border: 1px solid var(--e-or); background: var(--surface); }
@@ -672,7 +672,7 @@ html.fx-anim :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, foote
 :is([data-skin="neon"], [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])) .stage { padding: clamp(22px, 4vw, 46px); }
 :is([data-skin="neon"], [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])) .stage.boulito-stage { display: grid; }
 :is([data-skin="neon"], [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])) .roughcut-stage { padding-bottom: clamp(96px, 17vw, 190px); }
-:is([data-skin="neon"], [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])) .stage :is(.shot, .window, .term, .screen) { border-radius: 0; box-shadow: 0 0 0 1px var(--n-c), 0 0 34px -6px color-mix(in oklab, var(--n-c) 70%, transparent); }
+:is([data-skin="neon"], [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])) .stage :is(.shot, .window, .term, .screen, .diff) { border-radius: 0; box-shadow: 0 0 0 1px var(--n-c), 0 0 34px -6px color-mix(in oklab, var(--n-c) 70%, transparent); }
 :is([data-skin="neon"], [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])) .said li { border-radius: 0; border: 1px solid var(--n-c); background: var(--bg); color: var(--ink); font-family: "FX Mono", monospace; font-size: 14px; box-shadow: 0 0 18px -6px var(--n-c); }
 :is([data-skin="neon"], [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])) .said li::before { border-radius: 0; background: var(--n-m); box-shadow: 0 0 8px var(--n-m); }
 :is([data-skin="neon"], [data-skin="mix"] :is([id="roughcut"], [id="mac-toolkit"])) .diff { border-radius: 0; border: 1px solid var(--n-c); background: var(--surface); box-shadow: 0 0 40px -10px var(--n-c); }
@@ -777,7 +777,7 @@ html.fx-anim :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, foote
   box-shadow: 0 0 0 4px var(--ink), 10px 10px 0 4px var(--ink);
   overflow: visible;
 }
-:is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .stage :is(.shot, .window, .term, .screen) { border-radius: 0; box-shadow: 0 0 0 4px var(--ink), 6px 6px 0 4px rgb(0 0 0 / .55); }
+:is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .stage :is(.shot, .window, .term, .screen, .diff) { border-radius: 0; box-shadow: 0 0 0 4px var(--ink), 6px 6px 0 4px rgb(0 0 0 / .55); }
 :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .said li { border-radius: 0; border: 0; background: var(--surface); color: var(--ink); font: 16px/1.2 "FX Pixelify", sans-serif; box-shadow: 0 0 0 3px var(--ink), 4px 4px 0 3px var(--ink); }
 :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .said li::before { border-radius: 0; background: var(--x-b); }
 :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .said small { color: var(--muted); }
@@ -1141,7 +1141,7 @@ html[data-skin="overdrive"] .stage::after {
 .od-sheen { position: absolute; z-index: 3; inset: 0; border-radius: 12px; pointer-events: none; display: none; mix-blend-mode: overlay;
   background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgb(255 255 255 / .55), transparent 40%), linear-gradient(115deg, transparent 30%, rgb(182 255 59 / .35) 45%, rgb(255 46 136 / .3) 55%, transparent 70%) var(--mx, 50%) 0 / 300% 100%; }
 html[data-skin="overdrive"] .stage:hover .od-sheen { display: block; }
-html[data-skin="overdrive"] .stage :is(.shot, .window, .term, .screen) { border: 2px solid var(--edge); border-radius: 8px; box-shadow: 6px 6px 0 rgb(0 0 0 / .55); }
+html[data-skin="overdrive"] .stage :is(.shot, .window, .term, .screen, .diff) { border: 2px solid var(--edge); border-radius: 8px; box-shadow: 6px 6px 0 rgb(0 0 0 / .55); }
 html[data-skin="overdrive"] .said li { border-radius: 0; border: 2px solid var(--edge); background: var(--surface); color: var(--ink); font: 600 15px/1.2 "FX Geist", sans-serif; box-shadow: 4px 4px 0 var(--v); clip-path: none; }
 html[data-skin="overdrive"] .said li::before { border-radius: 0; background: var(--a); box-shadow: 0 0 0 1px #0a0a0b; }
 html[data-skin="overdrive"] .diff { border-radius: 0; border: 2px solid var(--edge); background: var(--sunken); box-shadow: 10px 10px 0 var(--hard); }
@@ -1844,9 +1844,8 @@ html[data-skin="overdrive"] [data-guest="synth"] .stage { --steps: linear-gradie
   .lang-toggle i, html:not([lang="fr"]) .lang-toggle b[data-l="en"], html[lang="fr"] .lang-toggle b[data-l="fr"] { display: none; }
   .lang-toggle b { opacity: 1 !important; }
 }
-/* Homebrew: its diff box sits higher, so the number goes in the free space below it */
-html[data-skin="overdrive"] .upstream .od-num { top: auto; bottom: 6px; font-size: clamp(8rem, 19vw, 17rem); }
-@media (max-width: 760px) { html[data-skin="overdrive"] .upstream .od-num { top: 90px; bottom: auto; font-size: 9rem; } }
+/* Homebrew: the diff sits in a stage like the other projects, which animates for it */
+html[data-fun] .stage .diff { animation: none !important; }
 
 /* Particles animated from JS (Web Animations): their CSS keyframes stay off */
 .fx-p.fx-js:not(.coin), .fx-spark.fx-js, .od-confetti.fx-js { animation: none !important; }

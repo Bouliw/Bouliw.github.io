@@ -161,6 +161,7 @@ h2 { font: 500 clamp(2.1rem, 3.8vw, 3.1rem)/1.04 var(--serif); letter-spacing: -
 /* Upstream */
 .upstream { padding: clamp(56px, 9vw, 112px) 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: minmax(0, 1fr); gap: 32px; }
 @media (min-width: 960px) { .upstream { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 64px; align-items: center; } }
+.diff-stage { padding: clamp(16px, 3vw, 32px); }
 .diff { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow-x: auto; font: 12.5px/1.8 var(--mono); padding: 16px 0; color: var(--muted); }
 .diff span { display: block; padding: 0 20px; white-space: pre; }
 .diff .file { color: var(--ink); font-weight: 600; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 10px; }
@@ -407,7 +408,9 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
     <p data-i18n="t67">After installing whisper.cpp, Homebrew's caveats sent users to a model host that now returns a 404. I replaced the link with the models folder of the upstream repository, which lists the available models and how to download them.</p>
     <p class="links"><a class="more" href="https://github.com/Homebrew/homebrew-core/pull/318001">Pull request #318001</a><span class="label" style="color:var(--muted)" data-i18n="t68">Merged 13 Oct 2026</span></p>
   </div>
-  <pre class="diff" tabindex="0" aria-label="The one-line change in Formula/w/whisper.cpp.rb" data-i18n-aria="a10"><span class="file">Formula/w/whisper.cpp.rb</span><span>    To obtain model files (.bin), visit one of these locations:</span><span> </span><span>      https://huggingface.co/ggerganov/whisper.cpp/tree/main</span><del>-     https://ggml.ggerganov.com/</del><ins>+     https://github.com/ggml-org/whisper.cpp/tree/master/models</ins></pre>
+  <figure class="stage diff-stage">
+    <pre class="diff" tabindex="0" aria-label="The one-line change in Formula/w/whisper.cpp.rb" data-i18n-aria="a10"><span class="file">Formula/w/whisper.cpp.rb</span><span>    To obtain model files (.bin), visit one of these locations:</span><span> </span><span>      https://huggingface.co/ggerganov/whisper.cpp/tree/main</span><del>-     https://ggml.ggerganov.com/</del><ins>+     https://github.com/ggml-org/whisper.cpp/tree/master/models</ins></pre>
+  </figure>
 </section>
 
 </main>
