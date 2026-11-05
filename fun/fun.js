@@ -22,8 +22,8 @@
   const DEFAULT_SKIN = 'overdrive';
   const SKINS = [['overdrive', 'Overdrive'], ['y2k', 'Y2K'], ['phantom', 'Phantom'], ['alert', 'Alert'], ['neon', 'Neon'], ['pixel', '8-bit'], ['mix', 'Mix']];
   // In Mix, each section wears one style (keep in sync with build_css.py).
-  const MIX = { takeline: 'phantom', roughcut: 'neon', 'mac-toolkit': 'neon', earshot: 'y2k', trackmend: 'y2k', vigie: 'alert', 'doc-indexer': 'alert', boulito: 'pixel', upstream: 'pixel' };
-  const EPISODES = ['第壱話', '第弐話', '第参話', '第四話', '第伍話', '第六話', '第七話', '第八話', '第九話'];
+  const MIX = { takeline: 'phantom', roughcut: 'neon', 'mac-toolkit': 'neon', earshot: 'y2k', trackmend: 'y2k', vigie: 'alert', 'doc-indexer': 'alert', boulito: 'pixel', upstream: 'pixel', lantern: 'phantom' };
+  const EPISODES = ['第壱話', '第弐話', '第参話', '第四話', '第伍話', '第六話', '第七話', '第八話', '第九話', '第拾話'];
   const SPARKS = ['#ff6bd5', '#b49cff', '#22d3ee', '#b6ff3b', '#6b2bff'];
   const COLORS = ['#b6ff3b', '#6b2bff', '#ff2e88', '#22d3ee', '#ffffff'];
   const GLYPHS = '!<>-_\\/[]{}=+*^?#ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -36,7 +36,7 @@
     start: ["It's dangerous to go alone", 'Opened the portfolio in fun mode'],
     costume: ['Outfit check', 'Switched to another style'],
     hopper: ["Gotta try 'em all", 'Tried all seven styles'],
-    tour: ['Around the world in nine stages', 'Visited all nine projects'],
+    tour: ['Around the world in ten stages', 'Visited all ten projects'],
     source: ['Use the source, Luke', 'Opened a project'],
     konami: ['Thirty extra lives', 'Entered the code from old games'],
     sticker: ['Sticky fingers', 'Moved a sticker'],
@@ -52,7 +52,7 @@
     start: 'Open the portfolio in fun mode',
     costume: 'Pick another style in the dock',
     hopper: 'Try all seven styles',
-    tour: 'Scroll through all nine projects in one visit',
+    tour: 'Scroll through all ten projects in one visit',
     source: 'Click a project window or one of its links',
     konami: 'Type the code shown in the footer',
     sticker: 'Drag a sticker around the Overdrive headline',
@@ -81,7 +81,7 @@
       start: ["Dangereux d'y aller seul", 'Portfolio ouvert en mode fun'],
       costume: ['Relooking extrême', 'Un autre style essayé'],
       hopper: ['Attrapez-les tous', 'Les sept styles essayés'],
-      tour: ['Le tour du monde en neuf étapes', 'Les neuf projets visités'],
+      tour: ['Le tour du monde en dix étapes', 'Les dix projets visités'],
       source: ['Utilise la source, Luke', 'Un projet ouvert'],
       konami: ['Trente vies en rab', 'Le code des vieux jeux tapé'],
       sticker: ['Ça colle !', 'Un autocollant déplacé'],
@@ -95,7 +95,7 @@
       start: 'Ouvrir le portfolio en mode fun',
       costume: 'Choisir un autre style dans le dock',
       hopper: 'Essayer les sept styles',
-      tour: 'Faire défiler les neuf projets en une visite',
+      tour: 'Faire défiler les dix projets en une visite',
       source: "Cliquer sur la fenêtre d'un projet ou sur un de ses liens",
       konami: 'Taper le code affiché en bas de page',
       sticker: 'Déplacer un autocollant du titre Overdrive',

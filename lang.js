@@ -73,7 +73,13 @@
     "t65": "FineTune recompilé : volume par app, périphériques audio laissés à macOS",
     "t66": "Correctif d'une ligne dans la formule whisper.cpp, fusionné dans homebrew-core.",
     "t67": "Après l'installation de whisper.cpp, les avertissements de Homebrew renvoyaient vers un hébergeur de modèles qui répond désormais par une erreur 404. J'ai remplacé le lien par le dossier des modèles du dépôt upstream, qui liste les modèles disponibles et comment les télécharger.",
-    "t68": "Fusionné le 13 oct. 2026"
+    "t68": "Fusionné le 13 oct. 2026",
+    "t69": "Client Jellyfin stylé",
+    "t70": "09 · Home cinéma",
+    "t71": "Un client stylé pour ma médiathèque Jellyfin, sur le Mac, une TV LG et les téléphones.",
+    "t72": "Une seule app web en TypeScript : elle s'installe depuis Safari sur le Mac et les téléphones, et devient une app webOS sur la TV, où chaque appui sur la télécommande répond instantanément. Jellyfin reste le moteur ; Lantern ne remplace que l'interface.",
+    "t73": "Les films d'une collection deviennent des sagas, les recommandations viennent d'un petit moteur qui tourne dans l'app et apprend de ce que je regarde, et le lecteur choisit seul entre lecture directe et flux du serveur, avec saut du générique, aperçus sur la barre de lecture et épisode suivant.",
+    "t74": "Huit styles, chacun avec ses animations, ses sons d'interface et sa musique d'ambiance générative."
   };
   const FR_ATTR = {
     "a0": "Ailleurs",
@@ -86,7 +92,8 @@
     "a7": "Illustration : un texte sous l'encoche du MacBook, avec le mot en cours de lecture surligné et une reprise notée",
     "a8": "Rapport d'analyse de trackmend sur une bibliothèque d'exemple de douze fichiers, avant et après les commandes de tags, de paroles et de dédoublonnage",
     "a9": "Terminal : des documents fictifs extraits en texte, puis le texte OCR d'une quittance de loyer scannée",
-    "a10": "La modification d'une ligne dans Formula/w/whisper.cpp.rb"
+    "a10": "La modification d'une ligne dans Formula/w/whisper.cpp.rb",
+    "a11": "La page d'accueil de Lantern dans le style P5 : une grande bannière pour une saga, puis des rangées de titres"
   };
   const TITLE_FR = "Bouliw · Des logiciels qui travaillent là où sont vos fichiers";
   const root = document.documentElement;
