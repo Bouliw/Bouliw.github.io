@@ -79,7 +79,8 @@
     "t71": "Un client stylé pour ma médiathèque Jellyfin, sur le Mac, une TV LG et les téléphones.",
     "t72": "Une seule app web en TypeScript : elle s'installe depuis Safari sur le Mac et les téléphones, et devient une app webOS sur la TV, où chaque appui sur la télécommande répond instantanément. Jellyfin reste le moteur ; Lantern ne remplace que l'interface.",
     "t73": "Les films d'une collection deviennent des sagas, les recommandations viennent d'un petit moteur qui tourne dans l'app et apprend de ce que je regarde, et le lecteur choisit seul entre lecture directe et flux du serveur, avec saut du générique, aperçus sur la barre de lecture et épisode suivant.",
-    "t74": "Huit styles, chacun avec ses animations, ses sons d'interface et sa musique d'ambiance générative."
+    "t74": "Huit styles, chacun avec ses animations, ses sons d'interface et sa musique d'ambiance générative.",
+    "t75": "Référencé dans Awesome MLX"
   };
   const FR_ATTR = {
     "a0": "Ailleurs",
