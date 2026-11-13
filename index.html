@@ -226,7 +226,7 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
   <nav class="index" aria-label="Projects" data-i18n-aria="a1">
     <ol>
       <li style="--accent:#e8553f"><a href="#roughcut"><span class="n">01</span><span class="t">Roughcut</span><span class="d" data-i18n="t3">Rough cuts for Final Cut Pro</span></a></li>
-      <li style="--accent:#7c5cff"><a href="#earshot"><span class="n">02</span><span class="t">Earshot</span><span class="d" data-i18n="t4">Live transcription</span></a></li>
+      <li style="--accent:#7c5cff"><a href="#earshot"><span class="n">02</span><span class="t">Earshot</span><span class="d" data-i18n="t4">Call transcription</span></a></li>
       <li style="--accent:#3d6df2"><a href="#vigie"><span class="n">03</span><span class="t">Vigie</span><span class="d" data-i18n="t5">Log and AI agent detection</span></a></li>
       <li style="--accent:#9a4dff"><a href="#boulito"><span class="n">04</span><span class="t">Boulito</span><span class="d" data-i18n="t6">On-device voice assistant</span></a></li>
       <li style="--accent:#e0b000"><a href="#takeline"><span class="n">05</span><span class="t">Takeline</span><span class="d" data-i18n="t7">Voice-following teleprompter</span></a></li>
@@ -259,13 +259,13 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
 
 <article class="project" id="earshot" style="--accent:#7c5cff">
   <div class="copy">
-    <p class="label" data-i18n="t18">02 · Live transcription</p>
+    <p class="label" data-i18n="t18">02 · Call transcription</p>
     <div class="head"><img src="assets/earshot-icon.webp" width="192" height="192" alt="" loading="lazy"><h2>Earshot</h2></div>
-    <p class="tagline" data-i18n="t19">Live transcription of any app on the Mac, with speaker names.</p>
-    <p data-i18n="t20">Pick Teams, Zoom or Chrome from the menu bar and Earshot transcribes only that app's audio, as it's said. It taps the app's own output through Core Audio. System sounds and your own microphone stay out of the transcript, and no bot joins the call.</p>
-    <p data-i18n="t21">In Teams, speaker names come from its live captions. Each session is filed under its calendar event, and live subtitles can float over any window.</p>
-    <p class="fact" data-i18n="t22">Nothing is uploaded: capture and transcription both run on the Mac.</p>
-    <ul class="stack"><li>Swift</li><li>Core Audio taps</li><li>whisper.cpp + Metal</li><li>EventKit</li><li>Accessibility API</li></ul>
+    <p class="tagline" data-i18n="t19">Transcription of calls and classes on the Mac and on Windows, with each voice told apart.</p>
+    <p data-i18n="t20">On the Mac, pick Teams, Zoom or Chrome from the menu bar and Earshot transcribes only that app's audio, live or once the call is over. It taps the app's own output through Core Audio, so system sounds stay out of the transcript and no bot joins the call.</p>
+    <p data-i18n="t21">On Windows, it records the PC's sound and your microphone on two tracks, then writes the transcript once the call ends, each voice told apart. On the Mac, Teams speaker names come from its live captions, sessions are filed under their calendar event, and live subtitles can float over any window.</p>
+    <p class="fact" data-i18n="t22">Nothing is uploaded: capture and transcription both run on your computer.</p>
+    <ul class="stack"><li>Swift</li><li>Core Audio taps</li><li>whisper.cpp + Metal</li><li>EventKit</li><li>Accessibility API</li><li>C# + WASAPI</li></ul>
     <p class="links"><a class="btn" href="https://github.com/Bouliw/earshot/releases/latest" data-i18n="t28b">Download for Windows and Mac</a><a class="more" href="https://github.com/Bouliw/earshot" data-i18n="t13">Source on GitHub</a></p>
   </div>
   <figure class="stage earshot-stage">
