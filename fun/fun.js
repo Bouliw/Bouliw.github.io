@@ -23,6 +23,11 @@
   const BUG_SAID_KEY = 'bouliw-fun-bug-lines';
   const BUG_BEST_KEY = 'bouliw-fun-bug-best';
   const SITE = 'https://bouliw.github.io/';
+  // Seasonal event picked in the dock: 'auto' follows the date.
+  const EVENT_KEY = 'bouliw-fun-event';
+  const EVENTS = ['auto', 'none', 'winter', 'christmas', 'newyear', 'halloween', 'april', 'birthday'];
+  const WINTRY = ['winter', 'christmas', 'newyear'];
+  const eventPref = () => { const v = store.get(EVENT_KEY); return EVENTS.includes(v) ? v : 'auto'; };
   // A challenge link carries a bug run time in ms: ?dare=102300 is 1:42.3 to beat.
   const DARE = (() => { const v = parseInt(new URLSearchParams(location.search).get('dare') || '', 10); return v >= 1000 && v <= 3600000 ? v : 0; })();
   const DEFAULT_SKIN = 'overdrive';
@@ -235,13 +240,15 @@
       ok: 'Done', best: n => `best ${n}`, chip: (L, a, b) => `Level ${L}, ${a} of ${b} XP. Show achievements and how to level up`,
       sound: 'Sound', music: 'Music', typing: 'Typing', typingAria: 'Typing sounds', dock: 'Fun mode style', fun: 'Fun mode',
       game: 'Hidden game', screen: 'Game screen. Move with the arrow keys or the pointer, fire with space or a tap.', cont: 'Continue: back to the top',
-      reset: 'Reset progress', resetSure: 'Sure? Click again', resetNote: 'Your style, sound and language stay as they are.', newGame: 'New game!', run: 'BUG RUN', record: 'NEW RECORD', whoa: 'Whoa!',
+      reset: 'Reset progress', resetSure: 'Sure? Click again', resetNote: 'Your style, sound, event and language stay as they are.', newGame: 'New game!', run: 'BUG RUN', record: 'NEW RECORD', whoa: 'Whoa!',
       hello: 'Hi there!', thanks: 'Thanks for playing!', round: 'Round 2!', outfit: 'New outfit!', cheat: 'Cheat code!', level: L => `LEVEL ${L}!`,
       dare: 'Challenge someone', copied: 'Link copied!', copyThis: 'Copy this link', dareBest: t => `Your bug run record: ${t}`, dareChip: t => `DARE ${t}`,
       dareText: t => `I caught the 12 hidden bugs on bouliw.github.io in ${t}. Can you beat that?`,
       dareIn: t => `Challenge: beat ${t}. Catch all 12 bugs!`, dareReset: t => `Challenge: ${t}. Reset your progress (LV badge) to take it on.`,
       dareGo: t => `Challenge: ${t}. Go!`, dareWon: 'CHALLENGE WON', dareWin: d => `Challenge won, ${d} ahead! Send them your link.`, dareLose: d => `Missed by ${d}. Reset and try again.`,
       sec: ms => (ms < 60000 ? `${(ms / 1000).toFixed(1)} s` : clock(ms)),
+      event: 'Event', eventAria: 'Seasonal event',
+      events: { auto: "Auto (today's date)", none: 'None', winter: 'Winter', christmas: 'Christmas', newyear: 'New year', halloween: 'Halloween', april: 'April fools', birthday: "The site's birthday" },
     },
     fr: {
       unlockedToast: 'Succès débloqué', progress: 'Progression', close: 'Fermer', todo: 'Encore à débloquer', earn: "Comment gagner de l'XP", done: 'Débloqués',
@@ -249,13 +256,15 @@
       ok: 'Fait', best: n => `record ${n}`, chip: (L, a, b) => `Niveau ${L}, ${a} XP sur ${b}. Voir les succès et comment monter de niveau`,
       sound: 'Son', music: 'Musique', typing: 'Frappe', typingAria: 'Sons de frappe', dock: 'Style du mode fun', fun: 'Mode fun',
       game: 'Jeu caché', screen: 'Écran du jeu. Déplacement avec les flèches ou la souris, tir avec espace ou un toucher.', cont: 'Continuer : retour en haut',
-      reset: 'Remettre à zéro', resetSure: 'Sûr ? Reclique', resetNote: 'Ton style, le son et la langue restent comme ils sont.', newGame: 'Nouvelle partie !', run: 'BUG RUN', record: 'NOUVEAU RECORD', whoa: 'Hé !',
+      reset: 'Remettre à zéro', resetSure: 'Sûr ? Reclique', resetNote: "Ton style, le son, l'événement et la langue restent comme ils sont.", newGame: 'Nouvelle partie !', run: 'BUG RUN', record: 'NOUVEAU RECORD', whoa: 'Hé !',
       hello: 'Salut !', thanks: "Merci d'avoir joué !", round: 'Round 2 !', outfit: 'Nouvelle tenue !', cheat: 'Code de triche !', level: L => `NIVEAU ${L} !`,
       dare: "Défier quelqu'un", copied: 'Lien copié !', copyThis: 'Copie ce lien', dareBest: t => `Ton record au bug run : ${t}`, dareChip: t => `DÉFI ${t}`,
       dareText: t => `J'ai attrapé les 12 bugs cachés de bouliw.github.io en ${t}. Tu fais mieux ?`,
       dareIn: t => `Défi reçu : ${t} à battre. Attrape les 12 bugs !`, dareReset: t => `Défi : ${t}. Remets ta progression à zéro (badge LV) pour le relever.`,
       dareGo: t => `Défi : ${t}. C'est parti !`, dareWon: 'DÉFI RELEVÉ', dareWin: d => `Défi relevé, avec ${d} d'avance ! Envoie-lui ton lien.`, dareLose: d => `Raté de ${d}. Remets à zéro et retente.`,
       sec: ms => (ms < 60000 ? `${(ms / 1000).toFixed(1).replace('.', ',')} s` : clock(ms)),
+      event: 'Événement', eventAria: 'Événement saisonnier',
+      events: { auto: 'Auto (date du jour)', none: 'Aucun', winter: 'Hiver', christmas: 'Noël', newyear: 'Nouvel an', halloween: 'Halloween', april: "Poisson d'avril", birthday: 'Anniversaire du site' },
     },
   };
   const isFr = () => root.lang === 'fr';
@@ -984,6 +993,8 @@
   const winter = () => {
     const q = new URLSearchParams(location.search);
     if (q.has('winter')) return q.get('winter') !== '0';
+    const ev = eventPref();
+    if (ev !== 'auto') return WINTRY.includes(ev);
     const d = whenNow(), m = d.getMonth(), day = d.getDate();
     return m === 11 || (m === 0 && day <= 6);
   };
@@ -1053,12 +1064,16 @@
   function momentNow() {
     const d = whenNow(), m = d.getMonth() + 1, day = d.getDate(), h = d.getHours(), wd = d.getDay(), age = d.getFullYear() - BORN;
     const at = (id, arg) => Object.assign({ id, arg }, MOMENTS[id]);
-    if (m === 10 && day === 31 && age >= 1) return at('birthday', age);
-    if (m === 4 && day === 1) return at('april');
-    if (m === 10 && day >= 25) return at('halloween');
-    if (m === 12 && (day === 24 || day === 25)) return at('christmas');
-    if (m === 12 && day === 31) return at('nye');
-    if (m === 1 && day === 1) return at('newyear');
+    const ev = eventPref();
+    if (MOMENTS[ev]) return at(ev, ev === 'birthday' ? Math.max(1, age) : undefined);
+    if (ev === 'auto') {
+      if (m === 10 && day === 31 && age >= 1) return at('birthday', age);
+      if (m === 4 && day === 1) return at('april');
+      if (m === 10 && day >= 25) return at('halloween');
+      if (m === 12 && (day === 24 || day === 25)) return at('christmas');
+      if (m === 12 && day === 31) return at('nye');
+      if (m === 1 && day === 1) return at('newyear');
+    }
     if (h < 5) return at('night', h);
     if (wd === 5 && h >= 17) return at('friday');
     if (h >= 6 && h < 10) return at('morning');
@@ -1150,7 +1165,7 @@
   const spr = (c, r, extra = '') => `<span class="fx-spr${extra}" style="--c:${c};--r:${r}"></span>`;
   const buddy = {
     el: null, s: null, say: null, x: -90, timer: 0, talkTimer: 0, idleTimer: 0, until: 0, asleep: false, dir: 0, walkEnd: 0,
-    arrived: false, lastComment: 0, said: new Set(), waiting: new Set(), held: false, flying: false, noClick: false, raf: 0, fx: 0, fy: 0, mo: null,
+    arrived: false, lastComment: 0, said: new Set(), waiting: new Set(), held: false, flying: false, noClick: false, raf: 0, fx: 0, fy: 0, mo: null, gen: 0,
     row() { return OUTFIT[skinNow()] || 0; },
     frame(c, walk = false, c0 = 0) {
       if (!this.s) return;
@@ -1163,6 +1178,7 @@
     },
     create() {
       if (this.el || !isOn()) return;
+      this.gen++;
       this.mo = momentNow();
       const mo = this.mo;
       this.el = hidden('div', 'fx-buddy', `<div class="hop">${spr(8, 0)}${winter() ? HAT : ''}${mo && mo.hat === 'witch' ? WITCH : ''}${mo && mo.item ? ITEMS[mo.item] : ''}<span class="say"></span></div>`);
@@ -1193,15 +1209,15 @@
         this.walkTo(rand(40, Math.min(innerWidth * .4, 420)), () => { this.arrived = true; this.greet(); });
       };
       if (motion()) setTimeout(arrive, 900);
-      else { this.x = 16; this.el.style.setProperty('--x', '16px'); this.arrived = true; setTimeout(() => this.greet(), 900); }
+      else { this.x = 16; this.el.style.setProperty('--x', '16px'); this.arrived = true; const g = this.gen; setTimeout(() => this.greet(0, g), 900); }
       this.schedule();
       this.poke();
     },
     // A challenge link first, then the day or the time of day, else a plain hello.
-    greet(tries = 0) {
-      if (!this.el) return;
+    greet(tries = 0, g = this.gen) {
+      if (!this.el || g !== this.gen) return;
       // On a first visit the "start" achievement lands about now: let its GG go first.
-      if (tries < 12 && (!unlocked.has('start') || performance.now() < this.until)) { setTimeout(() => this.greet(tries + 1), 400); return; }
+      if (tries < 12 && (!unlocked.has('start') || performance.now() < this.until)) { setTimeout(() => this.greet(tries + 1, g), 400); return; }
       if (DARE && isOn()) { this.react(9, (bugs.caught().length ? u('dareReset') : u('dareIn'))(clock(DARE)), 4200); return; }
       const mo = this.mo;
       if (!mo) { this.talk(u('hello'), 1800); return; }
@@ -1210,7 +1226,9 @@
       else this.react(mo.pose, line, 3000);
     },
     destroy() {
-      clearTimeout(this.timer); clearTimeout(this.talkTimer); clearTimeout(this.idleTimer);
+      clearTimeout(this.timer); clearTimeout(this.talkTimer); clearTimeout(this.idleTimer); clearTimeout(this.walkDone);
+      this.walkThen = null;
+      this.gen++;
       cancelAnimationFrame(this.raf);
       this.held = this.flying = false;
       if (this.el) this.el.remove();
@@ -1247,7 +1265,7 @@
       this.walkDone = setTimeout(() => { this.walkEnd = 0; this.frame(8); const f = this.walkThen; this.walkThen = null; if (f) f(); }, t * 1000);
     },
     // A walk cut short (a GG, a grab) still runs what was to follow, such as his arrival, once he is free.
-    later(ms) { const f = this.walkThen; this.walkThen = null; if (f) setTimeout(f, ms); },
+    later(ms) { const f = this.walkThen, g = this.gen; this.walkThen = null; if (f) setTimeout(() => { if (g === this.gen) f(); }, ms); },
     jump() {
       if (!this.el || !motion()) return;
       this.el.classList.remove('jump');
@@ -1688,6 +1706,77 @@
     document.body.append(card);
     dareBox = card;
     setTimeout(() => { if (card.isConnected && !card.contains(document.activeElement)) card.remove(); }, 30000);
+  }
+
+  /* ================= Event menu (dock): pick a seasonal event by hand ================= */
+  let evMenu = null, evOff = null;
+  function syncEventButton() {
+    const b = dock && dock.querySelector('.fx-event');
+    if (!b) return;
+    const v = eventPref();
+    b.classList.toggle('on', v !== 'auto');
+    b.setAttribute('aria-label', `${u('eventAria')}${isFr() ? ' : ' : ': '}${u('events')[v]}`);
+  }
+  function closeEventMenu(refocus) {
+    if (!evMenu) return;
+    evMenu.remove();
+    evMenu = null;
+    if (evOff) evOff();
+    evOff = null;
+    const b = dock && dock.querySelector('.fx-event');
+    if (b) { b.setAttribute('aria-expanded', 'false'); if (refocus) b.focus(); }
+  }
+  function eventMenu(btn) {
+    if (evMenu) { closeEventMenu(true); return; }
+    const cur = eventPref();
+    evMenu = document.createElement('div');
+    evMenu.className = 'fx-ev-menu';
+    evMenu.setAttribute('role', 'menu');
+    evMenu.setAttribute('aria-label', u('eventAria'));
+    evMenu.innerHTML = EVENTS.map(k => `<button type="button" role="menuitemradio" aria-checked="${k === cur}" data-ev="${k}">${esc(u('events')[k])}</button>` +
+      (k === 'none' ? '<span class="sep" role="separator"></span>' : '')).join('');
+    document.body.append(evMenu);
+    // Above the button, kept inside the window.
+    const r = btn.getBoundingClientRect(), w = evMenu.offsetWidth;
+    evMenu.style.left = `${Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)).toFixed(0)}px`;
+    evMenu.style.bottom = `${(innerHeight - r.top + 10).toFixed(0)}px`;
+    btn.setAttribute('aria-expanded', 'true');
+    audio.play('switch');
+    const items = [...evMenu.querySelectorAll('[data-ev]')];
+    (items.find(i => i.getAttribute('aria-checked') === 'true') || items[0]).focus();
+    evMenu.addEventListener('click', e => {
+      const it = e.target.closest('[data-ev]');
+      if (!it) return;
+      setEvent(it.dataset.ev);
+      closeEventMenu(true);
+    });
+    const onKey = e => {
+      if (e.key === 'Escape') { e.preventDefault(); closeEventMenu(true); return; }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        const i = items.indexOf(document.activeElement);
+        items[(i + (e.key === 'ArrowDown' ? 1 : items.length - 1) + items.length) % items.length].focus();
+      }
+      if (e.key === 'Tab') closeEventMenu(false);
+    };
+    const onDown = e => { if (!evMenu.contains(e.target) && !btn.contains(e.target)) closeEventMenu(false); };
+    const onResize = () => closeEventMenu(false);
+    addEventListener('keydown', onKey, true);
+    addEventListener('pointerdown', onDown, true);
+    addEventListener('resize', onResize);
+    evOff = () => { removeEventListener('keydown', onKey, true); removeEventListener('pointerdown', onDown, true); removeEventListener('resize', onResize); };
+  }
+  // Applies at once: snow on or off, and the buddy walks back in dressed for it.
+  function setEvent(v) {
+    if (!EVENTS.includes(v)) return;
+    store.set(EVENT_KEY, v);
+    syncEventButton();
+    aprilDone = false;
+    if (!isOn()) return;
+    document.querySelectorAll('.fx-snow').forEach(n => n.remove());
+    if (winter() && core) snowOn(core.add);
+    buddy.destroy();
+    buddy.create();
   }
 
   /* ================= Menu poses and the sliding selection ================= */
@@ -2755,6 +2844,7 @@
     soundOff: '<svg class="off" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9l5 6m0-6-5 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     soundOn: '<svg class="on" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>',
     music: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 4v11.3A3.5 3.5 0 1 0 11 18.5V8l9-2v7.3a3.5 3.5 0 1 0 2 3.2V2z"/></svg>',
+    event: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/><path d="m12 12.6.9 1.9 2 .3-1.5 1.4.4 2-1.8-1-1.8 1 .4-2-1.5-1.4 2-.3z" fill="currentColor" stroke="none"/></svg>',
     typing: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h0M10 10h0M14 10h0M18 10h0M7 14h10" stroke-linecap="round"/></svg>',
   };
 
@@ -2776,9 +2866,12 @@
       '<span class="fx-dock-sep" aria-hidden="true"></span>' +
       `<button type="button" class="fx-sound" aria-pressed="false" aria-label="${u('sound')}">${ICONS.soundOff}${ICONS.soundOn}<span class="lbl" aria-hidden="true">${u('sound')}</span></button>` +
       `<button type="button" class="fx-music" aria-pressed="false" aria-label="${u('music')}" hidden>${ICONS.music}<span class="lbl" aria-hidden="true">${u('music')}</span></button>` +
-      `<button type="button" class="fx-typing" aria-pressed="false" aria-label="${u('typingAria')}" hidden>${ICONS.typing}<span class="lbl" aria-hidden="true">${u('typing')}</span></button>`;
+      `<button type="button" class="fx-typing" aria-pressed="false" aria-label="${u('typingAria')}" hidden>${ICONS.typing}<span class="lbl" aria-hidden="true">${u('typing')}</span></button>` +
+      `<button type="button" class="fx-event" aria-haspopup="menu" aria-expanded="false">${ICONS.event}<span class="lbl" aria-hidden="true">${u('event')}</span></button>`;
     dock.addEventListener('click', e => {
       if (e.target.closest('.fx-xp')) { openPanel(); return; }
+      const ev = e.target.closest('.fx-event');
+      if (ev) { eventMenu(ev); return; }
       const b = e.target.closest('[data-skin-btn]');
       if (b) pickSkin(b.dataset.skinBtn);
       if (e.target.closest('.fx-sound')) {
@@ -2804,6 +2897,7 @@
     const header = toggle.closest('header');
     (header || toggle).after(dock);
     syncAudioButtons();
+    syncEventButton();
     xp.render();
   }
 
@@ -2820,6 +2914,7 @@
       music.stop();
       audio.keepAwake(false);
       closePanel(false);
+      closeEventMenu(false);
       lite = false;
       root.classList.remove('fx-lite');
       odOff();
@@ -2850,6 +2945,7 @@
     if (!isOn()) return;
     relang = true;
     closePanel(false);
+    closeEventMenu(false);
     odOff();
     coreOff();
   });
