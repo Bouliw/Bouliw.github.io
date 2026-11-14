@@ -1,7 +1,7 @@
 /* Bouliw · Fun mode.
    On by default. The Fun switch in the header brings back the plain site, and a dock
    picks the style: Overdrive (default), Y2K, Phantom, Alert, Neon, 8-bit or Mix.
-   Choices (mode, style, sound, music, typing, achievements, XP) live in localStorage.
+   Choices (mode, style, sound, music, typing, achievements, XP, bugs caught) live in localStorage.
    Everything heavy pauses off screen, in background tabs, and drops to a lighter
    version if the frame rate falls. */
 (() => {
@@ -19,6 +19,8 @@
   const TRIED_KEY = 'bouliw-fun-tried';
   const XP_KEY = 'bouliw-fun-xp';
   const HI_KEY = 'bouliw-fun-hiscore';
+  const BUG_KEY = 'bouliw-fun-bugs';
+  const BUG_SAID_KEY = 'bouliw-fun-bug-lines';
   const DEFAULT_SKIN = 'overdrive';
   const SKINS = [['overdrive', 'Overdrive'], ['y2k', 'Y2K'], ['phantom', 'Phantom'], ['alert', 'Alert'], ['neon', 'Neon'], ['pixel', '8-bit'], ['mix', 'Mix']];
   // In Mix, each section wears one style (keep in sync with build_css.py).
@@ -31,6 +33,40 @@
   // Columns: 0-3 walk right, 4-7 walk left, 8 idle, 9 wave, 10 thumbs up, 11 arms crossed.
   const OUTFIT = { overdrive: 0, y2k: 1, phantom: 2, alert: 3, neon: 4, pixel: 0, mix: 0 };
   const MENU_POSES = [[0, 8], [5, 4], [3, 11], [2, 9], [5, 1], [5, 5], [2, 11], [1, 10], [4, 10]];
+  // What a bug says when it is caught: a different line each time, never twice until all have been said.
+  const BUG_LINES = [
+    "You found me! For the record, I'm a feature.",
+    'Busted. Works on my machine, though.',
+    "Got me! Please don't tell QA.",
+    'Found! Close the ticket, I surrender.',
+    'Sharp eyes. Ever thought about pentesting?',
+    'You found me! My CVE number is on its way.',
+    "Relax, I'm only a warning.",
+    'Shh… I shipped on a Friday at 5 pm.',
+    'Found me. Now try to reproduce me.',
+    'Fine, you win. Back to node_modules I go.',
+    "Found! I'm blaming the cache.",
+    'Fix me and two more will show up.',
+    'Argh! I was one step away from a segfault.',
+    'A semicolon has been looking for me all day.',
+    'I should have hidden in the CSS. Nobody goes there.',
+    'Found me. Status: WONTFIX.',
+    'Noooo, three days before I retired.',
+    'Congrats, you won… nothing. Well, some XP.',
+    'Usually I only come out during live demos.',
+    'This stays between us. And the logs.',
+    'I was hiding behind a missing bracket.',
+    "I'm not a memory leak. I'm a memory.",
+    'Of course you check the corners.',
+    "I'm not lost, I'm undocumented.",
+    'Caught! Can I at least keep my stack trace?',
+    'Wow. Even the unit tests never found me.',
+    'You found me! I was in staging, I swear.',
+    "Fine. But I'm back in the next update.",
+    "I'm not hiding, I'm deprecated.",
+    'Found me! Quick, act like this was planned.',
+  ];
+  const BUG_LAST = "That was the last one. Zero bugs left… until the next commit.";
   const LINES = ['Hi there!', 'Pick a style below!', 'Click a window to see the code.', 'Try the Konami code!', 'Insert coin at the bottom!', 'New outfit?', 'Turn the sound on!'];
   const TROPHIES = {
     start: ["It's dangerous to go alone", 'Opened the portfolio in fun mode'],
@@ -45,6 +81,8 @@
     clicks: ['Carpal tunnel any%', 'Clicked 30 times'],
     arcade: ['Arcade rat', 'Found the hidden game'],
     ace: ['All your base are belong to us', 'Scored 3,000 points'],
+    bug: ['Works on my machine', 'Caught a hidden bug'],
+    bugs: ['Bug bounty', 'Caught all twelve hidden bugs'],
   };
 
   // What to do for each achievement still locked; a counter where there is one.
@@ -61,12 +99,15 @@
     clicks: 'Click 30 times in one visit',
     arcade: 'Find the coin slot at the bottom of the page',
     ace: 'Score 3,000 in the hidden game',
+    bug: 'Something is peeking out from an edge of the page. Click it',
+    bugs: 'Catch the twelve bugs hiding around the page',
   };
   const EARN = [
     ['Unlock an achievement', '+50'],
     ['Type the cheat code', '+100'],
     ['Open a project on GitHub', '+25'],
     ['Try a style for the first time', '+20'],
+    ['Catch a hidden bug', '+15'],
     ['Reach a project you have not seen this visit', '+15'],
     ['Switch back to a style', '+10'],
     ['Press CONTINUE? in the footer', '+10'],
@@ -90,6 +131,8 @@
       clicks: ['Tendinite any%', '30 clics'],
       arcade: ["Rat d'arcade", 'Jeu caché trouvé'],
       ace: ['All your base are belong to us', '3 000 points marqués'],
+      bug: ['Chez moi, ça marche', 'Un bug caché attrapé'],
+      bugs: ['Bug bounty', 'Les douze bugs cachés attrapés'],
     },
     hints: {
       start: 'Ouvrir le portfolio en mode fun',
@@ -104,12 +147,15 @@
       clicks: 'Cliquer 30 fois en une visite',
       arcade: 'Trouver la fente à pièces en bas de page',
       ace: 'Faire 3 000 points au jeu caché',
+      bug: "Quelque chose dépasse d'un bord de la page. Clique dessus",
+      bugs: 'Attraper les douze bugs cachés sur la page',
     },
     earn: [
       ['Débloquer un succès', '+50'],
       ['Taper le code de triche', '+100'],
       ['Ouvrir un projet sur GitHub', '+25'],
       ['Essayer un style pour la première fois', '+20'],
+      ['Attraper un bug caché', '+15'],
       ['Arriver sur un projet pas encore vu pendant la visite', '+15'],
       ['Revenir à un style', '+10'],
       ['Appuyer sur CONTINUE? en bas de page', '+10'],
@@ -117,6 +163,39 @@
       ['Cliquer partout (40 par visite) ou embêter le perso', '+1 / +2'],
       ['Jouer au jeu caché', 'score ÷ 50'],
     ],
+    bugLines: [
+      "Tu m'as trouvé ! Pour info, je suis une fonctionnalité.",
+      'Grillé. Pourtant, chez moi ça marche.',
+      "Tu m'as eu ! Ne dis rien à la QA.",
+      'Trouvé ! Ferme le ticket, je me rends.',
+      "T'as l'œil. Tu as déjà pensé au pentest ?",
+      "Tu m'as trouvé ! Mon numéro de CVE arrive.",
+      "Pas de panique, je ne suis qu'un warning.",
+      "Chut… on m'a mis en prod un vendredi à 17 h.",
+      'Trouvé. Maintenant, essaie de me reproduire.',
+      "Bon, t'as gagné. Je retourne dans node_modules.",
+      "Trouvé ! Je dirai que c'est la faute du cache.",
+      'Corrige-moi et deux autres vont apparaître.',
+      "Argh ! J'étais à deux doigts du segfault.",
+      'Un point-virgule me cherche depuis ce matin.',
+      "J'aurais dû me cacher dans le CSS. Personne n'y va.",
+      'Trouvé. Statut : WONTFIX.',
+      'Noooon, à trois jours de la retraite…',
+      "Bravo, tu as gagné… rien. Enfin, de l'XP.",
+      "D'habitude, je ne sors que pendant les démos.",
+      'Ça reste entre nous. Et les logs.',
+      'Je me cachais derrière une accolade oubliée.',
+      'Je ne suis pas une fuite de mémoire, je suis un souvenir.',
+      'Évidemment, tu regardes dans les coins.',
+      'Je ne suis pas perdu, je suis non documenté.',
+      'Pris ! Je peux au moins garder ma stack trace ?',
+      "Même les tests unitaires ne m'avaient pas trouvé.",
+      "Tu m'as trouvé ! J'étais en préprod, je te jure.",
+      "D'accord. Mais je reviens à la prochaine mise à jour.",
+      'Je ne me cache pas, je suis déprécié.',
+      "Trouvé ! Vite, fais comme si c'était prévu.",
+    ],
+    bugLast: "C'était le dernier. Zéro bug… jusqu'au prochain commit.",
     lines: ['Salut !', 'Choisis un style en bas !', 'Clique sur une fenêtre pour voir le code.', 'Essaie le code Konami !', 'Une pièce en bas de page !', 'Nouvelle tenue ?', 'Active le son !'],
   };
   const UI = {
@@ -143,6 +222,7 @@
   const hintText = id => (isFr() ? FR.hints : HINTS)[id];
   const earnList = () => (isFr() ? FR.earn : EARN);
   const lineList = () => (isFr() ? FR.lines : LINES);
+  const bugLines = () => (isFr() ? FR.bugLines : BUG_LINES);
 
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
@@ -310,6 +390,7 @@
         case 'boom': this.hiss(t, .22, .06, 600, 'lowpass'); T(140, t, .2, 'square', .02, 40); break;
         case 'hurt': T(200, t, .3, 'sawtooth', .03, 60, 1200); break;
         case 'wave': [659, 784, 988, 1319].forEach((f, i) => T(f, t + i * .06, .1, 'triangle', .012)); break;
+        case 'bug': T(620, t, .07, 'square', .01, 1500, 2400); [1047, 1319, 1760].forEach((f, i) => T(f, t + .08 + i * .06, .14, 'triangle', .012)); break;
         case 'coin': T(988, t, .07, 'square', .01, 0, 2400); T(1319, t + .07, .3, 'square', .01, 0, 2400); break;
         default:
       }
@@ -653,6 +734,7 @@
     if (id === 'hopper') return `${Math.min(store.list(TRIED_KEY).length, SKINS.length)}/${SKINS.length}`;
     if (id === 'tour') return `${visit.seen.size}/${visit.stages}`;
     if (id === 'clicks') return `${Math.min(visit.clicks, 30)}/30`;
+    if (id === 'bugs') return `${bugs.caught().length}/${BUG_SPOTS.length}`;
     if (id === 'ace') { const hi = parseInt(store.get(HI_KEY) || '0', 10) || 0; return hi ? u('best')(hi) : ''; }
     return '';
   }
@@ -817,7 +899,7 @@
   /* ================= The pixel buddy ================= */
   const spr = (c, r, extra = '') => `<span class="fx-spr${extra}" style="--c:${c};--r:${r}"></span>`;
   const buddy = {
-    el: null, s: null, say: null, x: -90, timer: 0, talkTimer: 0, idleTimer: 0, until: 0, asleep: false,
+    el: null, s: null, say: null, x: -90, timer: 0, talkTimer: 0, idleTimer: 0, until: 0, asleep: false, dir: 0, walkEnd: 0,
     row() { return OUTFIT[skinNow()] || 0; },
     frame(c, walk = false, c0 = 0) {
       if (!this.s) return;
@@ -831,6 +913,8 @@
       this.el = hidden('div', 'fx-buddy', `<div class="hop">${spr(8, 0)}<span class="say"></span></div>`);
       this.s = this.el.querySelector('.fx-spr');
       this.say = this.el.querySelector('.say');
+      // The poof class must not outlive its animation, or it keeps the walk cycle from playing.
+      this.s.addEventListener('animationend', e => { if (e.animationName === 'fx-poof' && this.el) this.el.classList.remove('poof'); });
       this.el.addEventListener('click', e => {
         e.stopPropagation();
         this.wake();
@@ -876,14 +960,15 @@
       const dist = Math.abs(x - this.x);
       if (dist < 4) { if (then) then(); return; }
       const t = dist / 75;
-      this.frame(x > this.x ? 0 : 4, true, x > this.x ? 0 : 4);
+      this.dir = x > this.x ? 0 : 4;
+      this.frame(this.dir, true, this.dir);
       this.el.style.setProperty('--t', `${t}s`);
       this.el.style.setProperty('--x', `${x}px`);
       this.el.classList.toggle('r', x > innerWidth / 2);
       this.x = x;
-      this.until = performance.now() + t * 1000;
+      this.until = this.walkEnd = performance.now() + t * 1000;
       clearTimeout(this.walkDone);
-      this.walkDone = setTimeout(() => { this.frame(8); if (then) then(); }, t * 1000);
+      this.walkDone = setTimeout(() => { this.walkEnd = 0; this.frame(8); if (then) then(); }, t * 1000);
     },
     jump() {
       if (!this.el || !motion()) return;
@@ -903,6 +988,7 @@
       if (!this.el) return;
       this.wake();
       clearTimeout(this.walkDone);
+      this.walkEnd = 0;
       // Stop where he is.
       const r = this.el.getBoundingClientRect();
       if (Math.abs(r.left - this.x) > 2) { this.x = r.left; this.el.style.setProperty('--t', '0s'); this.el.style.setProperty('--x', `${this.x}px`); }
@@ -913,7 +999,9 @@
     },
     outfit() {
       if (!this.el) return;
-      this.frame(8);
+      // Mid-walk he keeps walking in the new outfit; standing still, he faces the visitor.
+      if (performance.now() < this.walkEnd) this.frame(this.dir, true, this.dir);
+      else this.frame(this.asleep ? 11 : 8);
       if (motion()) { this.el.classList.remove('poof'); void this.el.offsetWidth; this.el.classList.add('poof'); }
       this.talk(u('outfit'), 1400);
     },
@@ -939,6 +1027,180 @@
       if (!this.el || this.el.hidden) return false;
       const r = this.el.getBoundingClientRect();
       return Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2)) < 150;
+    },
+  };
+
+  /* ================= Hidden bugs ================= */
+  // Twelve little bugs peek out from the edges of things. Click one to catch it: it says
+  // something, flies off and stays caught (localStorage). The spots follow the layout,
+  // which changes with the style and the window size.
+  // [id, host, target inside the host ('' = the host), edge it peeks from, position along that edge]
+  const BUG_SPOTS = [
+    ['top', 'header.top', '.mark .glyph', 'bottom', .5],
+    ['roughcut', '#roughcut', '.stage .inset', 'top', .78],
+    ['earshot', '#earshot', '.stage video', 'left', .8],
+    ['vigie', '#vigie', '.fact', 'right', .5],
+    ['boulito', '#boulito', '.stage > img', 'bottom', .5],
+    ['takeline', '#takeline', '.stage .screen', 'top', .14],
+    ['trackmend', '#trackmend', '.stage img', 'bottom', .22],
+    ['doc-indexer', '#doc-indexer', '.stage img', 'left', .35],
+    ['mac-toolkit', '#mac-toolkit', '.stage .term', 'right', .7],
+    ['lantern', '#lantern', '.stage img', 'right', .3],
+    ['upstream', '#upstream', '.stage pre', 'top', .8],
+    ['bottom', 'footer', '.fx-coin', 'top', .8],
+  ];
+  // 16×16, two frames (antennae and legs move, eyes look the other way).
+  // k outline and head, w eye, b shell (the section's accent colour), s shine.
+  const BUG_ART = [[
+    '...k........k...', '....k......k....', '.....k....k.....', '....kkkkkkkk....',
+    '...kkkkkkkkkk...', '..kkwwkkkkwwkk..', '..kkwkkkkkwkkk..', '..kkkkkkkkkkkk..',
+    '...kkkkkkkkkk...', 'k.kbbsbbkbbbbk.k', '.kbbsbbbkbbkbbk.', 'kkbbbbbbkbbbbbkk',
+    '.kbkbbbbkbbbbbk.', 'kkbbbbbbkbbbkbkk', '..kbbbbbkbbbbk..', '...kkkkkkkkkk...',
+  ], [
+    '..k..........k..', '...k........k...', '.....k....k.....', '....kkkkkkkk....',
+    '...kkkkkkkkkk...', '..kkwwkkkkwwkk..', '..kkkwkkkkkwkk..', '..kkkkkkkkkkkk..',
+    '...kkkkkkkkkk...', '..kbbsbbkbbbbk..', 'kkbbsbbbkbbkbbkk', '.kbbbbbbkbbbbbk.',
+    'kkbkbbbbkbbbbbkk', '.kbbbbbbkbbbkbk.', 'k.kbbbbbkbbbbk.k', '...kkkkkkkkkk...',
+  ]];
+  const BUG_FILL = { k: '#0a0a0b', w: '#fff', b: 'currentColor', s: 'rgb(255 255 255 / .75)' };
+  let bugSvg = '';
+  function bugMarkup() {
+    if (bugSvg) return bugSvg;
+    const frame = (rows, cls) => {
+      let out = '';
+      rows.forEach((row, y) => {
+        for (let x = 0; x < row.length;) {
+          const c = row[x];
+          let w = 1;
+          while (row[x + w] === c) w++;
+          if (c !== '.') out += `<rect x="${x}" y="${y}" width="${w}" height="1" fill="${BUG_FILL[c]}"/>`;
+          x += w;
+        }
+      });
+      return `<g class="${cls}">${out}</g>`;
+    };
+    bugSvg = `<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${frame(BUG_ART[0], 'fa')}${frame(BUG_ART[1], 'fb')}</svg>`;
+    return bugSvg;
+  }
+  const bugs = {
+    items: [], ro: null, io: null, raf: 0, onResize: null,
+    caught() { return store.list(BUG_KEY).filter(id => BUG_SPOTS.some(([s]) => s === id)); },
+    create() {
+      if (this.items.length || !isOn()) return;
+      const caught = new Set(this.caught());
+      this.ro = new ResizeObserver(() => this.place());
+      this.io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('live', e.isIntersecting)), { rootMargin: '120px' });
+      BUG_SPOTS.forEach(spot => {
+        const [id, hostSel, targetSel] = spot;
+        const host = document.querySelector(hostSel);
+        if (caught.has(id) || !host) return;
+        const el = hidden('span', 'fx-bug', bugMarkup());
+        el.style.setProperty('--d', `${-rand(0, 7).toFixed(2)}s`);
+        el.querySelector('svg').addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); this.catch(item); });
+        host.append(el);
+        const item = { id, spot, el, host };
+        this.items.push(item);
+        this.ro.observe(host);
+        const t = targetSel && host.querySelector(targetSel);
+        if (t) this.ro.observe(t);
+        this.io.observe(el);
+      });
+      this.onResize = () => this.place();
+      addEventListener('resize', this.onResize);
+      if (document.fonts) document.fonts.ready.then(() => this.place());
+      this.place();
+    },
+    destroy() {
+      cancelAnimationFrame(this.raf);
+      if (this.ro) this.ro.disconnect();
+      if (this.io) this.io.disconnect();
+      if (this.onResize) removeEventListener('resize', this.onResize);
+      this.items.forEach(({ el }) => el.remove());
+      this.items = [];
+      this.ro = this.io = this.onResize = null;
+    },
+    // Puts each bug against its edge. Layout boxes, not what is on screen: windows that slide
+    // or tilt in on scroll would otherwise drag the bug off with their first frame.
+    // Left and right edges too close to the window's sides (one column on phones) fall back to the top.
+    place() {
+      cancelAnimationFrame(this.raf);
+      this.raf = requestAnimationFrame(() => {
+        const vw = document.documentElement.clientWidth;
+        const box = (t, host) => {
+          if (t === host) return { x: -host.clientLeft, y: -host.clientTop, w: host.offsetWidth, h: host.offsetHeight };
+          let x = 0, y = 0, n = t;
+          while (n && n !== host) {
+            x += n.offsetLeft; y += n.offsetTop;
+            const p = n.offsetParent;
+            if (p && p !== host) { x += p.clientLeft; y += p.clientTop; }
+            n = p;
+          }
+          return n === host ? { x, y, w: t.offsetWidth, h: t.offsetHeight } : null;
+        };
+        this.items.forEach(({ spot, el, host }) => {
+          if (el.classList.contains('got')) return;
+          const [, , targetSel, edge, f] = spot;
+          const t = targetSel ? host.querySelector(targetSel) : host;
+          const r = t && t.getClientRects().length ? box(t, host) : null;
+          if (!r || !r.w || !r.h) { el.hidden = true; return; }
+          el.hidden = false;
+          const S = el.offsetWidth;
+          const ox = host.getBoundingClientRect().left + host.clientLeft;
+          let side = edge;
+          if ((side === 'left' && ox + r.x - S < 6) || (side === 'right' && ox + r.x + r.w + S > vw - 6)) side = 'top';
+          let x, y;
+          if (side === 'top' || side === 'bottom') { x = r.x + f * r.w - S / 2; y = side === 'top' ? r.y - S : r.y + r.h; }
+          else { x = side === 'left' ? r.x - S : r.x + r.w; y = r.y + f * r.h - S / 2; }
+          x = Math.max(6 - ox, Math.min(vw - S - 6 - ox, x));
+          el.dataset.side = side;
+          el.style.left = `${x.toFixed(1)}px`;
+          el.style.top = `${y.toFixed(1)}px`;
+        });
+      });
+    },
+    catch(item) {
+      const { id, el } = item;
+      const caught = new Set(this.caught());
+      if (caught.has(id) || el.classList.contains('got')) return;
+      caught.add(id);
+      store.set(BUG_KEY, JSON.stringify([...caught]));
+      const n = caught.size, total = BUG_SPOTS.length;
+      let text;
+      if (n >= total) text = isFr() ? FR.bugLast : BUG_LAST;
+      else {
+        const all = bugLines().map((_, i) => i);
+        let said = store.list(BUG_SAID_KEY).filter(i => i < all.length);
+        if (said.length >= all.length) said = [];
+        const i = pick(all.filter(k => !said.includes(k)));
+        said.push(i);
+        store.set(BUG_SAID_KEY, JSON.stringify(said));
+        text = bugLines()[i];
+      }
+      this.say(el, `BUG ${n}/${total}`, text);
+      el.classList.add('got');
+      this.items = this.items.filter(it => it !== item);
+      setTimeout(() => el.remove(), motion() ? 1000 : 0);
+      audio.play('bug');
+      xp.add(15);
+      trophy('bug');
+      if (n >= total) trophy('bugs');
+      if (panel) renderPanel();
+    },
+    // The speech bubble lives in the page (not in the bug, which may be turned on its side).
+    say(el, tag, text) {
+      const r = el.getBoundingClientRect();
+      const b = hidden('div', 'fx-bug-say', '<small></small><span></span>');
+      b.querySelector('small').textContent = tag;
+      b.querySelector('span').textContent = text;
+      b.style.setProperty('--bug', getComputedStyle(el).color);
+      document.body.append(b);
+      const vw = document.documentElement.clientWidth, w = b.offsetWidth, h = b.offsetHeight;
+      const cx = Math.max(w / 2 + 8, Math.min(vw - w / 2 - 8, r.left + r.width / 2));
+      const below = r.top - h - 14 < 8;
+      b.classList.toggle('below', below);
+      b.style.left = `${cx + scrollX}px`;
+      b.style.top = `${(below ? r.bottom : r.top) + scrollY}px`;
+      setTimeout(() => b.remove(), 3400);
     },
   };
 
@@ -1614,6 +1876,8 @@
 
     buddy.create();
     later(() => buddy.destroy());
+    bugs.create();
+    later(() => bugs.destroy());
     later(() => { if (game) game.close(); });
     music.sync();
     later(() => { music.stop(); audio.keepAwake(false); });
@@ -1626,7 +1890,7 @@
     if (!core) return;
     core.clear();
     core = null;
-    document.querySelectorAll('.fx-spark, .fx-p, .od-confetti, .fx-slash, .fx-glitch, .fx-bars, .fx-alarm, .fx-iris, .fx-win, .fx-levelup, .fx-xpgain').forEach(n => n.remove());
+    document.querySelectorAll('.fx-spark, .fx-p, .od-confetti, .fx-slash, .fx-glitch, .fx-bars, .fx-alarm, .fx-iris, .fx-win, .fx-levelup, .fx-xpgain, .fx-bug-say').forEach(n => n.remove());
   }
 
   // Watch the frame rate for two seconds; if it is low, switch to the lighter version.
@@ -1985,6 +2249,8 @@
     requestAnimationFrame(() => moveSel(false));
     if (changed) { clearTitlesSoon(30); setTimeout(clearTitles, 700); }
     if (changed && buddy.el) buddy.outfit();
+    // The layout moves with the style: put the bugs back against their edges.
+    if (changed) { bugs.place(); setTimeout(() => bugs.place(), 800); }
   }
 
   function pickSkin(k) {
