@@ -204,6 +204,13 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
   r.dataset.fun = '';
   r.dataset.skin = /^(overdrive|y2k|phantom|alert|neon|pixel|mix)$/.test(skin) ? skin : 'overdrive';
   r.classList.add('od-intro');
+  /* The headline and text fonts of the style, fetched alongside the stylesheet instead of after it. */
+  var fonts = { overdrive: ['noto-serif-wdth', 'geist'], y2k: ['michroma', 'geist'], phantom: ['anton', 'geist'], alert: ['noto-serif-wdth', 'geist'], neon: ['orbitron', 'geist-mono', 'geist'], pixel: ['press-start-2p', 'pixelify-sans'], mix: ['anton', 'geist'] }[r.dataset.skin];
+  fonts.forEach(function (f) {
+    var l = document.createElement('link');
+    l.rel = 'preload'; l.as = 'font'; l.type = 'font/woff2'; l.crossOrigin = 'anonymous'; l.href = 'fun/fonts/' + f + '.woff2';
+    document.head.appendChild(l);
+  });
 })();
 </script>
 </head>

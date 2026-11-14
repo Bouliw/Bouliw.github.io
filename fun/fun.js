@@ -1913,7 +1913,11 @@
   function setPose(i) {
     if (i === current) return;
     current = i;
-    document.querySelectorAll('.fx-pose, .od-pose').forEach(p => [...p.children].forEach((n, k) => n.classList.toggle('on', k === i)));
+    document.querySelectorAll('.fx-pose, .od-pose').forEach(p => [...p.children].forEach((n, k) => {
+      n.classList.toggle('on', k === i);
+      const img = k === i && n.querySelector('img[data-src]');
+      if (img) { img.src = img.dataset.src; delete img.dataset.src; }
+    }));
     menuLinks().forEach((a, k) => a.classList.toggle('on', k === i));
     moveSel(true);
   }
@@ -1933,7 +1937,9 @@
       const shot = sec && sec.querySelector('.stage img.shot, .stage .window img');
       if (icon || shot) {
         const img = new Image();
-        img.src = (icon || shot).getAttribute('src');
+        // Loaded when this item is first shown (see setPose), not all at start.
+        img.dataset.src = (icon || shot).getAttribute('src');
+        img.decoding = 'async';
         img.alt = '';
         img.className = icon ? 'badge' : 'badge shot-pose';
         item.append(img);
@@ -2315,8 +2321,10 @@
     const pausable = [...document.querySelectorAll('.hero, .project, .upstream, footer')];
     const checkPause = () => {
       const top = -400, bottom = innerHeight + 400;
-      pausable.forEach(sec => {
-        const r = sec.getBoundingClientRect();
+      // All the reads first, then the writes: one layout per call instead of one per section.
+      const rects = pausable.map(sec => sec.getBoundingClientRect());
+      pausable.forEach((sec, i) => {
+        const r = rects[i];
         sec.classList.toggle('fx-paused', r.bottom < top || r.top > bottom);
         // Safety net: a project on screen is always shown, even if its reveal was missed.
         if (r.top < innerHeight * .85 && r.bottom > 0 && !sec.classList.contains('fx-in') && !sec.matches('.hero, footer')) { sec.classList.add('fx-in'); land(sec); }
@@ -2569,11 +2577,14 @@
     if (document.fonts) document.fonts.ready.then(() => clearTitlesSoon(0));
     later(() => { clearTimeout(clearTimer); document.querySelectorAll(':is(.project, .upstream) .stage').forEach(st => { st.style.marginTop = ''; }); });
 
-    buddy.create();
+    // The buddy, the bugs and the snow come in a task of their own, once the page has been laid out,
+    // so start-up is not one long block of work.
+    const bagNow = core;
+    const extras = () => { if (core !== bagNow || !isOn()) return; buddy.create(); bugs.create(); if (winter()) snowOn(add); };
+    const idle = window.requestIdleCallback ? requestIdleCallback(extras, { timeout: 500 }) : setTimeout(extras, 80);
+    later(() => { if (window.cancelIdleCallback) cancelIdleCallback(idle); else clearTimeout(idle); });
     later(() => buddy.destroy());
-    bugs.create();
     later(() => bugs.destroy());
-    if (winter()) snowOn(add);
     later(() => { if (game) game.close(); });
     music.sync();
     later(() => { music.stop(); audio.keepAwake(false); });
@@ -2813,8 +2824,12 @@
     const onScroll = () => {
       ticking = false;
       if (!od) return;
+      // All the reads first (page height, section positions, accent), then the writes.
       const max = document.documentElement.scrollHeight - innerHeight;
       const p = max > 0 ? scrollY / max : 0;
+      let cur = 0;
+      named.forEach((s, k) => { if (s.getBoundingClientRect().top < innerHeight * .45) cur = k; });
+      const acc = cur !== tinted && cur !== 0 ? getComputedStyle(named[cur]).getPropertyValue('--accent').trim() : '';
       progress.style.setProperty('--p', p.toFixed(4));
       const nl = Math.round(p * segs.length);
       if (nl !== lit) {
@@ -2822,13 +2837,10 @@
         lit = nl;
         segs.forEach((s, k) => s.classList.toggle('on', k < lit));
       }
-      let cur = 0;
-      named.forEach((s, k) => { if (s.getBoundingClientRect().top < innerHeight * .45) cur = k; });
       hud.querySelector('b').textContent = String(cur).padStart(2, '0');
       hud.querySelector('.nm').textContent = cur === 0 ? 'START' : named[cur].id.replace(/-/g, ' ');
       if (cur !== tinted) {
         tinted = cur;
-        const acc = cur === 0 ? '' : getComputedStyle(named[cur]).getPropertyValue('--accent').trim();
         if (acc) { root.style.setProperty('--od-c1', acc); root.style.setProperty('--od-c3', `color-mix(in oklab, ${acc} 60%, #ff2e88)`); }
         else { root.style.removeProperty('--od-c1'); root.style.removeProperty('--od-c3'); }
       }
