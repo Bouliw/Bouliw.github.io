@@ -1569,6 +1569,33 @@ html[data-skin="overdrive"] .head::before { border-radius: 4px; background: var(
 html.fx-lite .fx-snow i:nth-child(2n) { display: none; }
 @media (prefers-reduced-motion: reduce) { .fx-snow { display: none; } }
 
+/* ---------- The buddy's calendar: a mug in the morning, a cake on the site's birthday, a witch's hat at Halloween ---------- */
+/* Drawn in the sprite's own grid, from 16 px above his head to his feet. */
+.fx-buddy .fx-item, .fx-buddy .fx-hat.witch { position: absolute; left: 0; top: calc(-16px * var(--s)); width: calc(32px * var(--s)); height: calc(68px * var(--s)); pointer-events: none; }
+.fx-buddy .fx-item { display: none; }
+.fx-buddy.c10 .fx-item { display: block; }
+.fx-buddy:has(.fx-spr.walk) .fx-hat.witch { top: calc(-17px * var(--s)); }
+.fx-buddy:has(.fx-hat.witch) .say { bottom: calc(100% + 10px + 14px * var(--s)); }
+/* April fools: the page spins round once, the buddy and the dock stay put. */
+.fx-april { animation: fx-april 3.4s cubic-bezier(.7, 0, .3, 1); }
+body:has(.fx-april) { overflow-x: clip; }
+@keyframes fx-april { 0% { rotate: 0deg; } 30%, 62% { rotate: 180deg; } 100% { rotate: 360deg; } }
+
+/* ---------- Challenge someone: the time to beat in the run timer, then a card to send yours ---------- */
+.fx-run i { font-style: normal; color: #ff6bd5; }
+.fx-run.done i { color: #6b2bff; }
+.fx-dare { position: fixed; z-index: 996; top: 122px; right: 16px; display: flex; gap: 10px; align-items: center; padding: 6px 6px 6px 12px; font: 10px/1 "FX Press", monospace; color: #fff; background: #0a0a0b; border: 2px solid #ff6bd5; box-shadow: 3px 3px 0 #6b2bff; }
+.fx-dare .go, .fx-dare-btn { padding: 8px 10px; font: 600 11px/1 "FX Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: #0a0a0b; background: #ff6bd5; border: 0; border-radius: 6px; cursor: pointer; }
+.fx-dare .go:hover, .fx-dare-btn:hover { background: #fff; }
+.fx-dare .go.ok, .fx-dare-btn.ok { background: #b6ff3b; }
+.fx-dare .x { padding: 2px 6px; font: 18px/1 "FX Geist", sans-serif; color: rgb(255 255 255 / .6); background: none; border: 0; cursor: pointer; }
+.fx-dare .x:hover { color: #fff; }
+.fx-dare-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; padding: 10px 18px; font: 12px/1.4 "FX Mono", monospace; color: rgb(255 255 255 / .8); border-bottom: 1px solid rgb(255 255 255 / .12); }
+.fx-dare-row[hidden] { display: none; }
+.fx-dare-link { width: min(340px, 72vw); padding: 7px 9px; font: 12px/1.3 "FX Geist", sans-serif; color: #0a0a0b; background: #fff; border: 0; border-radius: 6px; }
+@media (max-width: 759px) { .fx-dare { top: 152px; right: 10px; } }
+@media (prefers-reduced-motion: reduce) { .fx-april { animation: none; } }
+
 /* ---------- Hidden bugs: they peek out from an edge, click one to catch it ---------- */
 /* The box sits against the edge; the bug rises from the box's bottom side, which the rotation turns toward the edge. */
 .fx-bug { --s: 2.5; position: absolute; z-index: 30; width: calc(16px * var(--s)); height: calc(16px * var(--s)); overflow: hidden; pointer-events: none; color: var(--accent, #b6ff3b); }

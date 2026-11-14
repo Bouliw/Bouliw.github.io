@@ -22,6 +22,9 @@
   const BUG_KEY = 'bouliw-fun-bugs';
   const BUG_SAID_KEY = 'bouliw-fun-bug-lines';
   const BUG_BEST_KEY = 'bouliw-fun-bug-best';
+  const SITE = 'https://bouliw.github.io/';
+  // A challenge link carries a bug run time in ms: ?dare=102300 is 1:42.3 to beat.
+  const DARE = (() => { const v = parseInt(new URLSearchParams(location.search).get('dare') || '', 10); return v >= 1000 && v <= 3600000 ? v : 0; })();
   const DEFAULT_SKIN = 'overdrive';
   const SKINS = [['overdrive', 'Overdrive'], ['y2k', 'Y2K'], ['phantom', 'Phantom'], ['alert', 'Alert'], ['neon', 'Neon'], ['pixel', '8-bit'], ['mix', 'Mix']];
   // In Mix, each section wears one style (keep in sync with build_css.py).
@@ -100,6 +103,7 @@
     bugs: ['Bug bounty', 'Caught all twelve hidden bugs'],
     speedrun: ['Speedrunner', 'Caught all twelve bugs in under 3 minutes'],
     yeet: ['Yeet', 'Threw the buddy across the screen'],
+    dare: ['Challenge accepted', "Beat the time in a friend's challenge link"],
   };
 
   // What to do for each achievement still locked; a counter where there is one.
@@ -120,6 +124,7 @@
     bugs: 'Catch the twelve bugs hiding around the page',
     speedrun: 'Catch all twelve in one visit, in under 3 minutes (reset your progress to try again)',
     yeet: 'Grab the buddy and throw him',
+    dare: "Open a friend's challenge link, then beat their time",
   };
   const EARN = [
     ['Unlock an achievement', '+50'],
@@ -154,6 +159,7 @@
       bugs: ['Bug bounty', 'Les douze bugs cachés attrapés'],
       speedrun: ['Speedrunner', 'Les douze bugs en moins de 3 minutes'],
       yeet: ['Yeet', 'Le perso lancé à travers l\'écran'],
+      dare: ['Défi relevé', "Le temps d'un lien de défi battu"],
     },
     hints: {
       start: 'Ouvrir le portfolio en mode fun',
@@ -172,6 +178,7 @@
       bugs: 'Attraper les douze bugs cachés sur la page',
       speedrun: 'Les attraper tous en une visite, en moins de 3 minutes (remise à zéro pour réessayer)',
       yeet: 'Attraper le perso et le lancer',
+      dare: "Ouvrir le lien de défi d'un ami, puis battre son temps",
     },
     earn: [
       ['Débloquer un succès', '+50'],
@@ -230,6 +237,11 @@
       game: 'Hidden game', screen: 'Game screen. Move with the arrow keys or the pointer, fire with space or a tap.', cont: 'Continue: back to the top',
       reset: 'Reset progress', resetSure: 'Sure? Click again', resetNote: 'Your style, sound and language stay as they are.', newGame: 'New game!', run: 'BUG RUN', record: 'NEW RECORD', whoa: 'Whoa!',
       hello: 'Hi there!', thanks: 'Thanks for playing!', round: 'Round 2!', outfit: 'New outfit!', cheat: 'Cheat code!', level: L => `LEVEL ${L}!`,
+      dare: 'Challenge someone', copied: 'Link copied!', copyThis: 'Copy this link', dareBest: t => `Your bug run record: ${t}`, dareChip: t => `DARE ${t}`,
+      dareText: t => `I caught the 12 hidden bugs on bouliw.github.io in ${t}. Can you beat that?`,
+      dareIn: t => `Challenge: beat ${t}. Catch all 12 bugs!`, dareReset: t => `Challenge: ${t}. Reset your progress (LV badge) to take it on.`,
+      dareGo: t => `Challenge: ${t}. Go!`, dareWon: 'CHALLENGE WON', dareWin: d => `Challenge won, ${d} ahead! Send them your link.`, dareLose: d => `Missed by ${d}. Reset and try again.`,
+      sec: ms => (ms < 60000 ? `${(ms / 1000).toFixed(1)} s` : clock(ms)),
     },
     fr: {
       unlockedToast: 'Succès débloqué', progress: 'Progression', close: 'Fermer', todo: 'Encore à débloquer', earn: "Comment gagner de l'XP", done: 'Débloqués',
@@ -239,6 +251,11 @@
       game: 'Jeu caché', screen: 'Écran du jeu. Déplacement avec les flèches ou la souris, tir avec espace ou un toucher.', cont: 'Continuer : retour en haut',
       reset: 'Remettre à zéro', resetSure: 'Sûr ? Reclique', resetNote: 'Ton style, le son et la langue restent comme ils sont.', newGame: 'Nouvelle partie !', run: 'BUG RUN', record: 'NOUVEAU RECORD', whoa: 'Hé !',
       hello: 'Salut !', thanks: "Merci d'avoir joué !", round: 'Round 2 !', outfit: 'Nouvelle tenue !', cheat: 'Code de triche !', level: L => `NIVEAU ${L} !`,
+      dare: "Défier quelqu'un", copied: 'Lien copié !', copyThis: 'Copie ce lien', dareBest: t => `Ton record au bug run : ${t}`, dareChip: t => `DÉFI ${t}`,
+      dareText: t => `J'ai attrapé les 12 bugs cachés de bouliw.github.io en ${t}. Tu fais mieux ?`,
+      dareIn: t => `Défi reçu : ${t} à battre. Attrape les 12 bugs !`, dareReset: t => `Défi : ${t}. Remets ta progression à zéro (badge LV) pour le relever.`,
+      dareGo: t => `Défi : ${t}. C'est parti !`, dareWon: 'DÉFI RELEVÉ', dareWin: d => `Défi relevé, avec ${d} d'avance ! Envoie-lui ton lien.`, dareLose: d => `Raté de ${d}. Remets à zéro et retente.`,
+      sec: ms => (ms < 60000 ? `${(ms / 1000).toFixed(1).replace('.', ',')} s` : clock(ms)),
     },
   };
   const isFr = () => root.lang === 'fr';
@@ -772,12 +789,21 @@
     const ids = Object.keys(TROPHIES);
     const todo = ids.filter(id => !unlocked.has(id)), done = ids.filter(id => unlocked.has(id));
     const best = parseInt(store.get(HI_KEY) || '0', 10) || 0;
+    const runBest = parseInt(store.get(BUG_BEST_KEY) || '0', 10) || 0;
     const item = (id, ok) => {
       const [name, desc] = trophyText(id);
       const c = ok ? '' : counter(id);
       return `<li class="${ok ? 'ok' : 'todo'}"><span class="ico">${ok ? ICON_CUP : ICON_LOCK}</span><span class="txt"><b>${esc(name)}</b><span>${esc(ok ? desc : hintText(id))}</span></span>` +
         `<em>${c ? `<i>${esc(c)}</i>` : ''}${ok ? u('ok') : '+50 XP'}</em></li>`;
     };
+    // The bug run record, with a button to send it as a challenge. It sits outside the body,
+    // which is redrawn on every XP change: a redraw between pointerdown and pointerup eats the click.
+    const slot = panel.querySelector('.fx-dare-row');
+    if (slot.dataset.best !== String(runBest)) {
+      slot.dataset.best = String(runBest);
+      slot.hidden = !runBest;
+      slot.innerHTML = runBest ? `<span>${esc(u('dareBest')(clock(runBest)))}</span><button type="button" class="fx-dare-btn">${esc(u('dare'))}</button>` : '';
+    }
     panel.querySelector('.fx-panel-body').innerHTML =
       `<div class="lv"><b>LV ${L}</b><span>${xp.total - lo} / ${hi - lo} XP</span></div>` +
       `<div class="bar"><i style="--p:${((xp.total - lo) / (hi - lo)).toFixed(3)}"></i></div>` +
@@ -795,7 +821,7 @@
     panel.setAttribute('role', 'dialog');
     panel.setAttribute('aria-modal', 'true');
     panel.setAttribute('aria-labelledby', 'fx-panel-title');
-    panel.innerHTML = `<div class="fx-panel-top"><div class="fx-panel-title" id="fx-panel-title">${u('progress')}</div><button type="button" class="close" aria-label="${u('close')}">×</button></div><div class="fx-panel-body" tabindex="0"></div><div class="fx-reset-row"><button type="button" class="fx-reset">${u('reset')}</button><small>${esc(u('resetNote'))}</small></div>`;
+    panel.innerHTML = `<div class="fx-panel-top"><div class="fx-panel-title" id="fx-panel-title">${u('progress')}</div><button type="button" class="close" aria-label="${u('close')}">×</button></div><div class="fx-dare-row" hidden></div><div class="fx-panel-body" tabindex="0"></div><div class="fx-reset-row"><button type="button" class="fx-reset">${u('reset')}</button><small>${esc(u('resetNote'))}</small></div>`;
     renderPanel();
     document.body.append(panel);
     if (chip) chip.setAttribute('aria-expanded', 'true');
@@ -804,6 +830,8 @@
     close.addEventListener('click', () => closePanel());
     // Reset: a first click arms it for three seconds, a second one does it.
     panel.addEventListener('click', e => {
+      const d = e.target.closest('.fx-dare-btn');
+      if (d) { shareDare(parseInt(store.get(BUG_BEST_KEY) || '0', 10) || 0, d); return; }
       const b = e.target.closest('.fx-reset');
       if (!b) return;
       if (performance.now() < resetArmed) { resetArmed = 0; resetProgress(); return; }
@@ -815,7 +843,7 @@
     const onKey = e => {
       if (e.key === 'Escape') { e.preventDefault(); closePanel(); return; }
       if (e.key === 'Tab') {
-        const f = [close, panel.querySelector('.fx-panel-body'), panel.querySelector('.fx-reset')].filter(Boolean);
+        const f = [close, panel.querySelector('.fx-dare-btn'), panel.querySelector('.fx-panel-body'), panel.querySelector('.fx-reset')].filter(Boolean);
         const i = f.indexOf(document.activeElement);
         e.preventDefault();
         f[(i + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
@@ -852,7 +880,7 @@
     bugs.destroy();
     bugs.create();
     audio.play('boot');
-    buddy.react(9, u('newGame'), 2200);
+    buddy.react(9, DARE ? u('dareGo')(clock(DARE)) : u('newGame'), 2600);
     setTimeout(() => trophy('start'), 1500);
   }
   const queue = [];
@@ -956,7 +984,7 @@
   const winter = () => {
     const q = new URLSearchParams(location.search);
     if (q.has('winter')) return q.get('winter') !== '0';
-    const d = new Date(), m = d.getMonth(), day = d.getDate();
+    const d = whenNow(), m = d.getMonth(), day = d.getDate();
     return m === 11 || (m === 0 && day <= 6);
   };
   // 32 wide, drawn over the top of the buddy's head: k outline, r red, d shade, w white, g grey.
@@ -987,14 +1015,147 @@
       `<i class="${pick(['a', 'b'])}" style="--x:${rand(0, 100).toFixed(1)}vw;--z:${pick([4, 5, 5, 6, 7])}px;--t:${rand(9, 18).toFixed(1)}s;--d:-${rand(0, 18).toFixed(1)}s;--o:${rand(.55, 1).toFixed(2)}"></i>`).join('')), document.body);
   }
 
+  /* ================= The buddy's clock and calendar ================= */
+  // The visitor's own time. ?when=2027-04-01T09:30 pretends it is that moment (local time).
+  const whenNow = () => {
+    const q = new URLSearchParams(location.search).get('when');
+    const d = q ? new Date(q) : null;
+    return d && !isNaN(d) ? d : new Date();
+  };
+  // The site went live on 31 October 2026.
+  const BORN = 2026;
+  // [English, French]: what he says on arrival, then a few lines he slips in later.
+  const MOMENTS = {
+    birthday: { pose: 10, item: 'cake', hat: 'witch', hi: n => [`The site turns ${n} today!`, `Le site a ${n} an${n > 1 ? 's' : ''} aujourd'hui !`],
+      more: [['Cake, anyone?', 'Qui veut du gâteau ?'], ['No candles for the bugs.', 'Pas de bougie pour les bugs.'], ['Also, happy Halloween.', 'Et joyeux Halloween, au passage.']] },
+    april: { pose: 9, hi: () => ['April fools!', "Poisson d'avril !"],
+      more: [['Everything is fine. Nothing is upside down.', "Tout est normal. Rien n'est à l'envers."], ['Check your back. Just saying.', 'Regarde dans ton dos. Je dis ça…']] },
+    halloween: { pose: 9, hat: 'witch', hi: () => ['Boo! Happy Halloween.', 'Bouh ! Joyeux Halloween.'],
+      more: [['The real monsters are the bugs.', 'Les vrais monstres, ce sont les bugs.'], ['Trick or commit?', 'Un bonbon ou un commit ?']] },
+    christmas: { pose: 9, hi: () => ['Merry Christmas!', 'Joyeux Noël !'],
+      more: [['Santa ships to prod once a year.', 'Le père Noël met en prod une fois par an.'], ['I asked for fewer bugs.', "J'ai commandé moins de bugs."]] },
+    nye: { pose: 10, hi: () => ['Last commit of the year?', "Dernier commit de l'année ?"],
+      more: [['See you next year, bugs.', "À l'année prochaine, les bugs."]] },
+    newyear: { pose: 9, hi: () => ['Happy new year! New year, new bugs.', 'Bonne année ! Nouvelle année, nouveaux bugs.'],
+      more: [['Resolution: fewer bugs. Probably.', 'Résolution : moins de bugs. Sûrement.']] },
+    night: { pose: 11, sleepy: true, hi: h => [h ? `It's past ${h} am… shouldn't we be asleep?` : 'Past midnight… shouldn\'t we be asleep?', h ? `Il est ${h} h passées… On devrait dormir, non ?` : 'Minuit passé… On devrait dormir, non ?'],
+      more: [['*yawns*', '*bâille*'], ["Zzz… huh? I'm awake.", 'Zzz… hein ? Je dors pas.'], ['Five more minutes.', 'Encore cinq minutes.']] },
+    friday: { pose: 11, hi: () => ['Friday, past 5 pm. No deploys.', 'Vendredi, 17 h passées. Pas de mise en prod.'],
+      more: [['Nobody touches prod.', 'Personne ne touche à la prod.'], ['We merge on Monday. Promise.', 'On merge lundi. Promis.']] },
+    morning: { pose: 10, item: 'mug', hi: () => ['Coffee first. Projects later.', "Café d'abord. Les projets ensuite."],
+      more: [['Second coffee.', 'Deuxième café.'], ['Not before my coffee.', 'Pas avant mon café.']] },
+    weekend: { pose: 10, hi: () => ['Browsing portfolios on a weekend? Respect.', 'Un portfolio le week-end ? Respect.'],
+      more: [['Even the bugs sleep in on weekends.', 'Même les bugs font la grasse mat.']] },
+    lunch: { pose: 8, hi: () => ["Lunch break? I'll watch the bugs.", 'Pause déj ? Je surveille les bugs.'],
+      more: [["I'll eat later. Maybe.", 'Je mange plus tard. Peut-être.']] },
+  };
+  // Special days first, then the time of day.
+  function momentNow() {
+    const d = whenNow(), m = d.getMonth() + 1, day = d.getDate(), h = d.getHours(), wd = d.getDay(), age = d.getFullYear() - BORN;
+    const at = (id, arg) => Object.assign({ id, arg }, MOMENTS[id]);
+    if (m === 10 && day === 31 && age >= 1) return at('birthday', age);
+    if (m === 4 && day === 1) return at('april');
+    if (m === 10 && day >= 25) return at('halloween');
+    if (m === 12 && (day === 24 || day === 25)) return at('christmas');
+    if (m === 12 && day === 31) return at('nye');
+    if (m === 1 && day === 1) return at('newyear');
+    if (h < 5) return at('night', h);
+    if (wd === 5 && h >= 17) return at('friday');
+    if (h >= 6 && h < 10) return at('morning');
+    if (wd === 0 || wd === 6) return at('weekend');
+    if (h >= 12 && h < 14) return at('lunch');
+    return null;
+  }
+  const say2 = pair => pair[isFr() ? 1 : 0];
+  // Pixel art drawn in the sprite's own 32×52 grid (y may go above the head), one string per row.
+  const pixelSvg = (cls, top, rows, fill, extra = '') => {
+    let out = '';
+    rows.forEach((row, i) => {
+      for (let x = 0; x < row.length;) {
+        const c = row[x];
+        let w = 1;
+        while (row[x + w] === c) w++;
+        if (c !== '.' && fill[c]) out += `<rect x="${x}" y="${top + i}" width="${w}" height="1" fill="${fill[c]}"/>`;
+        x += w;
+      }
+    });
+    return `<svg class="${cls}" viewBox="0 -16 32 68" shape-rendering="crispEdges" aria-hidden="true">${out}${extra}</svg>`;
+  };
+  // Held in the thumbs-up pose (column 10), where his hand sits in front of his chest.
+  const ITEMS = {
+    mug: pixelSvg('fx-item mug', 22, [
+      '......s.s.......',
+      '.....s.s........',
+      '......s.s.......',
+      '.....s.s........',
+      '................',
+      '....kkkkkkk.....',
+      '....kcccccck....',
+      '....kwwwwwgk....',
+      '....kwwwwwgk....',
+      '....kwrrwwgk....',
+      '....kwwwwwgk....',
+      '.....kkkkkk.....',
+    ], { k: '#1a1216', c: '#5a3520', w: '#f6f6f6', g: '#cfcfd8', r: '#e0283c', s: '#b4b4c4' }),
+    cake: pixelSvg('fx-item cake', 20, [
+      '.......f........',
+      '......fy........',
+      '.......k........',
+      '......kck.......',
+      '......kck.......',
+      '..kkkkkkkkkkk...',
+      '.kpppwppwpppk...',
+      '.kpwpppppwppk...',
+      '.kbbbbbbbbbbk...',
+      '.kbbbbbbbbbbk...',
+      '.kppppppppppk...',
+      '.kbbbbbbbbbbk...',
+      'kggggggggggggk..',
+      '.kkkkkkkkkkkk...',
+    ], { k: '#1a1216', f: '#ff7a1a', y: '#ffd23f', c: '#7cc4ff', p: '#ff8fc7', w: '#fff3f8', b: '#8a4b2a', g: '#d8d8e0' }),
+  };
+  // A witch's hat for Halloween, over the top of his hair.
+  const WITCH = pixelSvg('fx-hat witch', -14, [
+    '......................kk........',
+    '....................kkpk........',
+    '..................kkppk.........',
+    '................kkpppk..........',
+    '...............kppppk...........',
+    '..............kpppppk...........',
+    '.............kppppppk...........',
+    '.............kpppppppk..........',
+    '............kppppppppk..........',
+    '............kpppppppppk.........',
+    '...........koooooooooook........',
+    '...........koooooooooook........',
+    '..........kppppppppppppk........',
+    '..........kpppppppppppppk.......',
+    '...kkkkkkkkpppppppppppppkkkkkk..',
+    '..kppppppppppppppppppppppppppk..',
+    '...kkkkkkkkkkkkkkkkkkkkkkkkkk...',
+  ], { k: '#1a1216', p: '#3b2559', o: '#ff7a1a' });
+  // April fools: the page turns upside down for a moment, the buddy stays on his feet.
+  let aprilDone = false;
+  function aprilFlip(then) {
+    const page = document.querySelector('body > .wrap') || document.querySelector('main');
+    if (aprilDone || !motion() || !page) { then(); return; }
+    aprilDone = true;
+    page.style.transformOrigin = `50% ${(scrollY + innerHeight / 2 - page.getBoundingClientRect().top - scrollY).toFixed(0)}px`;
+    page.classList.add('fx-april');
+    setTimeout(then, 1300);
+    setTimeout(() => { page.classList.remove('fx-april'); page.style.transformOrigin = ''; }, 3400);
+  }
+
   /* ================= The pixel buddy ================= */
   const spr = (c, r, extra = '') => `<span class="fx-spr${extra}" style="--c:${c};--r:${r}"></span>`;
   const buddy = {
     el: null, s: null, say: null, x: -90, timer: 0, talkTimer: 0, idleTimer: 0, until: 0, asleep: false, dir: 0, walkEnd: 0,
-    arrived: false, lastComment: 0, said: new Set(), waiting: new Set(), held: false, flying: false, noClick: false, raf: 0, fx: 0, fy: 0,
+    arrived: false, lastComment: 0, said: new Set(), waiting: new Set(), held: false, flying: false, noClick: false, raf: 0, fx: 0, fy: 0, mo: null,
     row() { return OUTFIT[skinNow()] || 0; },
     frame(c, walk = false, c0 = 0) {
       if (!this.s) return;
+      // The mug or the cake only shows in the thumbs-up pose, where his hand holds it.
+      this.el.classList.toggle('c10', c === 10 && !walk);
       this.s.style.setProperty('--c', c);
       this.s.style.setProperty('--r', this.row());
       this.s.classList.toggle('l', c0 === 4);
@@ -1002,7 +1163,9 @@
     },
     create() {
       if (this.el || !isOn()) return;
-      this.el = hidden('div', 'fx-buddy', `<div class="hop">${spr(8, 0)}${winter() ? HAT : ''}<span class="say"></span></div>`);
+      this.mo = momentNow();
+      const mo = this.mo;
+      this.el = hidden('div', 'fx-buddy', `<div class="hop">${spr(8, 0)}${winter() ? HAT : ''}${mo && mo.hat === 'witch' ? WITCH : ''}${mo && mo.item ? ITEMS[mo.item] : ''}<span class="say"></span></div>`);
       this.s = this.el.querySelector('.fx-spr');
       this.say = this.el.querySelector('.say');
       // The poof class must not outlive its animation, or it keeps the walk cycle from playing.
@@ -1027,12 +1190,24 @@
       const arrive = () => {
         if (!this.el) return;
         if (document.querySelector('.od-boot')) { setTimeout(arrive, 300); return; }
-        this.walkTo(rand(40, Math.min(innerWidth * .4, 420)), () => { this.arrived = true; this.talk(u('hello'), 1800); });
+        this.walkTo(rand(40, Math.min(innerWidth * .4, 420)), () => { this.arrived = true; this.greet(); });
       };
       if (motion()) setTimeout(arrive, 900);
-      else { this.x = 16; this.el.style.setProperty('--x', '16px'); this.arrived = true; }
+      else { this.x = 16; this.el.style.setProperty('--x', '16px'); this.arrived = true; setTimeout(() => this.greet(), 900); }
       this.schedule();
       this.poke();
+    },
+    // A challenge link first, then the day or the time of day, else a plain hello.
+    greet(tries = 0) {
+      if (!this.el) return;
+      // On a first visit the "start" achievement lands about now: let its GG go first.
+      if (tries < 12 && (!unlocked.has('start') || performance.now() < this.until)) { setTimeout(() => this.greet(tries + 1), 400); return; }
+      if (DARE && isOn()) { this.react(9, (bugs.caught().length ? u('dareReset') : u('dareIn'))(clock(DARE)), 4200); return; }
+      const mo = this.mo;
+      if (!mo) { this.talk(u('hello'), 1800); return; }
+      const line = say2(mo.hi(mo.arg));
+      if (mo.id === 'april') aprilFlip(() => this.react(mo.pose, line, 3000));
+      else this.react(mo.pose, line, 3000);
     },
     destroy() {
       clearTimeout(this.timer); clearTimeout(this.talkTimer); clearTimeout(this.idleTimer);
@@ -1047,8 +1222,9 @@
       if (!this.el) return;
       this.timer = setTimeout(() => {
         if (!this.el || this.asleep || document.hidden || performance.now() < this.until || !motion()) { this.schedule(); return; }
-        const r = Math.random();
+        const r = Math.random(), mo = this.mo;
         if (r < .6) this.walkTo(rand(16, innerWidth - 90));
+        else if (mo && r < .75) this.react(mo.pose, say2(pick(mo.more)), 2600);
         else if (r < .8) this.react(pick([9, 10, 11]), '', 1600);
         else this.react(8, pick(lineList()), 2400);
         this.schedule();
@@ -1067,8 +1243,11 @@
       this.x = x;
       this.until = this.walkEnd = performance.now() + t * 1000;
       clearTimeout(this.walkDone);
-      this.walkDone = setTimeout(() => { this.walkEnd = 0; this.frame(8); if (then) then(); }, t * 1000);
+      this.walkThen = then || null;
+      this.walkDone = setTimeout(() => { this.walkEnd = 0; this.frame(8); const f = this.walkThen; this.walkThen = null; if (f) f(); }, t * 1000);
     },
+    // A walk cut short (a GG, a grab) still runs what was to follow, such as his arrival, once he is free.
+    later(ms) { const f = this.walkThen; this.walkThen = null; if (f) setTimeout(f, ms); },
     jump() {
       if (!this.el || !motion()) return;
       this.el.classList.remove('jump');
@@ -1089,6 +1268,7 @@
       if (this.held || this.flying) { if (text) this.talk(text, ms); return; }
       this.wake();
       clearTimeout(this.walkDone);
+      this.later(ms + 200);
       this.walkEnd = 0;
       // Stop where he is.
       const r = this.el.getBoundingClientRect();
@@ -1109,7 +1289,7 @@
     poke() {
       this.wake();
       clearTimeout(this.idleTimer);
-      this.idleTimer = setTimeout(() => this.sleep(), 25000);
+      this.idleTimer = setTimeout(() => this.sleep(), this.mo && this.mo.sleepy ? 12000 : 25000);
     },
     sleep() {
       if (!this.el || game || this.held || this.flying) return;
@@ -1192,6 +1372,7 @@
     hold() {
       this.wake();
       clearTimeout(this.walkDone);
+      this.later(3000);
       this.walkEnd = 0;
       this.held = true;
       this.until = Infinity;
@@ -1418,7 +1599,7 @@
     // A small timer in the corner while a run is on.
     runStart(now) {
       this.t0 = now;
-      this.chip = hidden('div', 'fx-run', '<b></b><span></span>');
+      this.chip = hidden('div', 'fx-run', `<b></b><span></span>${DARE ? `<i>${u('dareChip')(clock(DARE))}</i>` : ''}`);
       document.body.append(this.chip);
       const draw = () => { if (this.chip && !this.chip.classList.contains('done')) this.chip.querySelector('b').textContent = `${u('run')} ${clock(performance.now() - this.t0)}`; };
       draw();
@@ -1436,6 +1617,13 @@
       this.chip.classList.add('done');
       this.chip.querySelector('b').textContent = `${record ? u('record') : u('run')} ${clock(ms)}`;
       if (ms < 180000) setTimeout(() => trophy('speedrun'), 900);
+      if (DARE) {
+        const won = ms < DARE;
+        if (won) this.chip.querySelector('i').textContent = u('dareWon');
+        setTimeout(() => buddy.react(won ? 10 : 11, won ? u('dareWin')(u('sec')(DARE - ms)) : u('dareLose')(u('sec')(ms - DARE)), 4200), 1400);
+        if (won) setTimeout(() => trophy('dare'), 2600);
+      }
+      dareCard(ms);
       this.t0 = 0;
       this.fresh = false;
       const chip = this.chip;
@@ -1459,6 +1647,48 @@
       setTimeout(() => b.remove(), 3400);
     },
   };
+
+  /* ================= Challenge someone: a link with your bug run time ================= */
+  const dareLink = ms => `${SITE}?dare=${Math.round(ms)}`;
+  async function shareDare(ms, btn) {
+    const text = u('dareText')(clock(ms)), url = dareLink(ms);
+    // Phones get the share sheet; computers get the link in the clipboard.
+    if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+      try { await navigator.share({ text, url }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    try {
+      await navigator.clipboard.writeText(`${text} ${url}`);
+      const was = btn.textContent;
+      btn.textContent = u('copied');
+      btn.classList.add('ok');
+      setTimeout(() => { if (btn.isConnected) { btn.textContent = was; btn.classList.remove('ok'); } }, 2200);
+    } catch (e) {
+      // No clipboard (an old browser, an iframe): show the link, selected, to copy by hand.
+      const box = document.createElement('input');
+      box.className = 'fx-dare-link';
+      box.readOnly = true;
+      box.value = `${text} ${url}`;
+      box.setAttribute('aria-label', u('copyThis'));
+      btn.replaceWith(box);
+      box.focus();
+      box.select();
+    }
+    audio.play('switch');
+  }
+  // Right after a full run: the time and a button to challenge someone.
+  let dareBox = null;
+  function dareCard(ms) {
+    if (dareBox) dareBox.remove();
+    const card = document.createElement('div');
+    card.className = 'fx-dare';
+    card.setAttribute('role', 'status');
+    card.innerHTML = `<b>${esc(clock(ms))}</b><button type="button" class="go">${esc(u('dare'))}</button><button type="button" class="x" aria-label="${esc(u('close'))}">×</button>`;
+    card.querySelector('.go').addEventListener('click', e => { e.stopPropagation(); shareDare(ms, e.currentTarget); });
+    card.querySelector('.x').addEventListener('click', e => { e.stopPropagation(); card.remove(); });
+    document.body.append(card);
+    dareBox = card;
+    setTimeout(() => { if (card.isConnected && !card.contains(document.activeElement)) card.remove(); }, 30000);
+  }
 
   /* ================= Menu poses and the sliding selection ================= */
   const menuLinks = () => document.querySelectorAll('.index ol a');
