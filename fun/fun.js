@@ -22,6 +22,7 @@
   const BUG_KEY = 'bouliw-fun-bugs';
   const BUG_SAID_KEY = 'bouliw-fun-bug-lines';
   const BUG_BEST_KEY = 'bouliw-fun-bug-best';
+  const BUG_TIME_KEY = 'bouliw-fun-bug-time';
   const SAID_KEY = 'bouliw-fun-comments';
   const QUIP_KEY = 'bouliw-fun-quips';
   const SITE = 'https://bouliw.github.io/';
@@ -168,7 +169,7 @@
     ace: 'Score 3,000 in the hidden game',
     bug: 'Something is peeking out from an edge of the page. Click it',
     bugs: 'Catch the twelve bugs hiding around the page',
-    speedrun: 'Catch all twelve in one visit, in under 3 minutes (hide the bugs again to retry)',
+    speedrun: 'Catch all twelve hidden bugs within 3 minutes of the first one (hide the bugs again to retry)',
     yeet: 'Grab the buddy and throw him',
     dare: "Open a friend's challenge link, then beat their time",
   };
@@ -222,7 +223,7 @@
       ace: 'Faire 3 000 points au jeu caché',
       bug: "Quelque chose dépasse d'un bord de la page. Clique dessus",
       bugs: 'Attraper les douze bugs cachés sur la page',
-      speedrun: 'Les attraper tous en une visite, en moins de 3 minutes (recacher les bugs pour réessayer)',
+      speedrun: 'Attraper les douze bugs cachés en moins de 3 minutes à partir du premier (recacher les bugs pour réessayer)',
       yeet: 'Attraper le perso et le lancer',
       dare: "Ouvrir le lien de défi d'un ami, puis battre son temps",
     },
@@ -287,7 +288,7 @@
       dareText: t => `I caught the 12 hidden bugs on bouliw.github.io in ${t}. Can you beat that?`,
       dareIn: t => `Challenge: beat ${t}. Catch all 12 bugs!`, dareReset: t => `Challenge: ${t}. Hide the bugs again (LV badge) to take it on.`,
       rebug: 'Hide the bugs again', bugsBack: 'The bugs are back. Catch them all!',
-      dareGo: t => `Challenge: ${t}. Go!`, dareWon: 'CHALLENGE WON', dareWin: d => `Challenge won, ${d} ahead! Send them your link.`, dareLose: d => `Missed by ${d}. Reset and try again.`,
+      dareGo: t => `Challenge: ${t}. Go!`, dareWon: 'CHALLENGE WON', dareWin: d => `Challenge won, ${d} ahead! Send them your link.`, dareLose: d => `Missed by ${d}. Hide the bugs again and retry.`,
       sec: ms => (ms < 60000 ? `${(ms / 1000).toFixed(1)} s` : clock(ms)),
       event: 'Event', eventAria: 'Seasonal event',
       events: { auto: "Auto (today's date)", none: 'None', winter: 'Winter', christmas: 'Christmas', newyear: 'New year', halloween: 'Halloween', april: 'April fools', birthday: "The site's birthday" },
@@ -304,7 +305,7 @@
       dareText: t => `J'ai attrapé les 12 bugs cachés de bouliw.github.io en ${t}. Tu fais mieux ?`,
       dareIn: t => `Défi reçu : ${t} à battre. Attrape les 12 bugs !`, dareReset: t => `Défi : ${t}. Recache les bugs (badge LV) pour le relever.`,
       rebug: 'Recacher les bugs', bugsBack: 'Les bugs sont de retour. Attrape-les tous !',
-      dareGo: t => `Défi : ${t}. C'est parti !`, dareWon: 'DÉFI RELEVÉ', dareWin: d => `Défi relevé, avec ${d} d'avance ! Envoie-lui ton lien.`, dareLose: d => `Raté de ${d}. Remets à zéro et retente.`,
+      dareGo: t => `Défi : ${t}. C'est parti !`, dareWon: 'DÉFI RELEVÉ', dareWin: d => `Défi relevé, avec ${d} d'avance ! Envoie-lui ton lien.`, dareLose: d => `Raté de ${d}. Recache les bugs et retente.`,
       sec: ms => (ms < 60000 ? `${(ms / 1000).toFixed(1).replace('.', ',')} s` : clock(ms)),
       event: 'Événement', eventAria: 'Événement saisonnier',
       events: { auto: 'Auto (date du jour)', none: 'Aucun', winter: 'Hiver', christmas: 'Noël', newyear: 'Nouvel an', halloween: 'Halloween', april: "Poisson d'avril", birthday: 'Anniversaire du site' },
@@ -933,6 +934,7 @@
     xp.render();
     closePanel();
     bugs.destroy();
+    try { localStorage.removeItem(BUG_TIME_KEY); } catch (e) { /* storage blocked */ }
     bugs.create();
     buddy.said = new Set();
     audio.play('boot');
@@ -941,9 +943,9 @@
   }
   // Puts the twelve bugs back without touching XP, achievements or records: a fresh bug run.
   function rebugs() {
-    try { localStorage.removeItem(BUG_KEY); } catch (e) { /* storage blocked */ }
     closePanel();
     bugs.destroy();
+    [BUG_KEY, BUG_TIME_KEY].forEach(k => { try { localStorage.removeItem(k); } catch (e) { /* storage blocked */ } });
     bugs.create();
     audio.play('boot');
     buddy.react(9, DARE ? u('dareGo')(clock(DARE)) : u('bugsBack'), 2600);
@@ -1580,14 +1582,43 @@
   }
   const bugs = {
     items: [], ro: null, io: null, raf: 0, onResize: null,
-    // The speedrun: only from a fresh start (no bug caught yet), timed from the first catch.
-    fresh: false, t0: 0, chip: null, tick: 0,
+    // The bug run clock starts with the first bug caught. It counts only while the page is on screen
+    // and carries over between visits (localStorage) until the last bug, so the first time someone
+    // catches them all, they get their time.
+    timed: false, acc: 0, seg: 0, onVis: null, onSave: null, saveTick: 0, chip: null, tick: 0,
+    elapsed() { return this.acc + (this.seg ? performance.now() - this.seg : 0); },
+    clockSave() { if (this.timed) store.set(BUG_TIME_KEY, String(Math.round(this.elapsed()))); },
+    clockStart(caughtCount) {
+      const saved = store.get(BUG_TIME_KEY);
+      // Bugs caught before the clock existed: that run stays untimed until the bugs are hidden again.
+      this.timed = caughtCount === 0 || saved !== null;
+      if (!this.timed) return;
+      this.acc = parseInt(saved || '0', 10) || 0;
+      this.seg = document.hidden ? 0 : performance.now();
+      this.clockSave();
+      this.onVis = () => {
+        if (document.hidden) { if (this.seg) { this.acc += performance.now() - this.seg; this.seg = 0; } this.clockSave(); }
+        else if (!this.seg) this.seg = performance.now();
+      };
+      this.onSave = () => this.clockSave();
+      document.addEventListener('visibilitychange', this.onVis);
+      addEventListener('pagehide', this.onSave);
+      this.saveTick = setInterval(this.onSave, 5000);
+    },
+    clockStop() {
+      if (this.onVis) document.removeEventListener('visibilitychange', this.onVis);
+      if (this.onSave) removeEventListener('pagehide', this.onSave);
+      clearInterval(this.saveTick);
+      // Bugs still out there: keep the time for the next visit.
+      if (this.timed && this.items.length) this.clockSave();
+      this.onVis = this.onSave = null;
+      this.timed = false;
+      this.seg = 0;
+    },
     caught() { return store.list(BUG_KEY).filter(id => BUG_SPOTS.some(([s]) => s === id)); },
     create() {
       if (this.items.length || !isOn()) return;
       const caught = new Set(this.caught());
-      this.fresh = caught.size === 0;
-      this.t0 = 0;
       this.ro = new ResizeObserver(() => this.place());
       this.io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('live', e.isIntersecting)), { rootMargin: '120px' });
       BUG_SPOTS.forEach(spot => {
@@ -1609,8 +1640,14 @@
       addEventListener('resize', this.onResize);
       if (document.fonts) document.fonts.ready.then(() => this.place());
       this.place();
+      // A run already under way (from an earlier visit): the clock goes on, and its timer shows.
+      if (this.items.length && caught.size) {
+        this.clockStart(caught.size);
+        if (this.timed) { this.runStart(); this.chip.querySelector('span').textContent = `${caught.size}/${BUG_SPOTS.length}`; }
+      }
     },
     destroy() {
+      this.clockStop();
       cancelAnimationFrame(this.raf);
       if (this.ro) this.ro.disconnect();
       if (this.io) this.io.disconnect();
@@ -1668,12 +1705,14 @@
       caught.add(id);
       store.set(BUG_KEY, JSON.stringify([...caught]));
       const n = caught.size, total = BUG_SPOTS.length;
-      const now = performance.now();
-      if (this.fresh && !this.t0) this.runStart(now);
+      // The first bug of a run starts the clock.
+      if (n === 1 && !this.timed) this.clockStart(0);
+      const ms = this.timed ? this.elapsed() : 0;
+      if (this.timed && !this.chip) this.runStart();
       let text;
       if (n >= total) {
         text = isFr() ? FR.bugLast : BUG_LAST;
-        if (this.t0) text += ` (${clock(now - this.t0)})`;
+        if (this.timed) text += ` (${clock(ms)})`;
       }
       else {
         const all = bugLines().map((_, i) => i);
@@ -1692,24 +1731,25 @@
       xp.add(15);
       trophy('bug');
       if (n >= total) trophy('bugs');
-      if (this.t0) this.runStep(n, total, now);
+      if (this.timed) this.runStep(n, total, ms);
       if (panel) renderPanel();
     },
     // A small timer in the corner while a run is on.
-    runStart(now) {
-      this.t0 = now;
+    runStart() {
       this.chip = hidden('div', 'fx-run', `<b></b><span></span>${DARE ? `<i>${u('dareChip')(clock(DARE))}</i>` : ''}`);
       document.body.append(this.chip);
-      const draw = () => { if (this.chip && !this.chip.classList.contains('done')) this.chip.querySelector('b').textContent = `${u('run')} ${clock(performance.now() - this.t0)}`; };
+      const draw = () => { if (this.chip && !this.chip.classList.contains('done')) this.chip.querySelector('b').textContent = `${u('run')} ${clock(this.elapsed())}`; };
       draw();
       this.tick = setInterval(draw, 100);
     },
-    runStep(n, total, now) {
+    runStep(n, total, ms) {
       if (!this.chip) return;
       this.chip.querySelector('span').textContent = `${n}/${total}`;
       if (n < total) return;
       clearInterval(this.tick);
-      const ms = now - this.t0;
+      // The run is over: stop the clock and forget its time.
+      this.clockStop();
+      try { localStorage.removeItem(BUG_TIME_KEY); } catch (e) { /* storage blocked */ }
       const best = parseInt(store.get(BUG_BEST_KEY) || '0', 10) || 0;
       const record = !best || ms < best;
       if (record) store.set(BUG_BEST_KEY, String(Math.round(ms)));
@@ -1723,8 +1763,6 @@
         if (won) setTimeout(() => trophy('dare'), 2600);
       }
       dareCard(ms);
-      this.t0 = 0;
-      this.fresh = false;
       const chip = this.chip;
       this.chip = null;
       setTimeout(() => chip.remove(), 7000);
