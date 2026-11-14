@@ -22,6 +22,8 @@
   const BUG_KEY = 'bouliw-fun-bugs';
   const BUG_SAID_KEY = 'bouliw-fun-bug-lines';
   const BUG_BEST_KEY = 'bouliw-fun-bug-best';
+  const SAID_KEY = 'bouliw-fun-comments';
+  const QUIP_KEY = 'bouliw-fun-quips';
   const SITE = 'https://bouliw.github.io/';
   // Seasonal event picked in the dock: 'auto' follows the date.
   const EVENT_KEY = 'bouliw-fun-event';
@@ -76,7 +78,7 @@
     'Found me! Quick, act like this was planned.',
   ];
   const BUG_LAST = "That was the last one. Zero bugs left… until the next commit.";
-  // What the buddy says the first time a project comes into view during a visit: [pose, English, French].
+  // What the buddy says about each project, once only (kept until the progress is reset): [pose, English, French].
   const COMMENTS = {
     roughcut: [10, 'I hate editing my vlogs. So the Mac does it.', 'Je déteste monter mes vlogs. Alors le Mac s\'en charge.'],
     earshot: [10, 'No bot joins the call. I checked.', 'Aucun bot ne rejoint l\'appel. J\'ai vérifié.'],
@@ -89,6 +91,45 @@
     lantern: [9, 'Popcorn not included.', 'Pop-corn non fourni.'],
     upstream: [10, 'One line, merged into Homebrew. Proud of it.', 'Une ligne, mergée dans Homebrew. J\'en suis fier.'],
   };
+  // Lines he drops now and then, never twice until all have been said: [English, French].
+  const QUIPS = [
+    ["I'm 32 pixels wide and still no desk.", '32 pixels de large et toujours pas de bureau.'],
+    ['My salary? Paid in XP.', 'Mon salaire ? Payé en XP.'],
+    ["Stand-up meeting. I'm the only one standing.", 'Réunion debout. Je suis le seul debout.'],
+    ['I asked for a raise. I got one more pixel.', "J'ai demandé une augmentation. On m'a donné un pixel de plus."],
+    ["Don't scroll so fast, I get seasick.", "Scrolle pas si vite, j'ai le mal de mer."],
+    ['Somewhere, a semicolon is missing. I can feel it.', 'Quelque part, il manque un point-virgule. Je le sens.'],
+    ["Ctrl+Z doesn't work in real life. I tried.", "Ctrl+Z ne marche pas dans la vraie vie. J'ai testé."],
+    ["I'm not slacking, I'm in power-saving mode.", 'Je ne glande pas, je suis en mode économie d’énergie.'],
+    ['It works on my machine. And now I live on yours.', "Chez moi, ça marche. Et là, j'habite chez toi."],
+    ['Have you tried turning it off and on again?', "T'as essayé d'éteindre et de rallumer ?"],
+    ["I'd offer you a coffee, but I'm a PNG.", 'Je t’offrirais bien un café, mais je suis un PNG.'],
+    ['Need me? I’ll be in the footer.', 'Si tu me cherches, je serai dans le footer.'],
+    ['This site has no cookies. I ate them.', "Ce site n'a pas de cookies. Je les ai mangés."],
+    ['Left, right, left, right. That’s my cardio.', "Gauche, droite, gauche, droite. C'est mon cardio."],
+    ["My only bug: I'm too charming.", "Mon seul bug, c'est que je suis trop charmant."],
+    ['Git blame says it was me. Git is lying.', 'Git blame dit que c’est moi. Git ment.'],
+    ['I tried dark mode once. Lost myself.', "J'ai testé le mode sombre. Je me suis perdu."],
+    ['Achievement idea: reading everything. Nobody has it.', "Idée de succès : tout lire. Personne ne l'a."],
+    ["I'm the senior pixel around here.", 'Ici, je suis le pixel senior.'],
+    ["Reloading won't get rid of me.", 'Recharger la page ne te débarrassera pas de moi.'],
+    ["Zero trust. I don't even trust myself.", 'Zero trust. Même moi, je ne me fais pas confiance.'],
+    ['Sometimes I just stand here and think about recursion.', 'Des fois, je reste là à penser à la récursivité.'],
+    ["Tabs or spaces? I'm a sprite, I don't care.", 'Tabs ou espaces ? Je suis un sprite, je m’en fiche.'],
+    ["I'd do a backflip, but it's not on my sprite sheet.", "Je ferais bien un salto, mais il n'est pas sur ma planche de sprites."],
+    ['Loading a joke… 99%.', 'Chargement d’une blague… 99 %.'],
+    ["I've read the whole site. Twice. It's good.", "J'ai lu tout le site. Deux fois. C'est bien."],
+    ['Pro tip: you can grab me. Not that I enjoy it.', "Astuce : on peut m'attraper. Pas que j'aime ça."],
+    ['Hobbies: walking, standing, judging your scroll speed.', 'Mes hobbies : marcher, rester debout, juger ta vitesse de scroll.'],
+    ['The bugs owe me money.', 'Les bugs me doivent de l’argent.'],
+    ['I push straight to main. I live dangerously.', 'Je push direct sur main. Je vis dangereusement.'],
+    ['404: motivation not found. Kidding, I love it here.', "404 : motivation introuvable. Je rigole, j'adore être ici."],
+    ['Fun mode is on. Fun is mandatory.', 'Le mode fun est activé. Le fun est obligatoire.'],
+    ["I don't have a backend. I have a back, and it hurts.", "Je n'ai pas de backend. J'ai un dos, et il me fait mal."],
+    ['My cache is full of memories.', 'Mon cache est plein de souvenirs.'],
+    ['Still here. Still a pixel. Still cute.', 'Toujours là. Toujours en pixels. Toujours mignon.'],
+    ['If you click me enough, nothing happens. Trust me.', 'Si tu cliques assez sur moi, il ne se passe rien. Fais-moi confiance.'],
+  ];
   const OUCH = [['Ouch.', 'Aïe.'], ['Was that necessary?', 'C\'était nécessaire ?'], ["I'm filing a bug report.", 'Je vais ouvrir un ticket.'], ['My pixels!', 'Mes pixels !'], ['Again? No.', 'Encore ? Non.'], ['I had a meeting.', 'J\'avais une réunion.']];
   const LINES = ['Hi there!', 'Pick a style below!', 'Click a window to see the code.', 'Try the Konami code!', 'Insert coin at the bottom!', 'New outfit?', 'Turn the sound on!'];
   const TROPHIES = {
@@ -877,7 +918,7 @@
   const unlocked = new Set(store.list(TROPHY_KEY));
   // Back to level 1: XP, achievements, styles tried, high score and bugs. Settings stay.
   function resetProgress() {
-    [XP_KEY, TROPHY_KEY, TRIED_KEY, HI_KEY, BUG_KEY, BUG_SAID_KEY, BUG_BEST_KEY].forEach(k => { try { localStorage.removeItem(k); } catch (e) { /* storage blocked */ } });
+    [XP_KEY, TROPHY_KEY, TRIED_KEY, HI_KEY, BUG_KEY, BUG_SAID_KEY, BUG_BEST_KEY, SAID_KEY].forEach(k => { try { localStorage.removeItem(k); } catch (e) { /* storage blocked */ } });
     store.set(TRIED_KEY, JSON.stringify([skinNow()]));
     unlocked.clear();
     queue.length = 0;
@@ -888,6 +929,7 @@
     closePanel();
     bugs.destroy();
     bugs.create();
+    buddy.said = new Set();
     audio.play('boot');
     buddy.react(9, DARE ? u('dareGo')(clock(DARE)) : u('newGame'), 2600);
     setTimeout(() => trophy('start'), 1500);
@@ -1165,7 +1207,7 @@
   const spr = (c, r, extra = '') => `<span class="fx-spr${extra}" style="--c:${c};--r:${r}"></span>`;
   const buddy = {
     el: null, s: null, say: null, x: -90, timer: 0, talkTimer: 0, idleTimer: 0, until: 0, asleep: false, dir: 0, walkEnd: 0,
-    arrived: false, lastComment: 0, said: new Set(), waiting: new Set(), held: false, flying: false, noClick: false, raf: 0, fx: 0, fy: 0, mo: null, gen: 0,
+    arrived: false, lastComment: 0, said: new Set(), waiting: new Set(), held: false, flying: false, noClick: false, raf: 0, fx: 0, fy: 0, mo: null, gen: 0, lastTalk: 0,
     row() { return OUTFIT[skinNow()] || 0; },
     frame(c, walk = false, c0 = 0) {
       if (!this.s) return;
@@ -1192,12 +1234,12 @@
         if (this.noClick) return; // the end of a throw, not a click
         this.wake();
         this.jump();
-        this.talk(pick(lineList()), 2200);
+        if (Math.random() < .6) this.quip(true); else this.talk(pick(lineList()), 2200);
         if (xp.session.clicks < 40) xp.add(2);
       });
       document.body.append(this.el);
       this.arrived = false;
-      this.said = new Set();
+      this.said = new Set(store.list(SAID_KEY));
       this.waiting = new Set();
       this.x = -90;
       this.el.style.setProperty('--x', `${this.x}px`);
@@ -1212,6 +1254,16 @@
       else { this.x = 16; this.el.style.setProperty('--x', '16px'); this.arrived = true; const g = this.gen; setTimeout(() => this.greet(0, g), 900); }
       this.schedule();
       this.poke();
+    },
+    // A line from QUIPS, never twice until all have been said (kept between visits).
+    quip(talkOnly = false) {
+      let said = store.list(QUIP_KEY).filter(i => i < QUIPS.length);
+      if (said.length >= QUIPS.length) said = [];
+      const i = pick(QUIPS.map((_, k) => k).filter(k => !said.includes(k)));
+      said.push(i);
+      store.set(QUIP_KEY, JSON.stringify(said));
+      const text = say2(QUIPS[i]);
+      if (talkOnly) this.talk(text, 3200); else this.react(pick([8, 9, 10, 11]), text, 3400);
     },
     // A challenge link first, then the day or the time of day, else a plain hello.
     greet(tries = 0, g = this.gen) {
@@ -1240,11 +1292,13 @@
       if (!this.el) return;
       this.timer = setTimeout(() => {
         if (!this.el || this.asleep || document.hidden || performance.now() < this.until || !motion()) { this.schedule(); return; }
-        const r = Math.random(), mo = this.mo;
-        if (r < .6) this.walkTo(rand(16, innerWidth - 90));
-        else if (mo && r < .75) this.react(mo.pose, say2(pick(mo.more)), 2600);
-        else if (r < .8) this.react(pick([9, 10, 11]), '', 1600);
-        else this.react(8, pick(lineList()), 2400);
+        const r = Math.random(), mo = this.mo, quiet = performance.now() - this.lastTalk > 15000;
+        // Mostly walking; once he has been quiet for 15 s, a line now and then (a quip, most often).
+        if (r < .5) this.walkTo(rand(16, innerWidth - 90));
+        else if (!quiet || r < .58) this.react(pick([9, 10, 11]), '', 1600);
+        else if (r < .66 && mo) this.react(mo.pose, say2(pick(mo.more)), 2600);
+        else if (r >= .66 && r < .7) this.react(8, pick(lineList()), 2400);
+        else this.quip();
         this.schedule();
       }, rand(6000, 12000));
     },
@@ -1276,6 +1330,7 @@
     talk(text, ms = 2000) {
       if (!this.el || !text) return;
       this.say.textContent = text;
+      this.lastTalk = performance.now();
       this.say.classList.toggle('wrap', text.length > 28);
       this.el.classList.add('talk');
       clearTimeout(this.talkTimer);
@@ -1337,6 +1392,7 @@
         if (settled && this.arrived && !game && !this.asleep && !this.held && !this.flying && now - this.lastComment > 5000 && now >= this.until) {
           this.waiting.delete(id);
           this.said.add(id);
+          store.set(SAID_KEY, JSON.stringify([...this.said]));
           this.lastComment = now;
           const [pose, en, fr] = COMMENTS[id];
           this.react(pose, isFr() ? fr : en, 3400);
