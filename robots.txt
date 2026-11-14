@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bouliw.github.io/sitemap.xml
