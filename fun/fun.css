@@ -1548,6 +1548,9 @@ html[data-skin="overdrive"] .head::before { border-radius: 4px; background: var(
 .fx-reset-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 12px 18px 14px; border-top: 1px solid rgb(255 255 255 / .12); }
 .fx-reset { padding: 8px 12px; font: 600 11px/1 "FX Mono", monospace; letter-spacing: .12em; text-transform: uppercase; color: #ff6b8a; background: transparent; border: 1px solid currentColor; border-radius: 8px; cursor: pointer; }
 .fx-reset:hover { color: #0a0a0b; background: #ff6b8a; border-color: #ff6b8a; }
+.fx-rebug { padding: 8px 12px; font: 600 11px/1 "FX Mono", monospace; letter-spacing: .12em; text-transform: uppercase; color: #b6ff3b; background: transparent; border: 1px solid currentColor; border-radius: 8px; cursor: pointer; }
+.fx-rebug:hover { color: #0a0a0b; background: #b6ff3b; border-color: #b6ff3b; }
+.fx-rebug[hidden] { display: none; }
 .fx-reset-row small { font: 12px/1.4 "FX Geist", sans-serif; color: rgb(255 255 255 / .55); }
 /* ---------- Bug speedrun timer ---------- */
 .fx-run { position: fixed; z-index: 995; top: 76px; right: 16px; display: flex; gap: 10px; align-items: center; padding: 8px 10px; font: 10px/1 "FX Press", monospace; color: #b6ff3b; background: #0a0a0b; border: 2px solid #b6ff3b; box-shadow: 3px 3px 0 #6b2bff; pointer-events: none; }

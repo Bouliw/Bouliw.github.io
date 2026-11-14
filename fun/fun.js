@@ -168,7 +168,7 @@
     ace: 'Score 3,000 in the hidden game',
     bug: 'Something is peeking out from an edge of the page. Click it',
     bugs: 'Catch the twelve bugs hiding around the page',
-    speedrun: 'Catch all twelve in one visit, in under 3 minutes (reset your progress to try again)',
+    speedrun: 'Catch all twelve in one visit, in under 3 minutes (hide the bugs again to retry)',
     yeet: 'Grab the buddy and throw him',
     dare: "Open a friend's challenge link, then beat their time",
   };
@@ -222,7 +222,7 @@
       ace: 'Faire 3 000 points au jeu caché',
       bug: "Quelque chose dépasse d'un bord de la page. Clique dessus",
       bugs: 'Attraper les douze bugs cachés sur la page',
-      speedrun: 'Les attraper tous en une visite, en moins de 3 minutes (remise à zéro pour réessayer)',
+      speedrun: 'Les attraper tous en une visite, en moins de 3 minutes (recacher les bugs pour réessayer)',
       yeet: 'Attraper le perso et le lancer',
       dare: "Ouvrir le lien de défi d'un ami, puis battre son temps",
     },
@@ -285,7 +285,8 @@
       hello: 'Hi there!', thanks: 'Thanks for playing!', round: 'Round 2!', outfit: 'New outfit!', cheat: 'Cheat code!', level: L => `LEVEL ${L}!`,
       dare: 'Challenge someone', copied: 'Link copied!', copyThis: 'Copy this link', dareBest: t => `Your bug run record: ${t}`, dareChip: t => `DARE ${t}`,
       dareText: t => `I caught the 12 hidden bugs on bouliw.github.io in ${t}. Can you beat that?`,
-      dareIn: t => `Challenge: beat ${t}. Catch all 12 bugs!`, dareReset: t => `Challenge: ${t}. Reset your progress (LV badge) to take it on.`,
+      dareIn: t => `Challenge: beat ${t}. Catch all 12 bugs!`, dareReset: t => `Challenge: ${t}. Hide the bugs again (LV badge) to take it on.`,
+      rebug: 'Hide the bugs again', bugsBack: 'The bugs are back. Catch them all!',
       dareGo: t => `Challenge: ${t}. Go!`, dareWon: 'CHALLENGE WON', dareWin: d => `Challenge won, ${d} ahead! Send them your link.`, dareLose: d => `Missed by ${d}. Reset and try again.`,
       sec: ms => (ms < 60000 ? `${(ms / 1000).toFixed(1)} s` : clock(ms)),
       event: 'Event', eventAria: 'Seasonal event',
@@ -301,7 +302,8 @@
       hello: 'Salut !', thanks: "Merci d'avoir joué !", round: 'Round 2 !', outfit: 'Nouvelle tenue !', cheat: 'Code de triche !', level: L => `NIVEAU ${L} !`,
       dare: "Défier quelqu'un", copied: 'Lien copié !', copyThis: 'Copie ce lien', dareBest: t => `Ton record au bug run : ${t}`, dareChip: t => `DÉFI ${t}`,
       dareText: t => `J'ai attrapé les 12 bugs cachés de bouliw.github.io en ${t}. Tu fais mieux ?`,
-      dareIn: t => `Défi reçu : ${t} à battre. Attrape les 12 bugs !`, dareReset: t => `Défi : ${t}. Remets ta progression à zéro (badge LV) pour le relever.`,
+      dareIn: t => `Défi reçu : ${t} à battre. Attrape les 12 bugs !`, dareReset: t => `Défi : ${t}. Recache les bugs (badge LV) pour le relever.`,
+      rebug: 'Recacher les bugs', bugsBack: 'Les bugs sont de retour. Attrape-les tous !',
       dareGo: t => `Défi : ${t}. C'est parti !`, dareWon: 'DÉFI RELEVÉ', dareWin: d => `Défi relevé, avec ${d} d'avance ! Envoie-lui ton lien.`, dareLose: d => `Raté de ${d}. Remets à zéro et retente.`,
       sec: ms => (ms < 60000 ? `${(ms / 1000).toFixed(1).replace('.', ',')} s` : clock(ms)),
       event: 'Événement', eventAria: 'Événement saisonnier',
@@ -854,6 +856,8 @@
       slot.hidden = !runBest;
       slot.innerHTML = runBest ? `<span>${esc(u('dareBest')(clock(runBest)))}</span><button type="button" class="fx-dare-btn">${esc(u('dare'))}</button>` : '';
     }
+    // Only once at least one bug has been caught.
+    panel.querySelector('.fx-rebug').hidden = !bugs.caught().length;
     panel.querySelector('.fx-panel-body').innerHTML =
       `<div class="lv"><b>LV ${L}</b><span>${xp.total - lo} / ${hi - lo} XP</span></div>` +
       `<div class="bar"><i style="--p:${((xp.total - lo) / (hi - lo)).toFixed(3)}"></i></div>` +
@@ -871,7 +875,7 @@
     panel.setAttribute('role', 'dialog');
     panel.setAttribute('aria-modal', 'true');
     panel.setAttribute('aria-labelledby', 'fx-panel-title');
-    panel.innerHTML = `<div class="fx-panel-top"><div class="fx-panel-title" id="fx-panel-title">${u('progress')}</div><button type="button" class="close" aria-label="${u('close')}">×</button></div><div class="fx-dare-row" hidden></div><div class="fx-panel-body" tabindex="0"></div><div class="fx-reset-row"><button type="button" class="fx-reset">${u('reset')}</button><small>${esc(u('resetNote'))}</small></div>`;
+    panel.innerHTML = `<div class="fx-panel-top"><div class="fx-panel-title" id="fx-panel-title">${u('progress')}</div><button type="button" class="close" aria-label="${u('close')}">×</button></div><div class="fx-dare-row" hidden></div><div class="fx-panel-body" tabindex="0"></div><div class="fx-reset-row"><button type="button" class="fx-rebug">${u('rebug')}</button><button type="button" class="fx-reset">${u('reset')}</button><small>${esc(u('resetNote'))}</small></div>`;
     renderPanel();
     document.body.append(panel);
     if (chip) chip.setAttribute('aria-expanded', 'true');
@@ -882,6 +886,7 @@
     panel.addEventListener('click', e => {
       const d = e.target.closest('.fx-dare-btn');
       if (d) { shareDare(parseInt(store.get(BUG_BEST_KEY) || '0', 10) || 0, d); return; }
+      if (e.target.closest('.fx-rebug')) { rebugs(); return; }
       const b = e.target.closest('.fx-reset');
       if (!b) return;
       if (performance.now() < resetArmed) { resetArmed = 0; resetProgress(); return; }
@@ -893,7 +898,7 @@
     const onKey = e => {
       if (e.key === 'Escape') { e.preventDefault(); closePanel(); return; }
       if (e.key === 'Tab') {
-        const f = [close, panel.querySelector('.fx-dare-btn'), panel.querySelector('.fx-panel-body'), panel.querySelector('.fx-reset')].filter(Boolean);
+        const f = [close, panel.querySelector('.fx-dare-btn'), panel.querySelector('.fx-panel-body'), panel.querySelector('.fx-rebug:not([hidden])'), panel.querySelector('.fx-reset')].filter(Boolean);
         const i = f.indexOf(document.activeElement);
         e.preventDefault();
         f[(i + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
@@ -933,6 +938,15 @@
     audio.play('boot');
     buddy.react(9, DARE ? u('dareGo')(clock(DARE)) : u('newGame'), 2600);
     setTimeout(() => trophy('start'), 1500);
+  }
+  // Puts the twelve bugs back without touching XP, achievements or records: a fresh bug run.
+  function rebugs() {
+    try { localStorage.removeItem(BUG_KEY); } catch (e) { /* storage blocked */ }
+    closePanel();
+    bugs.destroy();
+    bugs.create();
+    audio.play('boot');
+    buddy.react(9, DARE ? u('dareGo')(clock(DARE)) : u('bugsBack'), 2600);
   }
   const queue = [];
   let showing = false;
@@ -1207,7 +1221,7 @@
   const spr = (c, r, extra = '') => `<span class="fx-spr${extra}" style="--c:${c};--r:${r}"></span>`;
   const buddy = {
     el: null, s: null, say: null, x: -90, timer: 0, talkTimer: 0, idleTimer: 0, until: 0, asleep: false, dir: 0, walkEnd: 0,
-    arrived: false, lastComment: 0, said: new Set(), waiting: new Set(), held: false, flying: false, noClick: false, raf: 0, fx: 0, fy: 0, mo: null, gen: 0, lastTalk: 0,
+    arrived: false, lastComment: 0, said: new Set(), waiting: new Set(), held: false, flying: false, noClick: false, raf: 0, fx: 0, fy: 0, mo: null, gen: 0, lastTalk: 0, chat: 0,
     row() { return OUTFIT[skinNow()] || 0; },
     frame(c, walk = false, c0 = 0) {
       if (!this.s) return;
@@ -1254,6 +1268,21 @@
       else { this.x = 16; this.el.style.setProperty('--x', '16px'); this.arrived = true; const g = this.gen; setTimeout(() => this.greet(0, g), 900); }
       this.schedule();
       this.poke();
+      clearInterval(this.chat);
+      this.chat = setInterval(() => this.chatter(), 1000);
+    },
+    // A line as soon as he has said nothing for 15 s: a quip most of the time, else a word on the day or a tip.
+    // Not while he sleeps, flies, is held, or the game or the tab hides him.
+    chatter() {
+      if (!this.el || !this.arrived || this.asleep || this.held || this.flying || game || document.hidden || this.el.hidden) return;
+      const now = performance.now();
+      if (now - this.lastTalk < 15000) return;
+      const walking = now < this.walkEnd;
+      if (!walking && now < this.until) return;
+      const r = Math.random(), mo = this.mo;
+      const line = mo && r < .12 ? [mo.pose, say2(pick(mo.more))] : r < .2 ? [8, pick(lineList())] : null;
+      if (!line) { this.quip(walking); return; }
+      if (walking) this.talk(line[1], 3000); else this.react(line[0], line[1], 3000);
     },
     // A line from QUIPS, never twice until all have been said (kept between visits).
     quip(talkOnly = false) {
@@ -1263,7 +1292,7 @@
       said.push(i);
       store.set(QUIP_KEY, JSON.stringify(said));
       const text = say2(QUIPS[i]);
-      if (talkOnly) this.talk(text, 3200); else this.react(pick([8, 9, 10, 11]), text, 3400);
+      if (talkOnly) this.talk(text, 3400); else this.react(pick([8, 9, 10, 11]), text, 3400);
     },
     // A challenge link first, then the day or the time of day, else a plain hello.
     greet(tries = 0, g = this.gen) {
@@ -1278,7 +1307,7 @@
       else this.react(mo.pose, line, 3000);
     },
     destroy() {
-      clearTimeout(this.timer); clearTimeout(this.talkTimer); clearTimeout(this.idleTimer); clearTimeout(this.walkDone);
+      clearTimeout(this.timer); clearTimeout(this.talkTimer); clearTimeout(this.idleTimer); clearTimeout(this.walkDone); clearInterval(this.chat);
       this.walkThen = null;
       this.gen++;
       cancelAnimationFrame(this.raf);
@@ -1292,13 +1321,9 @@
       if (!this.el) return;
       this.timer = setTimeout(() => {
         if (!this.el || this.asleep || document.hidden || performance.now() < this.until || !motion()) { this.schedule(); return; }
-        const r = Math.random(), mo = this.mo, quiet = performance.now() - this.lastTalk > 15000;
-        // Mostly walking; once he has been quiet for 15 s, a line now and then (a quip, most often).
-        if (r < .5) this.walkTo(rand(16, innerWidth - 90));
-        else if (!quiet || r < .58) this.react(pick([9, 10, 11]), '', 1600);
-        else if (r < .66 && mo) this.react(mo.pose, say2(pick(mo.more)), 2600);
-        else if (r >= .66 && r < .7) this.react(8, pick(lineList()), 2400);
-        else this.quip();
+        // Walks and poses; his lines come from chatter().
+        if (Math.random() < .65) this.walkTo(rand(16, innerWidth - 90));
+        else this.react(pick([9, 10, 11]), '', 1600);
         this.schedule();
       }, rand(6000, 12000));
     },
