@@ -21,6 +21,7 @@
   const HI_KEY = 'bouliw-fun-hiscore';
   const BUG_KEY = 'bouliw-fun-bugs';
   const BUG_SAID_KEY = 'bouliw-fun-bug-lines';
+  const BUG_BEST_KEY = 'bouliw-fun-bug-best';
   const DEFAULT_SKIN = 'overdrive';
   const SKINS = [['overdrive', 'Overdrive'], ['y2k', 'Y2K'], ['phantom', 'Phantom'], ['alert', 'Alert'], ['neon', 'Neon'], ['pixel', '8-bit'], ['mix', 'Mix']];
   // In Mix, each section wears one style (keep in sync with build_css.py).
@@ -67,6 +68,20 @@
     'Found me! Quick, act like this was planned.',
   ];
   const BUG_LAST = "That was the last one. Zero bugs left… until the next commit.";
+  // What the buddy says the first time a project comes into view during a visit: [pose, English, French].
+  const COMMENTS = {
+    roughcut: [10, 'I hate editing my vlogs. So the Mac does it.', 'Je déteste monter mes vlogs. Alors le Mac s\'en charge.'],
+    earshot: [10, 'No bot joins the call. I checked.', 'Aucun bot ne rejoint l\'appel. J\'ai vérifié.'],
+    vigie: [11, 'Blue team mode: on. 53 rules, zero coffee.', 'Mode blue team activé. 53 règles, zéro café.'],
+    boulito: [9, 'Say “Skip the ad”. Go on, it works.', 'Dis « passe la pub ». Vas-y, ça marche.'],
+    takeline: [8, 'Read your script, it follows. Retake a line, it goes back.', 'Lis ton texte, il suit. Reprends une phrase, il revient.'],
+    trackmend: [10, 'My music library was a mess. Was.', 'Ma bibliothèque musicale était un chantier. Était.'],
+    'doc-indexer': [10, 'Your paperwork, searchable. Nothing leaves the Mac.', 'Tes papiers, cherchables. Rien ne quitte le Mac.'],
+    'mac-toolkit': [8, 'The first things I reinstall on a new Mac.', 'Ce que je réinstalle en premier sur un nouveau Mac.'],
+    lantern: [9, 'Popcorn not included.', 'Pop-corn non fourni.'],
+    upstream: [10, 'One line, merged into Homebrew. Proud of it.', 'Une ligne, mergée dans Homebrew. J\'en suis fier.'],
+  };
+  const OUCH = [['Ouch.', 'Aïe.'], ['Was that necessary?', 'C\'était nécessaire ?'], ["I'm filing a bug report.", 'Je vais ouvrir un ticket.'], ['My pixels!', 'Mes pixels !'], ['Again? No.', 'Encore ? Non.'], ['I had a meeting.', 'J\'avais une réunion.']];
   const LINES = ['Hi there!', 'Pick a style below!', 'Click a window to see the code.', 'Try the Konami code!', 'Insert coin at the bottom!', 'New outfit?', 'Turn the sound on!'];
   const TROPHIES = {
     start: ["It's dangerous to go alone", 'Opened the portfolio in fun mode'],
@@ -83,6 +98,8 @@
     ace: ['All your base are belong to us', 'Scored 3,000 points'],
     bug: ['Works on my machine', 'Caught a hidden bug'],
     bugs: ['Bug bounty', 'Caught all twelve hidden bugs'],
+    speedrun: ['Speedrunner', 'Caught all twelve bugs in under 3 minutes'],
+    yeet: ['Yeet', 'Threw the buddy across the screen'],
   };
 
   // What to do for each achievement still locked; a counter where there is one.
@@ -101,6 +118,8 @@
     ace: 'Score 3,000 in the hidden game',
     bug: 'Something is peeking out from an edge of the page. Click it',
     bugs: 'Catch the twelve bugs hiding around the page',
+    speedrun: 'Catch all twelve in one visit, in under 3 minutes (reset your progress to try again)',
+    yeet: 'Grab the buddy and throw him',
   };
   const EARN = [
     ['Unlock an achievement', '+50'],
@@ -133,6 +152,8 @@
       ace: ['All your base are belong to us', '3 000 points marqués'],
       bug: ['Chez moi, ça marche', 'Un bug caché attrapé'],
       bugs: ['Bug bounty', 'Les douze bugs cachés attrapés'],
+      speedrun: ['Speedrunner', 'Les douze bugs en moins de 3 minutes'],
+      yeet: ['Yeet', 'Le perso lancé à travers l\'écran'],
     },
     hints: {
       start: 'Ouvrir le portfolio en mode fun',
@@ -149,6 +170,8 @@
       ace: 'Faire 3 000 points au jeu caché',
       bug: "Quelque chose dépasse d'un bord de la page. Clique dessus",
       bugs: 'Attraper les douze bugs cachés sur la page',
+      speedrun: 'Les attraper tous en une visite, en moins de 3 minutes (remise à zéro pour réessayer)',
+      yeet: 'Attraper le perso et le lancer',
     },
     earn: [
       ['Débloquer un succès', '+50'],
@@ -205,6 +228,7 @@
       ok: 'Done', best: n => `best ${n}`, chip: (L, a, b) => `Level ${L}, ${a} of ${b} XP. Show achievements and how to level up`,
       sound: 'Sound', music: 'Music', typing: 'Typing', typingAria: 'Typing sounds', dock: 'Fun mode style', fun: 'Fun mode',
       game: 'Hidden game', screen: 'Game screen. Move with the arrow keys or the pointer, fire with space or a tap.', cont: 'Continue: back to the top',
+      reset: 'Reset progress', resetSure: 'Sure? Click again', resetNote: 'Your style, sound and language stay as they are.', newGame: 'New game!', run: 'BUG RUN', record: 'NEW RECORD', whoa: 'Whoa!',
       hello: 'Hi there!', thanks: 'Thanks for playing!', round: 'Round 2!', outfit: 'New outfit!', cheat: 'Cheat code!', level: L => `LEVEL ${L}!`,
     },
     fr: {
@@ -213,6 +237,7 @@
       ok: 'Fait', best: n => `record ${n}`, chip: (L, a, b) => `Niveau ${L}, ${a} XP sur ${b}. Voir les succès et comment monter de niveau`,
       sound: 'Son', music: 'Musique', typing: 'Frappe', typingAria: 'Sons de frappe', dock: 'Style du mode fun', fun: 'Mode fun',
       game: 'Jeu caché', screen: 'Écran du jeu. Déplacement avec les flèches ou la souris, tir avec espace ou un toucher.', cont: 'Continuer : retour en haut',
+      reset: 'Remettre à zéro', resetSure: 'Sûr ? Reclique', resetNote: 'Ton style, le son et la langue restent comme ils sont.', newGame: 'Nouvelle partie !', run: 'BUG RUN', record: 'NOUVEAU RECORD', whoa: 'Hé !',
       hello: 'Salut !', thanks: "Merci d'avoir joué !", round: 'Round 2 !', outfit: 'Nouvelle tenue !', cheat: 'Code de triche !', level: L => `NIVEAU ${L} !`,
     },
   };
@@ -726,6 +751,9 @@
 
   /* ================= Progress panel: level, achievements left, ways to earn XP ================= */
   let panel = null;
+  let resetArmed = 0;
+  // 83 512 ms → 1:23.5
+  const clock = ms => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}.${Math.floor(ms / 100) % 10}`;
   let panelOff = null;
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const ICON_CUP = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3zm0 4H6v1a2 2 0 0 0 1.2 1.8A5 5 0 0 1 7 8zm10 0v1q0 .9-.2 1.8A2 2 0 0 0 18 8V7z"/></svg>';
@@ -735,6 +763,7 @@
     if (id === 'tour') return `${visit.seen.size}/${visit.stages}`;
     if (id === 'clicks') return `${Math.min(visit.clicks, 30)}/30`;
     if (id === 'bugs') return `${bugs.caught().length}/${BUG_SPOTS.length}`;
+    if (id === 'speedrun') { const b = parseInt(store.get(BUG_BEST_KEY) || '0', 10) || 0; return b ? u('best')(clock(b)) : ''; }
     if (id === 'ace') { const hi = parseInt(store.get(HI_KEY) || '0', 10) || 0; return hi ? u('best')(hi) : ''; }
     return '';
   }
@@ -766,18 +795,27 @@
     panel.setAttribute('role', 'dialog');
     panel.setAttribute('aria-modal', 'true');
     panel.setAttribute('aria-labelledby', 'fx-panel-title');
-    panel.innerHTML = `<div class="fx-panel-top"><div class="fx-panel-title" id="fx-panel-title">${u('progress')}</div><button type="button" class="close" aria-label="${u('close')}">×</button></div><div class="fx-panel-body" tabindex="0"></div>`;
+    panel.innerHTML = `<div class="fx-panel-top"><div class="fx-panel-title" id="fx-panel-title">${u('progress')}</div><button type="button" class="close" aria-label="${u('close')}">×</button></div><div class="fx-panel-body" tabindex="0"></div><div class="fx-reset-row"><button type="button" class="fx-reset">${u('reset')}</button><small>${esc(u('resetNote'))}</small></div>`;
     renderPanel();
     document.body.append(panel);
     if (chip) chip.setAttribute('aria-expanded', 'true');
     audio.play('switch');
     const close = panel.querySelector('.close');
     close.addEventListener('click', () => closePanel());
+    // Reset: a first click arms it for three seconds, a second one does it.
+    panel.addEventListener('click', e => {
+      const b = e.target.closest('.fx-reset');
+      if (!b) return;
+      if (performance.now() < resetArmed) { resetArmed = 0; resetProgress(); return; }
+      resetArmed = performance.now() + 3000;
+      b.textContent = u('resetSure');
+      setTimeout(() => { if (b.isConnected && performance.now() >= resetArmed) b.textContent = u('reset'); }, 3050);
+    });
     close.focus();
     const onKey = e => {
       if (e.key === 'Escape') { e.preventDefault(); closePanel(); return; }
       if (e.key === 'Tab') {
-        const f = [close, panel.querySelector('.fx-panel-body')];
+        const f = [close, panel.querySelector('.fx-panel-body'), panel.querySelector('.fx-reset')].filter(Boolean);
         const i = f.indexOf(document.activeElement);
         e.preventDefault();
         f[(i + (e.shiftKey ? f.length - 1 : 1)) % f.length].focus();
@@ -800,6 +838,23 @@
   /* ================= Achievements ================= */
   let toasts = null;
   const unlocked = new Set(store.list(TROPHY_KEY));
+  // Back to level 1: XP, achievements, styles tried, high score and bugs. Settings stay.
+  function resetProgress() {
+    [XP_KEY, TROPHY_KEY, TRIED_KEY, HI_KEY, BUG_KEY, BUG_SAID_KEY, BUG_BEST_KEY].forEach(k => { try { localStorage.removeItem(k); } catch (e) { /* storage blocked */ } });
+    store.set(TRIED_KEY, JSON.stringify([skinNow()]));
+    unlocked.clear();
+    queue.length = 0;
+    xp.total = 0;
+    xp.session.clicks = 0;
+    visit.clicks = 0;
+    xp.render();
+    closePanel();
+    bugs.destroy();
+    bugs.create();
+    audio.play('boot');
+    buddy.react(9, u('newGame'), 2200);
+    setTimeout(() => trophy('start'), 1500);
+  }
   const queue = [];
   let showing = false;
   function trophy(id) {
@@ -896,10 +951,47 @@
   const skinOf = sec => (root.dataset.skin === 'mix' ? (MIX[sec.id] || 'phantom') : root.dataset.skin) || DEFAULT_SKIN;
   const clickKind = el => (el instanceof Element ? getComputedStyle(el).getPropertyValue('--fx-click').trim() : '') || 'pixels';
 
+  /* ================= Winter: snow and a beanie, 1 December to 6 January ================= */
+  // ?winter shows it on any date, ?winter=0 hides it.
+  const winter = () => {
+    const q = new URLSearchParams(location.search);
+    if (q.has('winter')) return q.get('winter') !== '0';
+    const d = new Date(), m = d.getMonth(), day = d.getDate();
+    return m === 11 || (m === 0 && day <= 6);
+  };
+  // 32 wide, drawn over the top of the buddy's head: k outline, r red, d shade, w white, g grey.
+  const HAT = (() => {
+    const rows = ['.............kkkkkk.............', '............kwwwwwgk............', '............kwwwwggk............', '..........kkkkggggkkkk..........'];
+    [12, 15, 17, 19, 21, 22].forEach(w => {
+      const l = 16 - Math.ceil(w / 2);
+      rows.push('.'.repeat(l - 1) + 'k' + 'r'.repeat(w - 2) + 'dd' + 'k' + '.'.repeat(32 - l - w - 1));
+    });
+    rows.push('...' + 'k'.repeat(26) + '...', '...k' + 'w'.repeat(24) + 'k...', '...k' + 'wgww'.repeat(6) + 'k...', '...' + 'k'.repeat(26) + '...');
+    const fill = { k: '#1a1216', r: '#e0283c', d: '#a3162a', w: '#f6f6f6', g: '#cfcfd8' };
+    let out = '';
+    rows.forEach((row, y) => {
+      for (let x = 0; x < row.length;) {
+        const c = row[x];
+        let w = 1;
+        while (row[x + w] === c) w++;
+        if (c !== '.') out += `<rect x="${x}" y="${y}" width="${w}" height="1" fill="${fill[c]}"/>`;
+        x += w;
+      }
+    });
+    return `<svg class="fx-hat" viewBox="0 0 32 14" shape-rendering="crispEdges" aria-hidden="true">${out}</svg>`;
+  })();
+  function snowOn(add) {
+    if (!motion()) return;
+    const n = lite || innerWidth < 760 ? 18 : 36;
+    add(hidden('div', 'fx-snow', Array.from({ length: n }, () =>
+      `<i class="${pick(['a', 'b'])}" style="--x:${rand(0, 100).toFixed(1)}vw;--z:${pick([4, 5, 5, 6, 7])}px;--t:${rand(9, 18).toFixed(1)}s;--d:-${rand(0, 18).toFixed(1)}s;--o:${rand(.55, 1).toFixed(2)}"></i>`).join('')), document.body);
+  }
+
   /* ================= The pixel buddy ================= */
   const spr = (c, r, extra = '') => `<span class="fx-spr${extra}" style="--c:${c};--r:${r}"></span>`;
   const buddy = {
     el: null, s: null, say: null, x: -90, timer: 0, talkTimer: 0, idleTimer: 0, until: 0, asleep: false, dir: 0, walkEnd: 0,
+    arrived: false, lastComment: 0, said: new Set(), waiting: new Set(), held: false, flying: false, noClick: false, raf: 0, fx: 0, fy: 0,
     row() { return OUTFIT[skinNow()] || 0; },
     frame(c, walk = false, c0 = 0) {
       if (!this.s) return;
@@ -910,19 +1002,24 @@
     },
     create() {
       if (this.el || !isOn()) return;
-      this.el = hidden('div', 'fx-buddy', `<div class="hop">${spr(8, 0)}<span class="say"></span></div>`);
+      this.el = hidden('div', 'fx-buddy', `<div class="hop">${spr(8, 0)}${winter() ? HAT : ''}<span class="say"></span></div>`);
       this.s = this.el.querySelector('.fx-spr');
       this.say = this.el.querySelector('.say');
       // The poof class must not outlive its animation, or it keeps the walk cycle from playing.
       this.s.addEventListener('animationend', e => { if (e.animationName === 'fx-poof' && this.el) this.el.classList.remove('poof'); });
+      this.el.addEventListener('pointerdown', e => this.grab(e));
       this.el.addEventListener('click', e => {
         e.stopPropagation();
+        if (this.noClick) return; // the end of a throw, not a click
         this.wake();
         this.jump();
         this.talk(pick(lineList()), 2200);
         if (xp.session.clicks < 40) xp.add(2);
       });
       document.body.append(this.el);
+      this.arrived = false;
+      this.said = new Set();
+      this.waiting = new Set();
       this.x = -90;
       this.el.style.setProperty('--x', `${this.x}px`);
       this.frame(8);
@@ -930,15 +1027,17 @@
       const arrive = () => {
         if (!this.el) return;
         if (document.querySelector('.od-boot')) { setTimeout(arrive, 300); return; }
-        this.walkTo(rand(40, Math.min(innerWidth * .4, 420)), () => this.talk(u('hello'), 1800));
+        this.walkTo(rand(40, Math.min(innerWidth * .4, 420)), () => { this.arrived = true; this.talk(u('hello'), 1800); });
       };
       if (motion()) setTimeout(arrive, 900);
-      else { this.x = 16; this.el.style.setProperty('--x', '16px'); }
+      else { this.x = 16; this.el.style.setProperty('--x', '16px'); this.arrived = true; }
       this.schedule();
       this.poke();
     },
     destroy() {
       clearTimeout(this.timer); clearTimeout(this.talkTimer); clearTimeout(this.idleTimer);
+      cancelAnimationFrame(this.raf);
+      this.held = this.flying = false;
       if (this.el) this.el.remove();
       this.el = this.s = this.say = null;
     },
@@ -956,7 +1055,7 @@
       }, rand(6000, 12000));
     },
     walkTo(x, then) {
-      if (!this.el || !motion()) return;
+      if (!this.el || !motion() || this.held || this.flying) return;
       const dist = Math.abs(x - this.x);
       if (dist < 4) { if (then) then(); return; }
       const t = dist / 75;
@@ -980,12 +1079,14 @@
     talk(text, ms = 2000) {
       if (!this.el || !text) return;
       this.say.textContent = text;
+      this.say.classList.toggle('wrap', text.length > 28);
       this.el.classList.add('talk');
       clearTimeout(this.talkTimer);
       this.talkTimer = setTimeout(() => this.el && this.el.classList.remove('talk'), ms);
     },
     react(col, text, ms = 1800) {
       if (!this.el) return;
+      if (this.held || this.flying) { if (text) this.talk(text, ms); return; }
       this.wake();
       clearTimeout(this.walkDone);
       this.walkEnd = 0;
@@ -1011,7 +1112,7 @@
       this.idleTimer = setTimeout(() => this.sleep(), 25000);
     },
     sleep() {
-      if (!this.el || game) return;
+      if (!this.el || game || this.held || this.flying) return;
       this.asleep = true;
       this.frame(11);
       this.say.textContent = 'Zzz…';
@@ -1022,6 +1123,121 @@
       this.asleep = false;
       this.el.classList.remove('sleep', 'talk');
       this.frame(8);
+    },
+    // A word on each project, once per visit, when the visitor stops on it (not while scrolling
+    // past, and not before he has walked in).
+    comment(id, sec) {
+      if (!COMMENTS[id] || this.said.has(id) || this.waiting.has(id)) return;
+      this.waiting.add(id);
+      const t0 = performance.now();
+      const check = () => {
+        if (!this.el) { this.waiting.delete(id); return; }
+        const r = sec.getBoundingClientRect(), now = performance.now();
+        const gone = r.bottom < 0 || r.top > innerHeight || now - t0 > 15000;
+        const settled = r.top < innerHeight * .55 && r.bottom > innerHeight * .45;
+        if (gone) { this.waiting.delete(id); return; }
+        if (settled && this.arrived && !game && !this.asleep && !this.held && !this.flying && now - this.lastComment > 5000 && now >= this.until) {
+          this.waiting.delete(id);
+          this.said.add(id);
+          this.lastComment = now;
+          const [pose, en, fr] = COMMENTS[id];
+          this.react(pose, isFr() ? fr : en, 3400);
+          return;
+        }
+        setTimeout(check, 500);
+      };
+      setTimeout(check, 700);
+    },
+    // Grab him and throw him: gravity, bounces off the edges of the window, then he gets up grumbling.
+    grab(e) {
+      if (!motion() || e.button > 0 || game || this.flying) return;
+      const el = this.el, r = el.getBoundingClientRect();
+      const ox = e.clientX - r.left, oy = e.clientY - r.top, sx = e.clientX, sy = e.clientY;
+      const trail = [];
+      let dragging = false;
+      const move = ev => {
+        if (!dragging) {
+          if (Math.hypot(ev.clientX - sx, ev.clientY - sy) < 6) return;
+          dragging = true;
+          this.hold();
+        }
+        this.put(ev.clientX - ox, ev.clientY - oy - this.ground());
+        trail.push([ev.clientX, ev.clientY, performance.now()]);
+        while (trail.length > 2 && trail[trail.length - 1][2] - trail[0][2] > 90) trail.shift();
+      };
+      const up = () => {
+        removeEventListener('pointermove', move);
+        removeEventListener('pointerup', up);
+        removeEventListener('pointercancel', up);
+        if (!dragging || !this.el) return;
+        this.noClick = true;
+        setTimeout(() => { this.noClick = false; }, 0);
+        const a = trail[0], b = trail[trail.length - 1];
+        const dt = a && b && b[2] > a[2] ? (b[2] - a[2]) / 1000 : 0;
+        this.fly(dt ? (b[0] - a[0]) / dt : 0, dt ? (b[1] - a[1]) / dt : 0);
+      };
+      addEventListener('pointermove', move);
+      addEventListener('pointerup', up);
+      addEventListener('pointercancel', up);
+    },
+    // Top of his box when he stands on his line.
+    ground() { return innerHeight - parseFloat(getComputedStyle(this.el).bottom) - this.el.offsetHeight; },
+    put(x, y) {
+      if (!this.el) return;
+      this.fx = Math.max(0, Math.min(innerWidth - this.el.offsetWidth, x));
+      this.fy = Math.min(0, Math.max(-this.ground(), y));
+      this.el.style.setProperty('--x', `${this.fx.toFixed(1)}px`);
+      this.el.style.setProperty('--y', `${this.fy.toFixed(1)}px`);
+    },
+    hold() {
+      this.wake();
+      clearTimeout(this.walkDone);
+      this.walkEnd = 0;
+      this.held = true;
+      this.until = Infinity;
+      const r = this.el.getBoundingClientRect();
+      this.fx = r.left;
+      this.fy = r.top - this.ground();
+      this.el.classList.add('held');
+      this.frame(9);
+      this.talk(u('whoa'), 900);
+    },
+    fly(vx, vy) {
+      this.held = false;
+      this.flying = true;
+      const lim = v => Math.max(-2800, Math.min(2800, v));
+      vx = lim(vx); vy = lim(vy);
+      const thrown = Math.hypot(vx, vy) > 600;
+      let last = performance.now();
+      const step = now => {
+        if (!this.el) return;
+        const dt = Math.min(.033, (now - last) / 1000);
+        last = now;
+        const maxX = innerWidth - this.el.offsetWidth, top = -this.ground();
+        vy += 2600 * dt;
+        let x = this.fx + vx * dt, y = this.fy + vy * dt;
+        if (x < 0 || x > maxX) { x = x < 0 ? 0 : maxX; vx = -vx * .6; }
+        if (y < top) { y = top; vy = -vy * .5; }
+        if (y > 0) {
+          y = 0;
+          if (Math.abs(vy) > 280) { vy = -vy * .42; vx *= .8; audio.play('jump'); } else { vy = 0; vx *= .86; }
+        }
+        this.put(x, y);
+        if (this.fy === 0 && vy === 0 && Math.abs(vx) < 14) { this.land(thrown); return; }
+        this.raf = requestAnimationFrame(step);
+      };
+      this.raf = requestAnimationFrame(step);
+    },
+    land(thrown) {
+      this.flying = false;
+      this.el.classList.remove('held');
+      this.x = this.fx;
+      this.el.style.setProperty('--t', '0s');
+      this.el.classList.toggle('r', this.x > innerWidth / 2);
+      this.until = 0;
+      const o = pick(OUCH);
+      this.react(11, o[isFr() ? 1 : 0], 2200);
+      if (thrown) setTimeout(() => trophy('yeet'), 2300);
     },
     near(x, y) {
       if (!this.el || this.el.hidden) return false;
@@ -1084,10 +1300,14 @@
   }
   const bugs = {
     items: [], ro: null, io: null, raf: 0, onResize: null,
+    // The speedrun: only from a fresh start (no bug caught yet), timed from the first catch.
+    fresh: false, t0: 0, chip: null, tick: 0,
     caught() { return store.list(BUG_KEY).filter(id => BUG_SPOTS.some(([s]) => s === id)); },
     create() {
       if (this.items.length || !isOn()) return;
       const caught = new Set(this.caught());
+      this.fresh = caught.size === 0;
+      this.t0 = 0;
       this.ro = new ResizeObserver(() => this.place());
       this.io = new IntersectionObserver(es => es.forEach(e => e.target.classList.toggle('live', e.isIntersecting)), { rootMargin: '120px' });
       BUG_SPOTS.forEach(spot => {
@@ -1118,6 +1338,9 @@
       this.items.forEach(({ el }) => el.remove());
       this.items = [];
       this.ro = this.io = this.onResize = null;
+      clearInterval(this.tick);
+      if (this.chip) this.chip.remove();
+      this.chip = null;
     },
     // Puts each bug against its edge. Layout boxes, not what is on screen: windows that slide
     // or tilt in on scroll would otherwise drag the bug off with their first frame.
@@ -1165,8 +1388,13 @@
       caught.add(id);
       store.set(BUG_KEY, JSON.stringify([...caught]));
       const n = caught.size, total = BUG_SPOTS.length;
+      const now = performance.now();
+      if (this.fresh && !this.t0) this.runStart(now);
       let text;
-      if (n >= total) text = isFr() ? FR.bugLast : BUG_LAST;
+      if (n >= total) {
+        text = isFr() ? FR.bugLast : BUG_LAST;
+        if (this.t0) text += ` (${clock(now - this.t0)})`;
+      }
       else {
         const all = bugLines().map((_, i) => i);
         let said = store.list(BUG_SAID_KEY).filter(i => i < all.length);
@@ -1184,7 +1412,35 @@
       xp.add(15);
       trophy('bug');
       if (n >= total) trophy('bugs');
+      if (this.t0) this.runStep(n, total, now);
       if (panel) renderPanel();
+    },
+    // A small timer in the corner while a run is on.
+    runStart(now) {
+      this.t0 = now;
+      this.chip = hidden('div', 'fx-run', '<b></b><span></span>');
+      document.body.append(this.chip);
+      const draw = () => { if (this.chip && !this.chip.classList.contains('done')) this.chip.querySelector('b').textContent = `${u('run')} ${clock(performance.now() - this.t0)}`; };
+      draw();
+      this.tick = setInterval(draw, 100);
+    },
+    runStep(n, total, now) {
+      if (!this.chip) return;
+      this.chip.querySelector('span').textContent = `${n}/${total}`;
+      if (n < total) return;
+      clearInterval(this.tick);
+      const ms = now - this.t0;
+      const best = parseInt(store.get(BUG_BEST_KEY) || '0', 10) || 0;
+      const record = !best || ms < best;
+      if (record) store.set(BUG_BEST_KEY, String(Math.round(ms)));
+      this.chip.classList.add('done');
+      this.chip.querySelector('b').textContent = `${record ? u('record') : u('run')} ${clock(ms)}`;
+      if (ms < 180000) setTimeout(() => trophy('speedrun'), 900);
+      this.t0 = 0;
+      this.fresh = false;
+      const chip = this.chip;
+      this.chip = null;
+      setTimeout(() => chip.remove(), 7000);
     },
     // The speech bubble lives in the page (not in the bug, which may be turned on its side).
     say(el, tag, text) {
@@ -1696,6 +1952,7 @@
     visit.stages = stages.length;
     const io = new IntersectionObserver(entries => entries.forEach(e => {
       if (!e.isIntersecting) return;
+      buddy.comment(e.target.id, e.target);
       if (!seen.has(e.target.id)) {
         seen.add(e.target.id);
         xp.add(15);
@@ -1878,6 +2135,7 @@
     later(() => buddy.destroy());
     bugs.create();
     later(() => bugs.destroy());
+    if (winter()) snowOn(add);
     later(() => { if (game) game.close(); });
     music.sync();
     later(() => { music.stop(); audio.keepAwake(false); });

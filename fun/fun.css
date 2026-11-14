@@ -1512,7 +1512,10 @@ html[data-skin="overdrive"] .head::before { border-radius: 4px; background: var(
 .fx-spr.walk.l { animation-name: fx-walk-l; }
 @keyframes fx-walk-r { from { background-position-x: 0%; } to { background-position-x: 36.3636%; } }
 @keyframes fx-walk-l { from { background-position-x: 36.3636%; } to { background-position-x: 72.7273%; } }
-.fx-buddy { position: fixed; z-index: 990; left: 0; bottom: 70px; translate: var(--x, -90px) 0; transition: translate var(--t, 0s) linear; cursor: pointer; }
+.fx-buddy { position: fixed; z-index: 990; left: 0; bottom: 70px; translate: var(--x, -90px) var(--y, 0px); transition: translate var(--t, 0s) linear; cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; }
+/* Held or flying: no easing between frames, and no shadow on the floor. */
+.fx-buddy.held { transition: none; cursor: grabbing; }
+.fx-buddy.held .hop::after { opacity: 0; }
 .fx-buddy[hidden] { display: none; }
 .fx-buddy .hop { position: relative; }
 .fx-buddy .hop::after { content: ""; position: absolute; left: 22%; right: 22%; bottom: -3px; height: 7px; border-radius: 50%; background: rgb(0 0 0 / .35); }
@@ -1532,6 +1535,7 @@ html[data-skin="overdrive"] .head::before { border-radius: 4px; background: var(
 /* Near the right edge the bubble opens to the left. */
 .fx-buddy.r .say { left: auto; right: 0; }
 .fx-buddy.r .say::after { left: auto; right: calc(16px * var(--s) - 5px); }
+.fx-buddy .say.wrap { white-space: normal; width: max-content; max-width: min(250px, 70vw); line-height: 1.6; }
 .fx-buddy.talk .say { opacity: 1; translate: 0 0; }
 .fx-buddy.sleep .say { opacity: 1; translate: 0 0; animation: fx-zzz 1.6s ease-in-out infinite; }
 @keyframes fx-zzz { 50% { translate: 0 -6px; } }
@@ -1539,6 +1543,31 @@ html[data-skin="overdrive"] .head::before { border-radius: 4px; background: var(
 .fx-peek .fx-spr { translate: 0 105%; transition: translate .4s cubic-bezier(.2, 1.3, .4, 1); }
 .fx-peek.up .fx-spr { translate: 0 42%; }
 @media (max-width: 759px) { .fx-buddy { --s: 1.25; bottom: 64px; } .fx-peek { display: none; } }
+
+/* ---------- Progress panel: reset ---------- */
+.fx-reset-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; padding: 12px 18px 14px; border-top: 1px solid rgb(255 255 255 / .12); }
+.fx-reset { padding: 8px 12px; font: 600 11px/1 "FX Mono", monospace; letter-spacing: .12em; text-transform: uppercase; color: #ff6b8a; background: transparent; border: 1px solid currentColor; border-radius: 8px; cursor: pointer; }
+.fx-reset:hover { color: #0a0a0b; background: #ff6b8a; border-color: #ff6b8a; }
+.fx-reset-row small { font: 12px/1.4 "FX Geist", sans-serif; color: rgb(255 255 255 / .55); }
+/* ---------- Bug speedrun timer ---------- */
+.fx-run { position: fixed; z-index: 995; top: 76px; right: 16px; display: flex; gap: 10px; align-items: center; padding: 8px 10px; font: 10px/1 "FX Press", monospace; color: #b6ff3b; background: #0a0a0b; border: 2px solid #b6ff3b; box-shadow: 3px 3px 0 #6b2bff; pointer-events: none; }
+.fx-run span { color: #fff; }
+.fx-run.done { color: #0a0a0b; background: #b6ff3b; border-color: #0a0a0b; }
+.fx-run.done span { color: #0a0a0b; }
+@media (max-width: 759px) { .fx-run { top: 66px; right: 10px; } }
+
+/* ---------- Winter (1 December to 6 January): snow and a beanie on the buddy ---------- */
+.fx-hat { position: absolute; left: 0; top: calc(-3px * var(--s)); width: calc(32px * var(--s)); height: calc(14px * var(--s)); pointer-events: none; }
+/* Walking frames sit one pixel higher than the standing ones. */
+.fx-buddy:has(.fx-spr.walk) .fx-hat { top: calc(-4px * var(--s)); }
+.fx-buddy:has(.fx-hat) .say { bottom: calc(100% + 10px + 4px * var(--s)); }
+.fx-snow { position: fixed; inset: 0; z-index: 980; overflow: hidden; pointer-events: none; }
+.fx-snow i { position: absolute; left: var(--x); top: -12px; width: var(--z); height: var(--z); background: #fff; opacity: var(--o); box-shadow: 0 0 0 1px rgb(60 40 140 / .4), 1px 1px 0 1px rgb(60 40 140 / .18); animation: fx-snow-a var(--t) linear var(--d) infinite; }
+.fx-snow i.b { animation-name: fx-snow-b; }
+@keyframes fx-snow-a { 0% { translate: 0 0; } 25% { translate: 14px 27vh; } 50% { translate: 0 55vh; } 75% { translate: -14px 82vh; } 100% { translate: 0 calc(100vh + 24px); } }
+@keyframes fx-snow-b { 0% { translate: 0 0; } 25% { translate: -14px 27vh; } 50% { translate: 0 55vh; } 75% { translate: 14px 82vh; } 100% { translate: 0 calc(100vh + 24px); } }
+html.fx-lite .fx-snow i:nth-child(2n) { display: none; }
+@media (prefers-reduced-motion: reduce) { .fx-snow { display: none; } }
 
 /* ---------- Hidden bugs: they peek out from an edge, click one to catch it ---------- */
 /* The box sits against the edge; the bug rises from the box's bottom side, which the rotation turns toward the edge. */
