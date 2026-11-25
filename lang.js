@@ -80,7 +80,13 @@
     "t72": "Une seule app web en TypeScript : elle s'installe depuis Safari sur le Mac et les téléphones, et devient une app webOS sur la TV, où chaque appui sur la télécommande répond instantanément. Jellyfin reste le moteur ; Lantern ne remplace que l'interface.",
     "t73": "Les films d'une collection deviennent des sagas, les recommandations viennent d'un petit moteur qui tourne dans l'app et apprend de ce que je regarde, et le lecteur choisit seul entre lecture directe et flux du serveur, avec saut du générique, aperçus sur la barre de lecture et épisode suivant.",
     "t74": "Huit styles, chacun avec ses animations, ses sons d'interface et sa musique d'ambiance générative.",
-    "t75": "Référencé dans Awesome MLX"
+    "t75": "Référencé dans Awesome MLX",
+    "t76": "Recherche de comptes sourcée",
+    "t77": "10 · Recherche commerciale",
+    "t78": "La recherche de comptes pour les commerciaux : une fiche sourcée et datée pour chaque entreprise cible.",
+    "t79": "Donnez-lui une entreprise et un fichier qui décrit ce que vous vendez. Il lit des sources publiques (le site de l'entreprise, ses offres d'emploi, la presse, Wikidata, les dépôts à la SEC) et rédige une fiche : à quel point le compte correspond et pourquoi, les signaux d'achat récents, les postes à approcher et trois accroches qui citent chacune un signal.",
+    "t80": "Le modèle n'a jamais le dernier mot sur un fait. Chaque affirmation doit citer sa source, et le code supprime celles dont la citation ne s'y retrouve pas mot pour mot ; le score et les dates sont eux aussi calculés par le code. Il tourne avec un modèle local ou une API, et exporte un CSV pour HubSpot ou Salesforce.",
+    "t81": "Zéro dépendance, et il étudie des entreprises, pas des personnes : ni noms, ni adresses mail, ni numéros de téléphone."
   };
   const FR_ATTR = {
     "a0": "Ailleurs",
@@ -94,7 +100,8 @@
     "a8": "Rapport d'analyse de trackmend sur une bibliothèque d'exemple de douze fichiers, avant et après les commandes de tags, de paroles et de dédoublonnage",
     "a9": "Terminal : des documents fictifs extraits en texte, puis le texte OCR d'une quittance de loyer scannée",
     "a10": "La modification d'une ligne dans Formula/w/whisper.cpp.rb",
-    "a11": "La page d'accueil de Lantern dans le style P5 : une grande bannière pour une saga, puis des rangées de titres"
+    "a11": "La page d'accueil de Lantern dans le style P5 : une grande bannière pour une saga, puis des rangées de titres",
+    "a12": "Une fiche foothold sur Adyen dans la page web locale : un score de 50 sur 100, puis chaque critère avec son verdict et un lien vers la preuve"
   };
   const TITLE_FR = "Bouliw · Des logiciels qui travaillent là où sont vos fichiers";
   const root = document.documentElement;
