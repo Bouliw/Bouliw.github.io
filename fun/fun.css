@@ -754,6 +754,9 @@ html.fx-anim :is([data-skin="alert"] :is(.top, .hero, .project, .upstream, foote
 @media (prefers-color-scheme: light) { :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .label::before { color: var(--x-a); } }
 :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) h2 { font: 400 clamp(1.25rem, 2.6vw, 2rem)/1.35 "FX Press", monospace; letter-spacing: 0; text-shadow: .12em .12em 0 var(--x-b); }
 :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .head img { image-rendering: pixelated; filter: drop-shadow(4px 4px 0 var(--ink)); }
+/* The longest name does not fit the card in the 8-bit font: it wraps after a hyphen, a little smaller. */
+html[data-skin="pixel"] #doc-indexer .head { width: fit-content; max-width: 100%; }
+html[data-skin="pixel"] #doc-indexer h2 { font-size: clamp(1.25rem, 2vw, 1.6rem); }
 :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .tagline { font-weight: 600; font-size: 1.28rem; }
 :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .copy p { font-size: 1.05rem; }
 :is([data-skin="pixel"], [data-skin="mix"] :is([id="boulito"], [id="upstream"], footer)) .copy .fact { border: 0; padding: 12px 14px 12px 40px; position: relative; background: color-mix(in oklab, var(--x-b) 22%, var(--surface)); box-shadow: inset 0 0 0 3px var(--ink); font: 15px/1.5 "FX Pixelify", sans-serif; color: var(--ink); }
@@ -1550,6 +1553,20 @@ html[data-skin="overdrive"] .head::before { border-radius: 4px; background: var(
 .fx-run.done { color: #0a0a0b; background: #b6ff3b; border-color: #0a0a0b; }
 .fx-run.done span { color: #0a0a0b; }
 @media (max-width: 759px) { .fx-run { top: 66px; right: 10px; } }
+.fx-run em { font-style: normal; }
+.fx-run svg { display: none; }
+/* In the dock, next to the level: no frame, a bug and the clock; the label comes back, lit up, when the run is over.
+   The STYLE label and a little button padding make room for it. */
+.fx-dock .fx-run { position: static; z-index: auto; flex: none; gap: 7px; min-height: 28px; padding: 7px 8px; font-size: 8px; white-space: nowrap; color: #b6ff3b; background: none; border: 0; border-radius: 9px; box-shadow: none; }
+.fx-dock .fx-run svg { display: block; width: 14px; height: 14px; flex: none; color: #b6ff3b; image-rendering: pixelated; }
+.fx-dock .fx-run .fb { opacity: 0; }
+.fx-dock .fx-run:not(.done) em { display: none; }
+.fx-dock .fx-run span { color: #a1a1aa; }
+.fx-dock .fx-run.done { color: #0a0a0b; background: #b6ff3b; }
+.fx-dock .fx-run.done span { color: #0a0a0b; }
+.fx-dock .fx-run.done svg { display: none; }
+.fx-dock:has(.fx-run) .fx-dock-label { display: none; }
+@media (min-width: 760px) { .fx-dock:has(.fx-run) button { padding-inline: 11px; } }
 
 /* ---------- Winter (1 December to 6 January): snow and a beanie on the buddy ---------- */
 .fx-hat { position: absolute; left: 0; top: calc(-3px * var(--s)); width: calc(32px * var(--s)); height: calc(14px * var(--s)); pointer-events: none; }

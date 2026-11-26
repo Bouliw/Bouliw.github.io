@@ -824,7 +824,8 @@
   let panel = null;
   let resetArmed = 0;
   // 83 512 ms → 1:23.5
-  const clock = ms => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}.${Math.floor(ms / 100) % 10}`;
+  // whole: seconds only, for a clock that is still running (tenths flickering ten times a second draw the eye).
+  const clock = (ms, whole) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}${whole ? '' : `.${Math.floor(ms / 100) % 10}`}`;
   let panelOff = null;
   const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const ICON_CUP = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 3h10v2h3v3a4 4 0 0 1-4 4h-.3A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.3 12H8a4 4 0 0 1-4-4V5h3zm0 4H6v1a2 2 0 0 0 1.2 1.8A5 5 0 0 1 7 8zm10 0v1q0 .9-.2 1.8A2 2 0 0 0 18 8V7z"/></svg>';
@@ -1735,13 +1736,23 @@
       if (this.timed) this.runStep(n, total, ms);
       if (panel) renderPanel();
     },
-    // A small timer in the corner while a run is on.
+    // A small timer while a run is on. It sits in the dock, right after the level, and moves into a new dock if the dock is rebuilt
+    // (language switch). Without a dock it falls back to the corner of the page.
+    placeChip() {
+      const xp = dock && dock.querySelector('.fx-xp');
+      if (xp) { if (this.chip.previousElementSibling !== xp) xp.after(this.chip); } else if (!this.chip.isConnected) document.body.append(this.chip);
+    },
     runStart() {
-      this.chip = hidden('div', 'fx-run', `<b></b><span></span>${DARE ? `<i>${u('dareChip')(clock(DARE))}</i>` : ''}`);
-      document.body.append(this.chip);
-      const draw = () => { if (this.chip && !this.chip.classList.contains('done')) this.chip.querySelector('b').textContent = `${u('run')} ${clock(this.elapsed())}`; };
+      this.chip = hidden('div', 'fx-run', `${bugMarkup()}<em></em><b></b><span></span>${DARE ? `<i>${u('dareChip')(clock(DARE))}</i>` : ''}`);
+      this.chip.querySelector('em').textContent = u('run');
+      this.placeChip();
+      const draw = () => {
+        if (!this.chip || this.chip.classList.contains('done')) return;
+        this.placeChip();
+        this.chip.querySelector('b').textContent = clock(this.elapsed(), true);
+      };
       draw();
-      this.tick = setInterval(draw, 100);
+      this.tick = setInterval(draw, 250);
     },
     runStep(n, total, ms) {
       if (!this.chip) return;
@@ -1755,7 +1766,8 @@
       const record = !best || ms < best;
       if (record) store.set(BUG_BEST_KEY, String(Math.round(ms)));
       this.chip.classList.add('done');
-      this.chip.querySelector('b').textContent = `${record ? u('record') : u('run')} ${clock(ms)}`;
+      this.chip.querySelector('em').textContent = record ? u('record') : u('run');
+      this.chip.querySelector('b').textContent = clock(ms);
       if (ms < 180000) setTimeout(() => trophy('speedrun'), 900);
       if (DARE) {
         const won = ms < DARE;
