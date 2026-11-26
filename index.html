@@ -247,6 +247,10 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
       <li style="--accent:#a8a49a"><a href="#upstream"><span class="n">+</span><span class="t">Homebrew</span><span class="d" data-i18n="t11">Upstream fix, merged</span></a></li>
     </ol>
   </nav>
+  <script>
+    /* Each entry gets its rank, so the staircase of the fun styles keeps going whatever the number of projects. */
+    document.querySelectorAll('.index li').forEach((li, i) => li.style.setProperty('--i', i));
+  </script>
 </section>
 
 <main id="projects">
@@ -439,7 +443,7 @@ footer a:hover { text-decoration: underline; text-underline-offset: 4px; }
     <p class="links"><a class="more" href="https://github.com/Bouliw/foothold" data-i18n="t13">Source on GitHub</a></p>
   </div>
   <figure class="stage">
-    <img class="shot" src="assets/foothold-brief.webp" width="1100" height="700" loading="lazy" decoding="async" alt="A foothold brief for Adyen in the local web page: a fit score of 50 out of 100, then each criterion with its verdict and a link to the evidence" data-i18n-alt="a12">
+    <img class="shot" src="assets/foothold-fit.webp" width="1520" height="968" loading="lazy" decoding="async" alt="A foothold brief for Adyen in the local web page: a fit score of 50 out of 100, then each criterion with its verdict and a link to the evidence" data-i18n-alt="a12">
   </figure>
 </article>
 
